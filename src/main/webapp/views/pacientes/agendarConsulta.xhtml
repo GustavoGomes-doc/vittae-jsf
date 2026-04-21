@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+    <ui:composition template="/WEB-INF/template/Header.xhtml">
+
+        <ui:define name="corpo">
+            
+            <h:form id="formAgendamento">
+                
+                <section id="agendar" class="content-section active">
+                    <div class="appointment-container">
+                        <div class="appointment-header">
+                            <h2>Agendamento de Consulta</h2>
+                        </div>
+
+                        <div class="progress-wrapper">
+                            <div class="progress-steps">
+                                <div class="step-item">
+                                    <div class="step-circle active" id="circle1"><span>1</span></div>
+                                    <span class="step-label">Consulta</span>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-circle" id="circle2"><span>2</span></div>
+                                    <span class="step-label">Médico</span>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-circle" id="circle3"><span>3</span></div>
+                                    <span class="step-label">Dados</span>
+                                </div>
+                            </div>
+                            <div class="progress-line">
+                                <div class="progress-fill" id="progressBar"></div>
+                            </div>
+                        </div> <br/>
+
+                        <div class="form-step active" id="step1">
+                            <h3>Dados da Consulta</h3>
+                            <div class="form-group">
+                                <label>Especialidade da consulta</label>
+                                <h:selectOneMenu id="especialidadeType" value="#{agendamentoBean.especialidade}" styleClass="form-control">
+                                    <f:selectItem itemValue="" itemLabel="Selecione..." />
+                                    <f:selectItem itemValue="cardiologia" itemLabel="Cardiologia" />
+                                    <f:selectItem itemValue="neurologia" itemLabel="Neurologia" />
+                                    <f:selectItem itemValue="alergologia" itemLabel="Alergologia e Imunologia" />
+                                    <f:selectItem itemValue="urologia" itemLabel="Urologia" />
+                                    <f:selectItem itemValue="ginecologia" itemLabel="Ginecologia" />
+                                    <f:selectItem itemValue="radiologia" itemLabel="Radiologia" />
+                                </h:selectOneMenu>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Consulta</label>
+                                <h:selectOneMenu id="consultaType" value="#{agendamentoBean.tipoConsulta}" styleClass="form-control">
+                                    <f:selectItem itemValue="" itemLabel="Selecione..." />
+                                    <f:selectItem itemValue="rotina" itemLabel="Consulta de Rotina" />
+                                    <f:selectItem itemValue="retorno" itemLabel="Retorno" />
+                                    <f:selectItem itemValue="urgencia" itemLabel="Urgência" />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Data</label>
+                                    <h:inputText id="consultaDate" value="#{agendamentoBean.dataConsulta}" styleClass="form-control" p:type="date" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Horário</label>
+                                    <h:inputText id="consultaTime" value="#{agendamentoBean.horaConsulta}" styleClass="form-control" p:type="time" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-step" id="step2">
+                            <div class="step-header-row">
+                                <h3>Selecione o Médico</h3>
+                                <input type="text" id="searchInput" placeholder="Buscar..." class="search-input" />
+                            </div>
+                            
+                            <h:inputHidden id="medicoSelecionadoId" value="#{agendamentoBean.medicoId}" />
+
+                            <div class="doctors-list" id="doctorsList">
+                                <ui:repeat value="#{agendamentoBean.listaMedicos}" var="medico">
+                                    <div class="doctor-card" onclick="selecionarMedico(this, '#{medico.id}')" data-nome="#{medico.nome}">
+                                        <div class="doctor-header">
+                                            <div class="doctor-avatar">MD</div>
+                                            <div class="doctor-info">
+                                                <h4>#{medico.nome}</h4>
+                                                <p class="doctor-specialty">#{medico.especialidade}</p>
+                                            </div>
+                                        </div>
+                                        <div class="doctor-details">
+                                            <span>📍 #{medico.localizacao}</span>
+                                            <span>⭐ 5.0</span>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </div>
+
+                        <div class="form-step" id="step3">
+                            <h3>Seus Dados</h3>
+                            <div class="form-group">
+                                <label>Nome Completo</label>
+                                <h:inputText id="patientName" value="#{agendamentoBean.paciente.nome}" styleClass="form-control" p:placeholder="Digite seu nome" />
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>CPF</label>
+                                    <h:inputText id="patientCPF" value="#{agendamentoBean.paciente.cpf}" styleClass="form-control mask-cpf" p:placeholder="000.000.000-00" p:maxlength="14" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefone</label>
+                                    <h:inputText id="patientPhone" value="#{agendamentoBean.paciente.telefone}" styleClass="form-control mask-phone" p:placeholder="(00) 00000-0000" p:maxlength="15" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Data de Nascimento</label>
+                                    <h:inputText id="patientBirthDate" value="#{agendamentoBean.paciente.dataNascimento}" styleClass="form-control mask-date" p:placeholder="00/00/0000" p:maxlength="10" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Sexo Biológico</label>
+                                    <h:selectOneMenu id="patientSex" value="#{agendamentoBean.paciente.sexo}" styleClass="form-control">
+                                        <f:selectItem itemValue="" itemLabel="Selecione..." />
+                                        <f:selectItem itemValue="masculino" itemLabel="Masculino" />
+                                        <f:selectItem itemValue="feminino" itemLabel="Feminino" />
+                                    </h:selectOneMenu>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Observações (Opcional)</label>
+                                <h:inputTextarea id="observations" value="#{agendamentoBean.observacoes}" styleClass="form-control" rows="3" p:placeholder="Alguma observação?" />
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="prevBtn" disabled="disabled">← Voltar</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">Próximo →</button>
+                            
+                            <h:commandButton id="btnSubmeterJSF" value="Prosseguir ✓" action="#{agendamentoBean.salvarAgendamento}" styleClass="btn btn-success" style="display: none;" />
+                            
+                            <button type="button" class="btn btn-success" id="submitBtnVisual" style="display: none;">Prosseguir ✓</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="historico" class="content-section active"></section>
+
+            </h:form>
+
+            <h:outputScript library="js" name="Paciente.js" />
+            <h:outputScript library="js" name="AgendarConsulta.js" />
+
+        </ui:define>
+    </ui:composition>
+</html>

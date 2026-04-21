@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="vittaePU"
+		transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<class>com.vittae.model.Medico</class>
+		<class>com.vittae.model.Usuario</class>
+		<class>com.vittae.model.Especialidade</class>
+		<class>com.vittae.model.Disponibilidade</class>
+		<class>com.vittae.model.Consulta</class>
+		<class>com.vittae.model.Paciente</class>
+
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/vittae?createDatabaseIfNotExist=true&amp;serverTimezone=UTC" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password" value=""/>
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" />
+	
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+
+			<property name="hibernate.c3p0.initialPoolSize" value="5" />
+			<property name="hibernate.c3p0.minPoolSize" value="5" />
+			<property name="hibernate.c3p0.maxPoolSize" value="50" />
+			<property name="hibernate.c3p0.maxIdleTime" value="3600" />
+		</properties>
+	</persistence-unit>
+</persistence>
