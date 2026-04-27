@@ -2,57 +2,28 @@ package com.vittae.model;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "medico")
-@PrimaryKeyJoinColumn(name = "id_usuario")
 public class Medico extends Usuario {
-    // resto do código igual...
 
-	@Lob
 	private byte[] foto;
-	
-	@Column(columnDefinition = "TEXT")
 	private String biografia;
-	
-	@Column(nullable = false)
 	private String crm;
-	
-	@Column(length = 2)
 	private String ufCrm;
-	
 	private String rqe;
-	
-	private int tempoConsultaMinutos;
+	private Integer tempoConsultaMinutos;
 	private LocalDate dataNascimento;
 	private String cep;
 	private double valorConsulta; 
 	private String telefone;
 
-	@ManyToMany
-	@JoinTable(name = "medico_especialidade", joinColumns = @JoinColumn(name = "id_medico"), inverseJoinColumns = @JoinColumn(name = "id_especialidade"))
-	private List<Especialidade> especialidades;
-
-	@OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<String> especialidades;
 	private List<Disponibilidade> disponibilidades;
-
-	@OneToMany(mappedBy = "medico")
 	private List<Consulta> consultas;
 
 	public Medico() {
 	}
 
-	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, double valorConsulta, String ufCrm, int tempoConsultaMinutos, String rqe, String biografia, List<Especialidade> especialidades, String telefone) {
+	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, double valorConsulta, String ufCrm, Integer tempoConsultaMinutos, String rqe, String biografia, List<String> especialidades, String telefone) {
 		this.foto = foto;
 		this.dataNascimento = dataNascimento;
 		this.crm = crm;
@@ -146,13 +117,13 @@ public class Medico extends Usuario {
 		this.valorConsulta = valorConsulta;
 	}
 
-	public List<Especialidade> getEspecialidades() {
-		return especialidades;
-	}
+	public List<String> getEspecialidades() {
+        return especialidades;
+    }
 
-	public void setEspecialidades(List<Especialidade> especialidades) {
-		this.especialidades = especialidades;
-	}
+	public void setEspecialidades(List<String> especialidades) {
+        this.especialidades = especialidades;
+    }
 
 	public List<Disponibilidade> getDisponibilidades() {
 		return disponibilidades;

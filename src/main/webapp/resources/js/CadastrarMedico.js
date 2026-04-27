@@ -1,4 +1,3 @@
-// ── FORA do DOMContentLoaded — escopo global para o onclick do XHTML funcionar ──
 function toggleHorario(checkbox, divId) {
     const div = document.getElementById(divId);
     if (div) div.style.display = checkbox.checked ? 'flex' : 'none';
@@ -181,11 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
             exibirErro('especialidade'); valido = false;
         } else ocultarErro('especialidade');
 
-        const diasMarcados = [
-            'formCadastro:dispSegunda', 'formCadastro:dispTerca',
-            'formCadastro:dispQuarta',  'formCadastro:dispQuinta',
-            'formCadastro:dispSexta',   'formCadastro:dispSabado'
-        ].some(id => { const el = document.getElementById(id); return el && el.checked; });
+		const checkboxes = document.querySelectorAll('#formCadastro input[type="checkbox"]');
+		const diasMarcados = Array.from(checkboxes).some(el => el.checked);
 
         if (!diasMarcados) {
             exibirErro('disp', 'Selecione ao menos um dia de disponibilidade.');

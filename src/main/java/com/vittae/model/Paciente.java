@@ -3,16 +3,6 @@ package com.vittae.model;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "paciente")
-@PrimaryKeyJoinColumn(name = "id_usuario")
 public class Paciente extends Usuario {
 
 	private LocalDate dataNascimento;
@@ -20,11 +10,8 @@ public class Paciente extends Usuario {
 	private String endereco;
 	private String cidade;
 
-	@OneToOne
-	@JoinColumn(name = "id_responsavel")
 	private Paciente responsavel;
 
-	@OneToMany(mappedBy = "paciente")
 	private List<Consulta> consultas;
 
 	public Paciente() {
