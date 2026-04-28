@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      lang="pt-BR">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vittae - Login Profissional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <h:outputStylesheet name="loginstyle.css"/>
+    <link rel="shortcut icon" href="#{request.contextPath}/resources/imagens/facvicon VITTAE.png" type="image/x-icon"/>
+</h:head>
+
+<h:body>
+    <h:form id="mainForm" prependId="false">
+        <section class="container-pai" id="mainContainer">
+            
+            <div class="forms-content-container">
+                
+                <!-- Formulário de Login -->
+                <div class="form-content sign-in" id="loginBlock">
+                    <h2>Acesse sua Conta</h2>
+                    <p class="subtitle">Bem-vindo de volta ao Vittae!</p>
+                    
+                    <div class="input-field">
+                        <i class="fas fa-id-card"/>
+                        <p:inputText id="cpfLogin" 
+                                   value="#{loginBean.cpf}" 
+                                   placeholder="CPF (000.000.000-00)" 
+                                   required="true"
+                                   requiredMessage="CPF é obrigatório"
+                                   styleClass="form-control"/>
+                        <p:message for="cpfLogin" styleClass="error-message"/>
+                    </div>
+                    
+                    <div class="input-field">
+                        <i class="fas fa-lock"/>
+                        <p:inputText id="senhaLogin" 
+                                   value="#{loginBean.senha}" 
+                                   placeholder="Sua Senha" 
+                                   required="true"
+                                   requiredMessage="Senha é obrigatória"
+                                   styleClass="form-control"
+                                   type="password"/>
+                        <p:message for="senhaLogin" styleClass="error-message"/>
+                    </div>
+                    
+                    <p:commandLink value="Esqueceu sua senha?" 
+                                 class="forgot-pass" 
+                                 action="#{loginBean.recuperarSenha()}"
+                                 update=":mainForm:messages"/>
+                    
+                    <p:commandButton value="Entrar" 
+                                   action="#{loginBean.login()}"
+                                   class="btn-main"
+                                   ajax="true"
+                                   update=":mainForm:messages loginBlock registerBlock"
+                                   process="@form"/>
+                    
+                    <div class="footer-copy">
+                        <p>&copy; 2026 Vittae.</p>
+                    </div>
+                </div>
+
+                <!-- Formulário de Cadastro -->
+                <div class="form-content sign-up" id="registerBlock">
+                    <h2>Criar Conta</h2>
+                    <p class="subtitle">Cadastre-se para agendar suas consultas.</p>
+                    
+                    <div class="input-field">
+                        <i class="fas fa-user"/>
+                        <p:inputText id="nome" 
+                                   value="#{loginBean.nome}" 
+                                   placeholder="Nome Completo" 
+                                   required="true"
+                                   requiredMessage="Nome é obrigatório"
+                                   styleClass="form-control"/>
+                        <p:message for="nome" styleClass="error-message"/>
+                    </div>
+                    
+                    <div class="input-field">
+                        <i class="fas fa-envelope"/>
+                        <p:inputText id="email" 
+                                   value="#{loginBean.email}" 
+                                   placeholder="E-mail" 
+                                   required="true"
+                                   requiredMessage="E-mail é obrigatório"
+                                   styleClass="form-control"/>
+                        <p:message for="email" styleClass="error-message"/>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-field">
+                            <i class="fas fa-id-card"/>
+                            <p:inputText id="cpfCadastro" 
+                                       value="#{loginBean.cpfCadastro}" 
+                                       placeholder="CPF" 
+                                       required="true"
+                                       requiredMessage="CPF é obrigatório"
+                                       styleClass="form-control"/>
+                            <p:message for="cpfCadastro" styleClass="error-message"/>
+                        </div>
+                        <div class="input-field">
+                            <i class="fas fa-phone"/>
+                            <p:inputText id="telefone" 
+                                       value="#{loginBean.telefone}" 
+                                       placeholder="Telefone" 
+                                       required="true"
+                                       requiredMessage="Telefone é obrigatório"
+                                       styleClass="form-control"/>
+                            <p:message for="telefone" styleClass="error-message"/>
+                        </div>
+                    </div>
+                    
+                    <div class="input-field">
+                        <i class="fas fa-lock"/>
+                        <p:password id="senhaCadastro" 
+                                  value="#{loginBean.senhaCadastro}" 
+                                  placeholder="Senha" 
+                                  required="true"
+                                  requiredMessage="Senha é obrigatória"
+                                  styleClass="form-control"/>
+                        <p:message for="senhaCadastro" styleClass="error-message"/>
+                    </div>
+                    
+                    <p:commandButton value="Cadastrar Agora" 
+                                   action="#{loginBean.cadastrar()}"
+                                   class="btn-main"
+                                   ajax="true"
+                                   update=":mainForm:messages loginBlock registerBlock"
+                                   process="@form"/>
+                </div>
+            </div>
+
+            <div class="overlay-panel-container">
+                <div class="overlay">
+                    
+                    <div class="overlay-section overlay-left">
+                        <h2>Já tem uma conta?</h2>
+                        <p>Acesse seu painel agora mesmo e continue cuidando da sua saúde.</p>
+                        <p:commandButton value="Fazer Login" 
+                                       id="signInBtn"
+                                       class="btn-outline"
+                                       action="#{loginBean.mostrarLogin()}"
+                                       update="loginBlock registerBlock overlay"/>
+                    </div>
+                    
+                    <div class="overlay-section overlay-right">
+                        <h2>Novo por aqui?</h2>
+                        <p>Crie sua conta em segundos e agende suas consultas com total praticidade.</p>
+                        <p:commandButton value="Criar Conta" 
+                                       id="signUpBtn"
+                                       class="btn-outline"
+                                       action="#{loginBean.mostrarCadastro()}"
+                                       update="loginBlock registerBlock overlay"/>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </section>
+
+        <p:messages id="messages" autoUpdate="true" showDetail="true"/>
+    </h:form>
+
+    <h:outputScript name="login.js"/>
+</h:body>
+</html>
