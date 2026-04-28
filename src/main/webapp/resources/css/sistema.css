@@ -1,4 +1,4 @@
-@import url('https://googleapis.com');
+
 
 :root {
     --primary: #7c3aed;
@@ -10,7 +10,7 @@
 }
 
 
-
+@import url('https://googleapis.com');
 
 * {
     margin: 0;
