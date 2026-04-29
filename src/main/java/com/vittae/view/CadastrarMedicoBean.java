@@ -112,6 +112,7 @@ public class CadastrarMedicoBean implements Serializable {
 	public void setDto(Medico dto) {
 		this.dto = dto;
 	}
+	
 
 	public List<DiaUI> getListaDias() {
 		return listaDias;

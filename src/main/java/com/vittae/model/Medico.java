@@ -3,6 +3,8 @@ package com.vittae.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 public class Medico extends Usuario {
 
 	private byte[] foto;
@@ -15,8 +17,10 @@ public class Medico extends Usuario {
 	private String cep;
 	private double valorConsulta; 
 	private String telefone;
-
+	
+	@JsonManagedReference
 	private List<String> especialidades;
+	
 	private List<Disponibilidade> disponibilidades;
 	private List<Consulta> consultas;
 

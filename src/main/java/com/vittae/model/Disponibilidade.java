@@ -1,6 +1,8 @@
 package com.vittae.model;
 
 import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vittae.model.enums.DiaSemana;
 
 public class Disponibilidade {
@@ -11,6 +13,8 @@ public class Disponibilidade {
 	private LocalTime horaFim;
 
 	private DiaSemana diaSemana;
+	
+	@JsonBackReference
 	private Medico medico;
 
 	public Disponibilidade() {
