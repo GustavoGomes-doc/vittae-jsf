@@ -1,66 +1,38 @@
 package com.vittae.model;
 
+import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vittae.model.enums.DiaSemana;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "disponibilidade")
 public class Disponibilidade {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String horaInicio;
-	private String horaFim;
+	private LocalTime horaInicio;
+	private LocalTime horaFim;
 
-	@Enumerated(EnumType.STRING)
 	private DiaSemana diaSemana;
-
-	@ManyToOne
-	@JoinColumn(name = "id_medico")
+	
+	@JsonBackReference
 	private Medico medico;
 
 	public Disponibilidade() {
 	}
 
-	public Disponibilidade(String horaInicio, String horaFim, DiaSemana diaSemana, Medico medico) {
-		this.horaInicio = horaInicio;
-		this.horaFim = horaFim;
-		this.diaSemana = diaSemana;
-		this.medico = medico;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getHoraInicio() {
+	public LocalTime getHoraInicio() {
 		return horaInicio;
 	}
 
-	public void setHoraInicio(String horaInicio) {
+	public void setHoraInicio(LocalTime horaInicio) {
 		this.horaInicio = horaInicio;
 	}
 
-	public String getHoraFim() {
+	public LocalTime getHoraFim() {
 		return horaFim;
 	}
 
-	public void setHoraFim(String horaFim) {
+	public void setHoraFim(LocalTime horaFim) {
 		this.horaFim = horaFim;
 	}
 
@@ -68,8 +40,14 @@ public class Disponibilidade {
 		return diaSemana;
 	}
 
-	public void setDiaSemana(DiaSemana diaSemana) {
-		this.diaSemana = diaSemana;
+	public void setDiaSemana(DiaSemana diaSemana) { this.diaSemana = diaSemana; }
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public Medico getMedico() {

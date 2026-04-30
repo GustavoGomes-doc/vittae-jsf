@@ -6,17 +6,12 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-
-
-
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
 
 	<ui:define name="corpo">
 		<script>
 			document.querySelector('.search-bar').style.visibility = 'hidden';
 		</script>
-		<!-- resto do conteúdo -->
-		<!-- resto do conteúdo -->
 
 		<div class="header-pagina">
 			<h1>Cadastrar Novo Médico</h1>
@@ -64,7 +59,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="nomeMedico" value="Nome Completo " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="nomeMedico"
 							value="#{cadastrarMedicoBean.dto.nome}"
 							placeholder="Ex: Dr. Ricardo Lima" required="true" />
@@ -73,7 +68,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="telefoneMedico" value="Telefone " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="telefoneMedico"
 							value="#{cadastrarMedicoBean.dto.telefone}"
 							placeholder="Ex: (11) 99999-9999" maxlength="15" required="true" />
@@ -82,7 +77,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="cpfMedico" value="CPF " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="cpfMedico" value="#{cadastrarMedicoBean.dto.cpf}"
 							placeholder="000.000.000-00" maxlength="14" required="true" />
 						<h:message for="cpfMedico" styleClass="erro-msg" />
@@ -90,7 +85,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="dataNascimento" value="Data de Nascimento " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="dataNascimento"
 							value="#{cadastrarMedicoBean.dto.dataNascimento}">
 							<f:passThroughAttribute name="type" value="date" />
@@ -120,7 +115,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="crmMedico" value="CRM " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="crmMedico" value="#{cadastrarMedicoBean.dto.crm}"
 							placeholder="Ex: 123456" required="true" />
 						<h:message for="crmMedico" styleClass="erro-msg" />
@@ -128,7 +123,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="ufCrm" value="UF do CRM " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:selectOneMenu id="ufCrm"
 							value="#{cadastrarMedicoBean.dto.ufCrm}" required="true">
 							<f:selectItem itemValue="" itemLabel="Selecione" />
@@ -146,7 +141,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="cepMedico" value="CEP " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="cepMedico" value="#{cadastrarMedicoBean.dto.cep}"
 							placeholder="00000-000" maxlength="9" required="true" />
 						<h:message for="cepMedico" styleClass="erro-msg" />
@@ -154,7 +149,7 @@
 
 					<div class="form-group">
 						<h:outputLabel for="valorConsulta" value="Valor da Consulta (R$) " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="valorConsulta"
 							value="#{cadastrarMedicoBean.dto.valorConsulta}"
 							placeholder="Ex: 350.00" required="true" />
@@ -164,7 +159,7 @@
 					<div class="form-group">
 						<h:outputLabel for="tempoConsulta"
 							value="Duração da Consulta (min) " />
-						<span class="req">*</span>
+						<span class="req"></span>
 						<h:inputText id="tempoConsulta"
 							value="#{cadastrarMedicoBean.dto.tempoConsultaMinutos}"
 							placeholder="Ex: 30" required="true" />
@@ -195,100 +190,35 @@
 			<!-- ── DISPONIBILIDADE (checkboxes JSF nativos) ── -->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-calendar-alt"> <!-- -->
-					</i> Disponibilidade Semanal
+					<i class="fas fa-calendar-alt"></i> Disponibilidade Semanal
 				</div>
 				<div class="check-grid">
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSegunda"
-							value="#{cadastrarMedicoBean.dispSegunda}"
-							onclick="toggleHorario(this, 'horario-SEGUNDA')" />
-						<h:outputLabel value="Segunda-feira" />
-						<div class="horario-wrap" id="horario-SEGUNDA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSegunda}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSegunda}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispTerca"
-							value="#{cadastrarMedicoBean.dispTerca}"
-							onclick="toggleHorario(this, 'horario-TERCA')" />
-						<h:outputLabel value="Terça-feira" />
-						<div class="horario-wrap" id="horario-TERCA" style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioTerca}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimTerca}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+					<ui:repeat value="#{cadastrarMedicoBean.listaDias}" var="dia">
+						<div class="check-item">
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispQuarta"
-							value="#{cadastrarMedicoBean.dispQuarta}"
-							onclick="toggleHorario(this, 'horario-QUARTA')" />
-						<h:outputLabel value="Quarta-feira" />
-						<div class="horario-wrap" id="horario-QUARTA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioQuarta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimQuarta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+							<h:selectBooleanCheckbox value="#{dia.selecionado}"
+								onclick="toggleHorario(this, 'horario-#{dia.valorEnum}')" />
+							<h:outputLabel value="#{dia.label}" />
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispQuinta"
-							value="#{cadastrarMedicoBean.dispQuinta}"
-							onclick="toggleHorario(this, 'horario-QUINTA')" />
-						<h:outputLabel value="Quinta-feira" />
-						<div class="horario-wrap" id="horario-QUINTA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioQuinta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimQuinta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+							<div class="horario-wrap" id="horario-#{dia.valorEnum}"
+								style="#{dia.selecionado ? '' : 'display: none'}">
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSexta"
-							value="#{cadastrarMedicoBean.dispSexta}"
-							onclick="toggleHorario(this, 'horario-SEXTA')" />
-						<h:outputLabel value="Sexta-feira" />
-						<div class="horario-wrap" id="horario-SEXTA" style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSexta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSexta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
+								<h:inputText value="#{dia.horaInicio}" styleClass="input-hora">
+									<f:passThroughAttribute name="type" value="time" />
+									<f:convertDateTime type="localTime" pattern="HH:mm" />
+								</h:inputText>
+								<span>às</span>
+								<h:inputText value="#{dia.horaFim}" styleClass="input-hora">
+									<f:passThroughAttribute name="type" value="time" />
+									<f:convertDateTime type="localTime" pattern="HH:mm" />
+								</h:inputText>
+							</div>
 						</div>
-					</div>
+					</ui:repeat>
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSabado"
-							value="#{cadastrarMedicoBean.dispSabado}"
-							onclick="toggleHorario(this, 'horario-SABADO')" />
-						<h:outputLabel value="Sábado" />
-						<div class="horario-wrap" id="horario-SABADO"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSabado}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSabado}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
 				</div>
-				<span class="erro-msg" id="err-disp"> <!-- -->
-				</span>
+				<span class="erro-msg" id="err-disp"></span>
 			</div>
 
 			<!-- ── ACESSO AO SISTEMA ── -->
@@ -328,7 +258,8 @@
 					action="#{cadastrarMedicoBean.salvar}" />
 			</div>
 
-			<h:messages style="color: red; font-weight: bold;" />
+			<h:messages showDetail="true" showSummary="true" tooltip="true"
+				style="color: red; font-weight: bold; border: 1px solid red; padding: 10px;" />
 
 		</h:form>
 

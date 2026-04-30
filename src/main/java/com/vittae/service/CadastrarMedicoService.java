@@ -1,144 +1,57 @@
-	package com.vittae.service;
-	
-	import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+package com.vittae.service;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
 
-import org.mindrot.jbcrypt.BCrypt;          // substitui o BCryptPasswordEncoder do Spring Security
-
-import com.vittae.dto.CadastrarMedicoDTO;
-import com.vittae.model.Disponibilidade;
-import com.vittae.model.Especialidade;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature; // Import obrigatório para configurar a data
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.Medico;
-import com.vittae.model.enums.DiaSemana;
-	
-	@ApplicationScoped              // substitui @Service do Spring
-	public class CadastrarMedicoService {
-	
-	    @Inject
-	    private EntityManager em;   // substitui o Repository do Spring Data
-	
-	    // ── SALVAR ────────────────────────────────────────────────────────────
-	    
-	    public Medico salvarDTO(CadastrarMedicoDTO dto) {
-	        EntityTransaction tx = em.getTransaction();
-	        try {
-	            tx.begin();
 
-	            Medico medico = new Medico();
-	            medico.setNome(dto.getNome());
-	            medico.setCpf(dto.getCpf());
-	            medico.setEmail(dto.getEmail());
-	            medico.setSenha(BCrypt.hashpw(dto.getSenha(), BCrypt.gensalt()));
-	            medico.setDataNascimento(dto.getDataNascimento());
-	            medico.setCrm(dto.getCrm());
-	            medico.setUfCrm(dto.getUfCrm());
-	            medico.setRqe(dto.getRqe());
-	            medico.setCep(dto.getCep());
-	            medico.setValorConsulta(dto.getValorConsulta());
-	            medico.setTempoConsultaMinutos(dto.getTempoConsultaMinutos());
-	            medico.setBiografia(dto.getBiografia());
-	            if (dto.getFoto() != null) medico.setFoto(dto.getFoto());
+public class CadastrarMedicoService {
 
-	            if (dto.getEspecialidades() != null) {
-	                List<Especialidade> especialidades = new ArrayList<>();
-	                for (String nomeEsp : dto.getEspecialidades()) {
-	                    List<Especialidade> resultado = em.createQuery(
-	                        "SELECT e FROM Especialidade e WHERE e.nome = :nome", Especialidade.class)
-	                        .setParameter("nome", nomeEsp)
-	                        .getResultList();
+    private static final String API_URL = "http://localhost:8085/api/medicos";
 
-	                    Especialidade esp;
-	                    if (!resultado.isEmpty()) {
-	                        esp = resultado.get(0);
-	                    } else {
-	                        esp = new Especialidade();
-	                        esp.setNome(nomeEsp);
-	                        em.persist(esp);
-	                    }
-	                    especialidades.add(esp);
-	                }
-	                medico.setEspecialidades(especialidades);
-	            }
+    public void salvarMedico(Medico medico) throws Exception {
+        try {
+            // Configurar o Jackson para entender datas (LocalDate e LocalTime)
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule()); 
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-	            em.persist(medico);
-	            em.flush();
+            // Converter o objeto Medico para String JSON
+            String json = mapper.writeValueAsString(medico);
+            
+            // Dica de Ouro: Deixe esse print para você ver no console do Eclipse como o JSON ficou!
+            System.out.println("Enviando JSON: " + json);
 
-	            if (dto.getDisponibilidades() != null) {
-	                List<Disponibilidade> disponibilidades = new ArrayList<>();
-	                for (CadastrarMedicoDTO.DisponibilidadeDTO dtoDisp : dto.getDisponibilidades()) {
-	                    Disponibilidade disp = new Disponibilidade();
-	                    disp.setDiaSemana(DiaSemana.valueOf(dtoDisp.getDiaSemana()));
-	                    disp.setHoraInicio(dtoDisp.getHoraInicio());
-	                    disp.setHoraFim(dtoDisp.getHoraFim());
-	                    disp.setMedico(medico);
-	                    disponibilidades.add(disp);
-	                    em.persist(disp);
-	                }
-	                medico.setDisponibilidades(disponibilidades);
-	            }
+            // Criar o Cliente HTTP
+            HttpClient client = HttpClient.newHttpClient();
 
-	            tx.commit();
-	            return medico;
+            // Montar a Requisição POST
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL))
+                    .header("Content-Type", "application/json") // avisa o spring que esta mandando um JSON
+                    .POST(BodyPublishers.ofString(json)) // pega o JSON gerado e coloca no corpo da mensagem HTTP 
+                    .build();
 
-	        } catch (Exception e) {
-	            if (tx.isActive()) tx.rollback();
-	            throw e;
-	        }
-	    }
-	
-	    // ── LISTAR — substitui cadastrarMedicoRepository.findAll() ────────────
-	
-	    public List<Medico> listarTodos() {
-	        return em.createQuery("SELECT m FROM Medico m", Medico.class).getResultList();
-	    }
-	
-	    // ── BUSCAR POR ID — substitui cadastrarMedicoRepository.findById() ────
-	
-	    public Optional<Medico> buscarPorId(Long id) {
-	        Medico medico = em.find(Medico.class, id);
-	        return Optional.ofNullable(medico);
-	    }
-	
-	    // ── ATUALIZAR — igual ao seu código, só troca o repository ───────────
-	
-	 // ── ATUALIZAR ────────────────────────────────────────────────────────
-	    public Medico atualizar(Long id, Medico dadosNovos) {
-	        EntityTransaction tx = em.getTransaction();
-	        try {
-	            tx.begin();
-	            Medico medico = em.find(Medico.class, id);
-	            if (medico == null) throw new RuntimeException("Médico não encontrado");
+            // Enviar e receber a resposta
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-	            if (dadosNovos.getNome() != null)  medico.setNome(dadosNovos.getNome());
-	            if (dadosNovos.getCrm() != null)   medico.setCrm(dadosNovos.getCrm());
-	            if (dadosNovos.getEmail() != null) medico.setEmail(dadosNovos.getEmail());
-
-	            Medico resultado = em.merge(medico);
-	            tx.commit();
-	            return resultado;
-	        } catch (Exception e) {
-	            if (tx.isActive()) tx.rollback();
-	            throw e;
-	        }
-	    }
-
-	    // ── DELETAR ──────────────────────────────────────────────────────────
-	    public void deletar(Long id) {
-	        EntityTransaction tx = em.getTransaction();
-	        try {
-	            tx.begin();
-	            Medico medico = em.find(Medico.class, id);
-	            if (medico != null) em.remove(medico);
-	            tx.commit();
-	        } catch (Exception e) {
-	            if (tx.isActive()) tx.rollback();
-	            throw e;
-	        }
-	    }
-	}	  
+            // Validar o resultado (200 OK ou 201 Created)
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                System.out.println("Médico enviado com sucesso para a API!");
+            } else {
+                throw new Exception("Falha ao salvar médico na API. Status: " + response.statusCode() 
+                                    + " - Erro: " + response.body());
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Erro de comunicação com a API: " + e.getMessage());
+        }
+    }
+}  
