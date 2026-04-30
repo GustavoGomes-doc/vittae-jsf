@@ -1,5 +1,6 @@
 package com.vittae.service;
 
+<<<<<<< Updated upstream
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -171,3 +172,8 @@ public class AgendarConsultaService {
 		}
 	}
 }
+=======
+public class AgendarConsultaService {
+
+}
+>>>>>>> Stashed changes

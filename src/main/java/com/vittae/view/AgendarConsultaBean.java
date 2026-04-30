@@ -1,5 +1,6 @@
 package com.vittae.view;
 
+<<<<<<< Updated upstream
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -252,4 +253,70 @@ public class AgendarConsultaBean implements Serializable {
 	public void setObservacoes(String observacoes) {
 		this.observacoes = observacoes;
 	}
+=======
+import com.vittae.model.Consulta;
+import com.vittae.model.Medico;
+import com.vittae.model.Paciente;
+// ... imports do seu service e do spring/jsf ...
+import java.util.List;
+
+// Adicione as anotações do seu framework (Spring ou JSF puro)
+// @Component ou @Named
+// @Scope("view") ou @ViewScoped
+public class AgendarConsultaBean {
+
+    private Consulta consultaNova = new Consulta();
+    
+    
+    private String especialidades;
+    private List<Medico> listaMedicos;
+    
+   
+    private int passoAtual = 1;
+
+    
+
+    public void buscarMedicos() {
+        // Aqui você vai no Service e preenche a listaMedicos
+        // listaMedicos = medicoService.buscar(especialidadeBusca);
+    }
+
+    public void selecionarMedico(Medico medicoEscolhido) {
+        // Guarda o médico dentro da nossa consultaNova
+        this.consultaNova.setMedico(medicoEscolhido);
+        proximoPasso();
+    }
+    
+    public void finalizarAgendamento() {
+        // Aqui você manda a 'consultaNova' para o Service salvar no banco
+    }
+
+    public void proximoPasso() {
+        if (passoAtual < 3) passoAtual++;
+    }
+
+    public void voltarPasso() {
+        if (passoAtual > 1) passoAtual--;
+    }
+
+	public List<Medico> getListaMedicos() {
+		return listaMedicos;
+	}
+
+	public void setListaMedicos(List<Medico> listaMedicos) {
+		this.listaMedicos = listaMedicos;
+	}
+
+	public String getEspecialidades() {
+		return especialidades;
+	}
+
+	public void setEspecialidades(String especialidades) {
+		this.especialidades = especialidades;
+	}
+
+    // --- GETTERS E SETTERS ---
+    // Crie os getters e setters apenas destas variáveis acima 
+    // (consultaNova, especialidadeBusca, listaMedicos, passoAtual)
+>>>>>>> Stashed changes
 }
