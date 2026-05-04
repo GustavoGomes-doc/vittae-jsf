@@ -145,17 +145,18 @@
     }
 
     function validateCurrentStep() {
-        if (currentStep === 1) {
-            const typeEl = document.getElementById("formAgendamento:consultaType");
-            const dateEl = document.getElementById("formAgendamento:consultaDate");
-            const timeEl = document.getElementById("formAgendamento:consultaTime");
+		if (currentStep === 1) {
+		    const espEl = document.getElementById("formAgendamento:especialidadeType");
+		    const typeEl = document.getElementById("formAgendamento:consultaType");
+		    const dateEl = document.getElementById("formAgendamento:consultaDate");
+		    const timeEl = document.getElementById("formAgendamento:consultaTime");
 
-            if (!typeEl.value || !dateEl.value || !timeEl.value) {
-                alert("Preencha todos os campos da consulta!");
-                return false;
-            }
-            return true;
-        }
+		    if (!espEl.value || !typeEl.value || !dateEl.value || !timeEl.value) {
+		        alert("Preencha todos os campos da consulta!");
+		        return false;
+		    }
+		    return true;
+		}
 
         if (currentStep === 2) {
             if (!selectedDoctorId) {

@@ -1,6 +1,5 @@
 package com.vittae.view;
 
-<<<<<<< Updated upstream
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,17 +28,12 @@ public class AgendarConsultaBean implements Serializable {
 
 	private AgendarConsultaService service;
 
-	// ── Step 1: dados da consulta ──────────────────────────────────────────
 	private String especialidade;
 	private String tipoConsulta;
-	private String dataConsulta; // vem como String do input date
-	private String horaConsulta; // vem como String do input time
-
-	// ── Step 2: médico selecionado ─────────────────────────────────────────
+	private String dataConsulta;
+	private String horaConsulta;
 	private Long medicoId;
 	private List<MedicoUI> listaMedicos = new ArrayList<>();
-
-	// ── Step 3: dados do paciente ──────────────────────────────────────────
 	private String pacienteNome;
 	private String pacienteCpf;
 	private String pacienteTelefone;
@@ -53,40 +47,28 @@ public class AgendarConsultaBean implements Serializable {
 		carregarMedicos();
 	}
 
-	/**
-	 * Busca médicos do Spring Boot e popula a lista pra o step 2.
-	 */
 	private void carregarMedicos() {
 		try {
 			String json = service.buscarMedicosJson();
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.registerModule(new JavaTimeModule());
 			mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-			// Desserializa o JSON em lista de MedicoUI
-			List<MedicoUI> medicos = mapper.readValue(json, new TypeReference<List<MedicoUI>>() {
+			this.listaMedicos = mapper.readValue(json, new TypeReference<List<MedicoUI>>() {
 			});
-			this.listaMedicos = medicos;
-
 		} catch (Exception e) {
 			System.err.println("Erro ao carregar médicos: " + e.getMessage());
 			this.listaMedicos = new ArrayList<>();
 		}
 	}
 
-	/**
-	 * Chamado pelo botão de submit do JSF no step 3.
-	 */
 	public String salvarAgendamento() {
 		try {
 			AgendamentoDTO dto = new AgendamentoDTO();
-
 			dto.setEspecialidade(especialidade);
 			dto.setTipoConsulta(tipoConsulta);
 			dto.setMedicoId(medicoId);
 			dto.setObservacoes(observacoes);
 
-			// Converte String da tela pra LocalDate/LocalTime
 			if (dataConsulta != null && !dataConsulta.isEmpty()) {
 				dto.setDataConsulta(LocalDate.parse(dataConsulta));
 				dto.setDataAgendado(LocalDate.now());
@@ -95,7 +77,6 @@ public class AgendarConsultaBean implements Serializable {
 				dto.setHora(LocalTime.parse(horaConsulta));
 			}
 
-			// Monta o paciente
 			PacienteDTO paciente = new PacienteDTO();
 			paciente.setNome(pacienteNome);
 			paciente.setCpf(pacienteCpf != null ? pacienteCpf.replaceAll("\\D", "") : "");
@@ -116,12 +97,42 @@ public class AgendarConsultaBean implements Serializable {
 		}
 	}
 
-	// ── Classe auxiliar pra representar médico na lista do step 2 ──────────
+	// ── MedicoUI ──
 	public static class MedicoUI {
 		private Long id;
 		private String nome;
-		private String especialidade;
-		private String localizacao;
+		private String crm;
+		private String telefone;
+		private List<String> especialidades;
+		private Integer tempoConsultaMinutos;
+		private double valorConsulta;
+		
+		public String getIniciais() {
+		    if (nome == null) return "MD";
+		    String[] p = nome.trim().split("\\s+");
+		    return p.length >= 2 ? ("" + p[0].charAt(0) + p[p.length-1].charAt(0)).toUpperCase() : nome.substring(0,2).toUpperCase();
+		}
+
+		public String getCorAvatar() {
+		    String[] cores = {"#7c3aed","#059669","#dc2626","#d97706","#2563eb","#db2777"};
+		    return cores[Math.abs(nome.hashCode()) % cores.length];
+		}
+
+		public Integer getTempoConsultaMinutos() {
+			return tempoConsultaMinutos;
+		}
+
+		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
+			this.tempoConsultaMinutos = tempoConsultaMinutos;
+		}
+
+		public double getValorConsulta() {
+			return valorConsulta;
+		}
+
+		public void setValorConsulta(double valorConsulta) {
+			this.valorConsulta = valorConsulta;
+		}
 
 		public Long getId() {
 			return id;
@@ -139,25 +150,32 @@ public class AgendarConsultaBean implements Serializable {
 			this.nome = nome;
 		}
 
-		public String getEspecialidade() {
-			return especialidade;
+		public String getCrm() {
+			return crm;
 		}
 
-		public void setEspecialidade(String especialidade) {
-			this.especialidade = especialidade;
+		public void setCrm(String crm) {
+			this.crm = crm;
 		}
 
-		public String getLocalizacao() {
-			return localizacao;
+		public String getTelefone() {
+			return telefone;
 		}
 
-		public void setLocalizacao(String localizacao) {
-			this.localizacao = localizacao;
+		public void setTelefone(String telefone) {
+			this.telefone = telefone;
+		}
+
+		public List<String> getEspecialidades() {
+			return especialidades;
+		}
+
+		public void setEspecialidades(List<String> especialidades) {
+			this.especialidades = especialidades;
 		}
 	}
 
-	// ── Getters e Setters ──────────────────────────────────────────────────
-
+	// ── Getters e Setters do Bean ──
 	public String getEspecialidade() {
 		return especialidade;
 	}
@@ -253,70 +271,4 @@ public class AgendarConsultaBean implements Serializable {
 	public void setObservacoes(String observacoes) {
 		this.observacoes = observacoes;
 	}
-=======
-import com.vittae.model.Consulta;
-import com.vittae.model.Medico;
-import com.vittae.model.Paciente;
-// ... imports do seu service e do spring/jsf ...
-import java.util.List;
-
-// Adicione as anotações do seu framework (Spring ou JSF puro)
-// @Component ou @Named
-// @Scope("view") ou @ViewScoped
-public class AgendarConsultaBean {
-
-    private Consulta consultaNova = new Consulta();
-    
-    
-    private String especialidades;
-    private List<Medico> listaMedicos;
-    
-   
-    private int passoAtual = 1;
-
-    
-
-    public void buscarMedicos() {
-        // Aqui você vai no Service e preenche a listaMedicos
-        // listaMedicos = medicoService.buscar(especialidadeBusca);
-    }
-
-    public void selecionarMedico(Medico medicoEscolhido) {
-        // Guarda o médico dentro da nossa consultaNova
-        this.consultaNova.setMedico(medicoEscolhido);
-        proximoPasso();
-    }
-    
-    public void finalizarAgendamento() {
-        // Aqui você manda a 'consultaNova' para o Service salvar no banco
-    }
-
-    public void proximoPasso() {
-        if (passoAtual < 3) passoAtual++;
-    }
-
-    public void voltarPasso() {
-        if (passoAtual > 1) passoAtual--;
-    }
-
-	public List<Medico> getListaMedicos() {
-		return listaMedicos;
-	}
-
-	public void setListaMedicos(List<Medico> listaMedicos) {
-		this.listaMedicos = listaMedicos;
-	}
-
-	public String getEspecialidades() {
-		return especialidades;
-	}
-
-	public void setEspecialidades(String especialidades) {
-		this.especialidades = especialidades;
-	}
-
-    // --- GETTERS E SETTERS ---
-    // Crie os getters e setters apenas destas variáveis acima 
-    // (consultaNova, especialidadeBusca, listaMedicos, passoAtual)
->>>>>>> Stashed changes
 }

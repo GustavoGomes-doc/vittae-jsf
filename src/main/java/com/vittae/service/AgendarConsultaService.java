@@ -1,6 +1,5 @@
 package com.vittae.service;
 
-<<<<<<< Updated upstream
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -16,8 +15,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 public class AgendarConsultaService {
 
 	// mesma porta do seu Spring Boot — ajusta se precisar
-	private static final String API_URL = "http://localhost:8085/api/consultas";
-	private static final String API_MEDICOS = "http://localhost:8085/api/medicos";
+	private static final String API_URL = "http://localhost:8081/api/agendamentos";
+	private static final String API_MEDICOS = "http://localhost:8081/api/medicos";
 
 	/**
 	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha
@@ -172,8 +171,3 @@ public class AgendarConsultaService {
 		}
 	}
 }
-=======
-public class AgendarConsultaService {
-
-}
->>>>>>> Stashed changes
