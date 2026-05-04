@@ -105,17 +105,19 @@ public class AgendarConsultaBean implements Serializable {
 		private String telefone;
 		private List<String> especialidades;
 		private Integer tempoConsultaMinutos;
-		private double valorConsulta;
-		
+		private Double valorConsulta;
+
 		public String getIniciais() {
-		    if (nome == null) return "MD";
-		    String[] p = nome.trim().split("\\s+");
-		    return p.length >= 2 ? ("" + p[0].charAt(0) + p[p.length-1].charAt(0)).toUpperCase() : nome.substring(0,2).toUpperCase();
+			if (nome == null)
+				return "MD";
+			String[] p = nome.trim().split("\\s+");
+			return p.length >= 2 ? ("" + p[0].charAt(0) + p[p.length - 1].charAt(0)).toUpperCase()
+					: nome.substring(0, 2).toUpperCase();
 		}
 
 		public String getCorAvatar() {
-		    String[] cores = {"#7c3aed","#059669","#dc2626","#d97706","#2563eb","#db2777"};
-		    return cores[Math.abs(nome.hashCode()) % cores.length];
+			String[] cores = { "#7c3aed", "#059669", "#dc2626", "#d97706", "#2563eb", "#db2777" };
+			return cores[Math.abs(nome.hashCode()) % cores.length];
 		}
 
 		public Integer getTempoConsultaMinutos() {
@@ -124,14 +126,6 @@ public class AgendarConsultaBean implements Serializable {
 
 		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
 			this.tempoConsultaMinutos = tempoConsultaMinutos;
-		}
-
-		public double getValorConsulta() {
-			return valorConsulta;
-		}
-
-		public void setValorConsulta(double valorConsulta) {
-			this.valorConsulta = valorConsulta;
 		}
 
 		public Long getId() {
@@ -172,6 +166,14 @@ public class AgendarConsultaBean implements Serializable {
 
 		public void setEspecialidades(List<String> especialidades) {
 			this.especialidades = especialidades;
+		}
+
+		public Double getValorConsulta() {
+			return valorConsulta;
+		}
+
+		public void setValorConsulta(Double valorConsulta) {
+			this.valorConsulta = valorConsulta;
 		}
 	}
 

@@ -1,9 +1,6 @@
 (function () {
     "use strict";
-
-    /* ═══════════════════════════════════════════════
-       ESTADO GLOBAL
-    ═══════════════════════════════════════════════ */
+	
     var state = {
         step: 1,
         pacienteNome: null,
@@ -269,6 +266,11 @@
                 mostrarErro('errRespParent', rParent); ok = false;
             } else { esconderErro('errRespParent', rParent); }
         }
+		
+		var motivo = document.getElementById('motivoConsulta');
+		if (!motivo || motivo.value.trim().length < 5) {
+		    mostrarErro('errMotivo', motivo); ok = false;
+		} else { esconderErro('errMotivo', motivo); }
 
         if (ok) {
             state.pacienteNome = obterNomePaciente();
@@ -385,6 +387,9 @@
     function filtrarMedicosPorEsp(esp) {
         document.querySelectorAll('.ag-medico-card').forEach(function(c) {
             var tags = c.querySelectorAll('.ag-medico-tag');
+			
+			if (tags.length === 0) { c.style.display = ''; return; }
+			
             var temEsp = false;
             tags.forEach(function(t) {
                 if (t.textContent.trim().toLowerCase() === esp.toLowerCase()) temEsp = true;
