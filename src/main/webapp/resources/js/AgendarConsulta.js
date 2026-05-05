@@ -231,7 +231,7 @@
             mostrarErro('errCpf', cpf); ok = false;
         } else { esconderErro('errCpf', cpf); }
 
-        var sexo = document.getElementById('fAg:pacSexo');
+        var sexo = document.getElementById('fAg:pacGenero');
         if (!sexo || !sexo.value) {
             mostrarErro('errSexo', sexo); ok = false;
         } else { esconderErro('errSexo', sexo); }

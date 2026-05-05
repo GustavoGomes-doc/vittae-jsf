@@ -38,7 +38,7 @@ public class AgendarConsultaBean implements Serializable {
 	private String pacienteCpf;
 	private String pacienteTelefone;
 	private String pacienteNascimento;
-	private String pacienteSexo;
+	private String pacienteGenero;
 	private String observacoes;
 
 	@PostConstruct
@@ -82,6 +82,8 @@ public class AgendarConsultaBean implements Serializable {
 			paciente.setCpf(pacienteCpf != null ? pacienteCpf.replaceAll("\\D", "") : "");
 			paciente.setTelefone(pacienteTelefone);
 			dto.setPaciente(paciente);
+			paciente.setGenero(pacienteGenero);           // ← adicionar
+			paciente.setNascimento(pacienteNascimento);
 
 			service.salvarAgendamento(dto);
 
@@ -258,12 +260,14 @@ public class AgendarConsultaBean implements Serializable {
 		this.pacienteNascimento = pacienteNascimento;
 	}
 
-	public String getPacienteSexo() {
-		return pacienteSexo;
+	
+
+	public String getPacienteGenero() {
+		return pacienteGenero;
 	}
 
-	public void setPacienteSexo(String pacienteSexo) {
-		this.pacienteSexo = pacienteSexo;
+	public void setPacienteGenero(String pacienteGenero) {
+		this.pacienteGenero = pacienteGenero;
 	}
 
 	public String getObservacoes() {

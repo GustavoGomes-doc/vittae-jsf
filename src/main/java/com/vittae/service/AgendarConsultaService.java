@@ -142,6 +142,8 @@ public class AgendarConsultaService {
 		private String nome;
 		private String cpf;
 		private String telefone;
+		private String genero; 
+		private String nascimento; 
 
 		public PacienteDTO() {
 		}
@@ -168,6 +170,22 @@ public class AgendarConsultaService {
 
 		public void setTelefone(String telefone) {
 			this.telefone = telefone;
+		}
+
+		public String getGenero() {
+			return genero;
+		}
+
+		public void setGenero(String genero) {
+			this.genero = genero;
+		}
+
+		public String getNascimento() {
+			return nascimento;
+		}
+
+		public void setNascimento(String nascimento) {
+			this.nascimento = nascimento;
 		}
 	}
 }
