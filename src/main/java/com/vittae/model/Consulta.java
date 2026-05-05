@@ -4,9 +4,11 @@ import com.vittae.model.enums.Status;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+
 // Classes puras, prontas para virar JSON
 public class Consulta {
-
+	
+	
 	private Long id;
 	private Medico medico;
 	private Paciente paciente;
@@ -14,6 +16,7 @@ public class Consulta {
 	private LocalDate dataAgendado;
 	private LocalDate dataConsulta;
 	private LocalTime hora;
+	
 
 	public Consulta() {
 	}
@@ -82,4 +85,5 @@ public class Consulta {
 	public void setHora(LocalTime hora) {
 		this.hora = hora;
 	}
+	
 }
