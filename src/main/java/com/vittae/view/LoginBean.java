@@ -1,146 +1,149 @@
-<<<<<<< Updated upstream
-package com.vittae.view; 
-
-import com.vittae.model.Usuario;
-import com.vittae.model.dao.UsuarioDao;
-import java.io.Serializable;
-=======
 package com.vittae.view;
 
-import com.vittae.model.Usuario;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
->>>>>>> Stashed changes
-import javax.enterprise.context.RequestScoped;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-<<<<<<< Updated upstream
-=======
-import com.fasterxml.jackson.databind.ObjectMapper; 
->>>>>>> Stashed changes
 
+import com.vittae.model.Usuario;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
+@Log4j
+@Getter
+@Setter
 @Named("loginBean")
-@RequestScoped
+@SessionScoped
 public class LoginBean implements Serializable {
 
-	private String cpf;
-	private String senha;
+    private static final long serialVersionUID = 1L;
 
-	@Inject
-	private UsuarioLogadoBean usuarioLogadoBean;
+    private Usuario usuario;
 
-<<<<<<< Updated upstream
-	// DAO descomentado para buscar no banco real!
-	@Inject
-	private UsuarioDao usuarioDao; 
+    // === Campos do seu formulário de Login ===
+    private String cpf; // O professor usou email, mas a sua tela pede CPF
+    private String senha;
 
-	public String entrar() {
-		// 1. Limpa a máscara do CPF que veio do front-end (remove pontos e traços)
-		String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
+    // === Campos do seu formulário de Cadastro ===
+    // Sem isso, a sua tela Login.xhtml vai dar erro ao carregar!
+    private String nome;
+    private String email;
+    private String cpfCadastro;
+    private String telefone;
+    private String senhaCadastro;
 
-		// 2. Busca o usuário no banco de dados usando o CPF limpo
-		Usuario user = usuarioDao.autenticar(cpfLimpo, senha);
+    @PostConstruct
+    public void inicializar() {
+        usuario = new Usuario();
+        log.info("Iniciando LoginBean da Vittae");
+    }
 
-		// 3. Se achou o usuário no banco e a senha bate:
-		if (user != null) {
+    public String login() {
+        log.info("Tentando logar.......");
 
-			// Preenche o Bean do JSF para a interface usar
-			usuarioLogadoBean.setUsuario(user);
+        HttpSession session = getSession(); 
+        
+        usuario = (Usuario) session.getAttribute("usuario");
 
-			// A MÁGICA PRO FILTRO: Pega a Sessão do Java e joga o usuário lá dentro
-			HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-			session.setAttribute("usuario", user);
+        // Se usuário não está na sessão = não está logado
+        if (usuario == null) {
+            
+            // 1. Limpa a máscara do CPF que vem do PrimeFaces
+            String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
 
-			// Redireciona para a página inicial protegida
-			return "/views/comum/Inicio.xhtml?faces-redirect=true";
+            // 2. Chama o método que conversa com o seu Spring Boot (substitui o DAO/Service local)
+            usuario = autenticarNoSpring(cpfLimpo, senha);
+            
+            if (usuario != null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Login realizado com sucesso!", usuario.getNome()));
+                log.info("Usuário logado: " + usuario.toString());
 
-		} else {
-			// Se a senha estiver errada ou usuário não existir
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "CPF ou senha incorretos!", null));
-			return null; // Fica na mesma página de login
-		}
-	}
+                session.setAttribute("usuario", usuario);
+                
+                // Redireciona para a página interna do SEU sistema
+                return "/views/comum/Inicio.xhtml?faces-redirect=true";
+                
+            } else {
+                /* Não autenticado */
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou!", "CPF ou senha incorretos"));
+                
+                return "/Login.xhtml"; // Fica na tela de login
+            }
+        }
+        return "/views/comum/Inicio.xhtml?faces-redirect=true";
+    }
 
-	public String sair() {
-		// Destrói a sessão inteira e desloga o usuário (usado no botão Sair da Sidebar)
-		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-		return "/login.xhtml?faces-redirect=true";
-	}
+    public String sair() {
+        log.info("Session invalidate");
 
-=======
-	public String entrar() {
-		// 1. Limpa a máscara do CPF
-		String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 
-		// 2. Monta o corpo da requisição em JSON (o que vai ser enviado para o Spring)
-		String jsonBody = String.format("{\"cpf\":\"%s\", \"senha\":\"%s\"}", cpfLimpo, senha);
+        try {
+            // Mudei o redirecionamento do professor ("/index.xhtml") para a sua tela "/Login.xhtml"
+            FacesContext.getCurrentInstance().getExternalContext().redirect(
+                    FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/Login.xhtml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "/Login.xhtml?faces-redirect=true";
+    }
 
-		try {
-			// 3. Prepara o "carteiro" (HttpClient) e a "carta" (HttpRequest)
-			HttpClient client = HttpClient.newHttpClient();
-			HttpRequest request = HttpRequest.newBuilder()
-					// ALERTA: Troque esta URL para o endereço real do seu Spring Boot!
-					.uri(URI.create("http://localhost:8080/api/auth/login")) 
-					.header("Content-Type", "application/json")
-					.POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-					.build();
+    private HttpSession getSession() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        return request.getSession();
+    }
 
-			// 4. Dispara a requisição e espera a resposta
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    // =========================================================================
+    // MÉTODO ISOLADO PARA CONVERSAR COM O BACK-END (SPRING BOOT)
+    // =========================================================================
+    private Usuario autenticarNoSpring(String cpfLimpo, String senha) {
+        try {
+            String jsonBody = String.format("{\"cpf\":\"%s\", \"senha\":\"%s\"}", cpfLimpo, senha);
+            
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    // ATENÇÃO: Ajuste a porta aqui para a porta que o seu colega usou no Spring!
+                    .uri(URI.create("http://localhost:8081/api/auth/login")) 
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
 
-			// 5. Analisa a resposta da API (Status 200 significa OK)
-			if (response.statusCode() == 200) {
-			
-				ObjectMapper mapper = new ObjectMapper();
-				Usuario user = mapper.readValue(response.body(), Usuario.class);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-				// Preenche o Bean da sessão
-				usuarioLogadoBean.setUsuario(user);
+            if (response.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(response.body(), Usuario.class);
+            }
+        } catch (Exception e) {
+            log.error("Erro ao conectar na API do Spring: " + e.getMessage());
+        }
+        return null;
+    }
 
-				// Joga na Sessão do Java (Para o seu Filtro liberar o acesso)
-				HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-				session.setAttribute("usuario", user);
-
-				return "/views/comum/Inicio.xhtml?faces-redirect=true";
-
-			} else {
-				// Se a API retornou 401 (Unauthorized), 403 (Forbidden) ou 404
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "CPF ou senha incorretos!", null));
-				return null; 
-			}
-
-		} catch (Exception e) {
-			// Se o servidor do Spring estiver fora do ar ou der erro de conexão
-			e.printStackTrace();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro de comunicação com o servidor!", null));
-			return null;
-		}
-	}
-
-	// === GETTERS E SETTERS ===
->>>>>>> Stashed changes
-	public String getCpf() {
-		return cpf;
-	}
-
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
+    // =========================================================================
+    // MÉTODOS PARA A TELA NÃO QUEBRAR (Ações dos botões)
+    // =========================================================================
+    public void cadastrar() {
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso", "Ainda precisa plugar na API de cadastro."));
+    }
+    public void recuperarSenha() { }
+    public void mostrarLogin() { }
+    public void mostrarCadastro() { }
 }
