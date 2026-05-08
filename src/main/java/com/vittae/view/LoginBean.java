@@ -34,11 +34,10 @@ public class LoginBean implements Serializable {
     private Usuario usuario;
 
     // === Campos do seu formulário de Login ===
-    private String cpf; // O professor usou email, mas a sua tela pede CPF
+    private String cpf; 
     private String senha;
 
     // === Campos do seu formulário de Cadastro ===
-    // Sem isso, a sua tela Login.xhtml vai dar erro ao carregar!
     private String nome;
     private String email;
     private String cpfCadastro;
@@ -58,13 +57,12 @@ public class LoginBean implements Serializable {
         
         usuario = (Usuario) session.getAttribute("usuario");
 
-        // Se usuário não está na sessão = não está logado
         if (usuario == null) {
             
             // 1. Limpa a máscara do CPF que vem do PrimeFaces
             String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
 
-            // 2. Chama o método que conversa com o seu Spring Boot (substitui o DAO/Service local)
+            // 2. Chama o método que conversa com o seu Spring Boot
             usuario = autenticarNoSpring(cpfLimpo, senha);
             
             if (usuario != null) {
@@ -74,15 +72,13 @@ public class LoginBean implements Serializable {
 
                 session.setAttribute("usuario", usuario);
                 
-                // Redireciona para a página interna do SEU sistema
                 return "/views/comum/Inicio.xhtml?faces-redirect=true";
                 
             } else {
-                /* Não autenticado */
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou!", "CPF ou senha incorretos"));
                 
-                return "/Login.xhtml"; // Fica na tela de login
+                return "/Login.xhtml"; 
             }
         }
         return "/views/comum/Inicio.xhtml?faces-redirect=true";
@@ -94,7 +90,6 @@ public class LoginBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 
         try {
-            // Mudei o redirecionamento do professor ("/index.xhtml") para a sua tela "/Login.xhtml"
             FacesContext.getCurrentInstance().getExternalContext().redirect(
                     FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/Login.xhtml");
         } catch (IOException e) {
@@ -110,15 +105,15 @@ public class LoginBean implements Serializable {
     }
 
     // =========================================================================
-    // MÉTODO ISOLADO PARA CONVERSAR COM O BACK-END (SPRING BOOT)
+    // COMUNICAÇÃO COM O SPRING BOOT
     // =========================================================================
+    
     private Usuario autenticarNoSpring(String cpfLimpo, String senha) {
         try {
             String jsonBody = String.format("{\"cpf\":\"%s\", \"senha\":\"%s\"}", cpfLimpo, senha);
             
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    // ATENÇÃO: Ajuste a porta aqui para a porta que o seu colega usou no Spring!
                     .uri(URI.create("http://localhost:8081/api/auth/login")) 
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
@@ -137,12 +132,55 @@ public class LoginBean implements Serializable {
     }
 
     // =========================================================================
-    // MÉTODOS PARA A TELA NÃO QUEBRAR (Ações dos botões)
+    // MÉTODOS PARA A TELA NÃO QUEBRAR E FUNCIONAR
     // =========================================================================
+    
     public void cadastrar() {
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso", "Ainda precisa plugar na API de cadastro."));
+        log.info("Iniciando tentativa de cadastro...");
+        try {
+            // 1. Limpa as máscaras do CPF e do Telefone para enviar apenas números
+            String cpfLimpo = this.cpfCadastro != null ? this.cpfCadastro.replaceAll("\\D", "") : "";
+            String telLimpo = this.telefone != null ? this.telefone.replaceAll("\\D", "") : "";
+
+            // 2. Monta o JSON. Como é o Front-End, colocamos tudo num pacote só (inclusive o telefone).
+            // O perfil vai fixo como PACIENTE para o Back-End saber de quem se trata.
+            String jsonBody = String.format(
+                "{\"nome\":\"%s\", \"email\":\"%s\", \"cpf\":\"%s\", \"senha\":\"%s\", \"telefone\":\"%s\", \"perfil\":\"PACIENTE\"}",
+                this.nome, this.email, cpfLimpo, this.senhaCadastro, telLimpo
+            );
+            
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    // ATENÇÃO: Confirme com seu colega se a URL de cadastro é essa mesma!
+                    .uri(URI.create("http://localhost:8081/api/auth/cadastrar")) 
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 201 || response.statusCode() == 200) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Cadastro realizado! Agora você pode fazer o login."));
+                
+                // Limpa os campos do formulário para a tela ficar em branco novamente
+                this.nome = "";
+                this.email = "";
+                this.cpfCadastro = "";
+                this.telefone = "";
+                this.senhaCadastro = "";
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro!", "Não foi possível criar a conta."));
+                log.error("Erro no Spring. Status: " + response.statusCode() + ". Retorno: " + response.body());
+            }
+        } catch (Exception e) {
+            log.error("Erro ao conectar na API de Cadastro do Spring: " + e.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_FATAL, "Falha de Conexão", "O servidor pode estar desligado."));
+        }
     }
+
     public void recuperarSenha() { }
     public void mostrarLogin() { }
     public void mostrarCadastro() { }

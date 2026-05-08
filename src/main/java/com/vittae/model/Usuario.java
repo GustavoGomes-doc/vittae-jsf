@@ -1,35 +1,26 @@
 package com.vittae.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Table;
+import com.vittae.model.enums.Perfil;
 
-@Entity
-@Table(name = "usuario")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String cpf;
 	private String senha;
 	private String nome;
 	private String email;
+	private Perfil perfil;
 
 	public Usuario() {
 	}
 
 	public Usuario(String cpf, String senha, String nome, String email) {
 		this.cpf = cpf;
-		this.senha = senha;
+		this.senha = senha;	
 		this.nome = nome;
 		this.email = email;
+		this.perfil = perfil;
 	}
 
 	public Long getId() {
@@ -70,5 +61,13 @@ public class Usuario {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Perfil getPerfil() {
+		return perfil;
+	}
+
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
 	}
 }
