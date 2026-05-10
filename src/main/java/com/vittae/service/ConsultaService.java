@@ -15,7 +15,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 
-public class AgendarConsultaService {
+public class ConsultaService {
 
 	// mesma porta do seu Spring Boot — ajusta se precisar
 	private static final String API_URL = "http://localhost:8081/api/agendamentos";

@@ -11,11 +11,6 @@
 		<listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
 	</listener>
 
-	<context-param>
-		<param-name>primefaces.UPLOADER</param-name>
-		<param-value>auto</param-value>
-	</context-param>
-
 	<resource-env-ref>
 		<resource-env-ref-name>BeanManager</resource-env-ref-name>
 		<resource-env-ref-type>javax.enterprise.inject.spi.BeanManager</resource-env-ref-type>

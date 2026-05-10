@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+    <ui:define name="css_extra">
+        <h:outputStylesheet library="css" name="VisualizarConsulta.css" />
+    </ui:define>
+
+    <ui:define name="corpo">
+
+        <h:messages id="mensagens" globalOnly="true" styleClass="info-messages"
+                    errorClass="error-messages" infoClass="success-messages" />
+
+        <h:form id="formVisualizarConsultas">
+
+            <!-- HEADER -->
+            <div class="page-header">
+                <h:panelGroup layout="block">
+                    <h2 class="page-title">Minhas Consultas</h2>
+                    <p class="page-subtitle">Gerencie seus agendamentos no sistema Vittae</p>
+                </h:panelGroup>
+
+                <h:link outcome="/views/pacientes/agendarConsulta" styleClass="btn-nova">
+                    <i class="fas fa-plus"></i> Nova Consulta
+                </h:link>
+            </div>
+
+            <!-- TOOLBAR: busca + filtros de status -->
+            <div class="toolbar">
+
+                <!-- Campo de busca -->
+                <h:panelGroup layout="block" styleClass="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <h:inputText id="filtroTexto"
+                                 value="#{visualizarConsultasBean.filtroTexto}"
+                                 styleClass="search-input"
+                                 p:placeholder="Buscar médico ou especialidade...">
+                        <f:ajax event="keyup"
+                                execute="@this"
+                                render="listaConsultasGroup mensagens"
+                                listener="#{visualizarConsultasBean.filtrar}" />
+                    </h:inputText>
+                </h:panelGroup>
+
+                <!-- Botões de filtro de status -->
+                <div class="filter-tabs">
+
+                    <!-- Todas -->
+                    <h:commandButton value="Todas"
+                                     styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'todas' ? 'active' : ''}">
+                        <f:setPropertyActionListener target="#{visualizarConsultasBean.filtroStatus}"
+                                                     value="todas" />
+                        <f:ajax execute="@this"
+                                render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+                                listener="#{visualizarConsultasBean.filtrar}" />
+                    </h:commandButton>
+
+                    <!-- Agendadas -->
+                    <h:commandButton value="Agendadas"
+                                     styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'agendada' ? 'active' : ''}">
+                        <f:setPropertyActionListener target="#{visualizarConsultasBean.filtroStatus}"
+                                                     value="agendada" />
+                        <f:ajax execute="@this"
+                                render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+                                listener="#{visualizarConsultasBean.filtrar}" />
+                    </h:commandButton>
+
+                    <!-- Realizadas -->
+                    <h:commandButton value="Realizadas"
+                                     styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'realizada' ? 'active' : ''}">
+                        <f:setPropertyActionListener target="#{visualizarConsultasBean.filtroStatus}"
+                                                     value="realizada" />
+                        <f:ajax execute="@this"
+                                render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+                                listener="#{visualizarConsultasBean.filtrar}" />
+                    </h:commandButton>
+
+                    <!-- Canceladas -->
+                    <h:commandButton value="Canceladas"
+                                     styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'cancelada' ? 'active' : ''}">
+                        <f:setPropertyActionListener target="#{visualizarConsultasBean.filtroStatus}"
+                                                     value="cancelada" />
+                        <f:ajax execute="@this"
+                                render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+                                listener="#{visualizarConsultasBean.filtrar}" />
+                    </h:commandButton>
+
+                </div>
+            </div>
+
+            <!-- LISTA -->
+            <h:panelGroup id="listaConsultasGroup" layout="block">
+
+                <!-- EMPTY STATE -->
+                <h:panelGroup rendered="#{empty visualizarConsultasBean.consultasFiltradas}"
+                              layout="block" styleClass="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-calendar-times"
+                           style="font-size: 32px; color: var(--vittae-purple);"></i>
+                    </div>
+                    <h3 class="empty-title">Nenhuma consulta encontrada</h3>
+                    <h:outputText value="Você não possui agendamentos para os critérios selecionados."
+                                  styleClass="empty-text" />
+                </h:panelGroup>
+
+                <!-- CARDS -->
+                <h:panelGroup rendered="#{not empty visualizarConsultasBean.consultasFiltradas}"
+                              layout="block">
+
+                    <ui:repeat value="#{visualizarConsultasBean.consultasFiltradas}" var="consulta">
+
+                        <h:panelGroup layout="block" styleClass="consulta-card">
+
+                            <!-- Card Header -->
+                            <div class="card-header">
+                                <h:panelGroup layout="block" styleClass="doctor-info">
+                                    <div class="avatar">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                    <h:panelGroup layout="block">
+                                        <div class="doctor-name">
+                                            <h:outputText value="#{consulta.medico.nome}" />
+                                        </div>
+                                        <div class="doctor-specialty">
+                                            <i class="fas fa-stethoscope"></i>
+                                            <h:outputText value="#{consulta.medico.especialidade}" />
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
+                                <h:panelGroup layout="block"
+                                              styleClass="badge badge-#{consulta.status.toString().toLowerCase()}">
+                                    <div class="badge-dot"></div>
+                                    <h:outputText value="#{consulta.status.descricao}" />
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="card-divider"></div>
+
+                            <!-- Detalhes -->
+                            <div class="card-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-calendar-day"></i> Data
+                                    </span>
+                                    <h:outputText value="#{consulta.dataConsulta}"
+                                                  styleClass="detail-value">
+                                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-clock"></i> Horário
+                                    </span>
+                                    <h:outputText value="#{consulta.hora}"
+                                                  styleClass="detail-value">
+                                        <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                    </h:outputText>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-money-bill-wave"></i> Valor
+                                    </span>
+                                    <h:outputText value="#{consulta.valorConsulta}"
+                                                  styleClass="detail-value price">
+                                        <f:convertNumber type="currency"
+                                                         currencySymbol="R$ "
+                                                         locale="pt_BR" />
+                                    </h:outputText>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-map-marker-alt"></i> Local
+                                    </span>
+                                    <span class="detail-address">
+                                        <h:outputText value="#{consulta.local}" />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Ações -->
+                            <div class="card-actions">
+                                <h:commandButton styleClass="btn btn-cancel"
+                                                 rendered="#{consulta.status.toString() ne 'CANCELADA'}">
+                                    <f:ajax execute="@this"
+                                            render="@form mensagens"
+                                            listener="#{visualizarConsultasBean.cancelar(consulta)}" />
+                                    <i class="fas fa-times"></i> Cancelar
+                                </h:commandButton>
+                            </div>
+
+                        </h:panelGroup>
+                    </ui:repeat>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
