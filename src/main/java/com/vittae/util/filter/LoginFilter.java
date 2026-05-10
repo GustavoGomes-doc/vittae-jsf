@@ -15,20 +15,25 @@ import javax.servlet.http.HttpSession;
 
 import com.vittae.model.Usuario;
 
-
-
 @WebFilter(urlPatterns = "/views/*", servletNames = "{Faces Servlet}")
 public class LoginFilter extends AbstractFilter implements Filter {
 	
-	public void init(FilterConfig arg0) throws ServletException{}
+	public void init(FilterConfig arg0) throws ServletException {}
 	
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		
 		HttpServletRequest req = (HttpServletRequest) request;
-		@SuppressWarnings("unused")
 		HttpServletResponse res = (HttpServletResponse) response;
 		HttpSession session = req.getSession();
+		
+		//verifica se a página requisitada já é a de login
+		String reqURI = req.getRequestURI();
+		if (reqURI.contains("/login.xhtml")) {
+			//se for a tela de login, deixa passar sem barrar
+			chain.doFilter(request, response);
+			return; 
+		}
 		
 		Usuario user = (Usuario) session.getAttribute("usuario");
 		

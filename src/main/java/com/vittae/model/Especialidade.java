@@ -1,12 +1,10 @@
 package com.vittae.model;
 
-import java.util.List;
-
 public class Especialidade {
 
 	private Long id;
 	private String nome;
-	private List<Medico> medicos;
+	//private List<Medico> medicos;
 
 	public Especialidade() {
 	}
@@ -31,11 +29,11 @@ public class Especialidade {
 		this.nome = nome;
 	}
 
-	public List<Medico> getMedicos() {
-		return medicos;
-	}
+	//public List<Medico> getMedicos() {
+		//return medicos;
+	//}
 
-	public void setMedicos(List<Medico> medicos) {
-		this.medicos = medicos;
-	}
+	//public void setMedicos(List<Medico> medicos) {
+	//	this.medicos = medicos;
+	//}
 }

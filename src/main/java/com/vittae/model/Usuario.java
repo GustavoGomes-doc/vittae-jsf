@@ -15,7 +15,7 @@ public class Usuario {
 	public Usuario() {
 	}
 
-	public Usuario(String cpf, String senha, String nome, String email) {
+	public Usuario(String cpf, String senha, String nome, String email, Perfil perfil) {
 		this.cpf = cpf;
 		this.senha = senha;	
 		this.nome = nome;
