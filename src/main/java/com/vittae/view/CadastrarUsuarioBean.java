@@ -32,7 +32,6 @@ public class CadastrarUsuarioBean implements Serializable {
     @Inject
     private UsuarioService usuarioService;
 
-    // AQUI MUDOU: Agora usamos o seu LoginBean oficial
     @Inject
     private LoginBean loginBean;
 
