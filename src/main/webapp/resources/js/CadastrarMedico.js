@@ -181,7 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else ocultarErro('especialidade');
 
 		const checkboxes = document.querySelectorAll('#formCadastro input[type="checkbox"]');
-		const diasMarcados = Array.from(checkboxes).some(el => el.checked);
+		const diasMarcados = Array.from(
+		    document.querySelectorAll('#formCadastro input[type="checkbox"]')
+		).some(el => el.checked);
 
         if (!diasMarcados) {
             exibirErro('disp', 'Selecione ao menos um dia de disponibilidade.');
