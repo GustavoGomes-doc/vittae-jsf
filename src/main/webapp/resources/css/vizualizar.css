@@ -26,7 +26,7 @@
     --radius-sm: 8px;
 }
 
-/* ===== FIX TOPBAR: empurra user-info para direita sem o search-bar ===== */
+/* ===== TOPBAR ===== */
 .topbar .user-info {
     margin-left: auto;
 }
@@ -145,7 +145,7 @@
     box-shadow: 0 0 0 3px rgba(124,58,237,.1);
 }
 
-/* ===== FILTER TABS (apenas VisualizarConsultas) ===== */
+/* ===== FILTER TABS ===== */
 .filter-tabs {
     display: flex;
     gap: 6px;
@@ -261,22 +261,13 @@
     border-radius: 50%;
 }
 
-.badge-agendada {
-    background: var(--status-confirmed-bg);
-    color: var(--status-confirmed);
-}
-.badge-agendada .badge-dot { background: var(--status-confirmed); }
+.badge-agendada  { background: var(--status-confirmed-bg); color: var(--status-confirmed); }
+.badge-agendada  .badge-dot { background: var(--status-confirmed); }
 
-.badge-realizada {
-    background: var(--status-done-bg);
-    color: var(--status-done);
-}
+.badge-realizada { background: var(--status-done-bg); color: var(--status-done); }
 .badge-realizada .badge-dot { background: var(--status-done); }
 
-.badge-cancelada {
-    background: var(--status-canceled-bg);
-    color: var(--status-canceled);
-}
+.badge-cancelada { background: var(--status-canceled-bg); color: var(--status-canceled); }
 .badge-cancelada .badge-dot { background: var(--status-canceled); }
 
 /* ===== DIVIDER ===== */
@@ -344,6 +335,30 @@
     gap: 10px;
 }
 
+.btn-remarcar {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    background: var(--status-confirmed-bg);
+    border: 1.5px solid var(--vittae-purple);
+    color: var(--vittae-purple);
+    text-decoration: none;
+}
+
+.btn-remarcar:hover {
+    background: #DDD6FE;
+    box-shadow: 0 2px 6px rgba(124,58,237,.2);
+    color: var(--vittae-purple);
+    text-decoration: none;
+}
+
 .btn-cancel {
     display: inline-flex;
     align-items: center;
@@ -365,30 +380,6 @@
     background: #FFE4E6;
     box-shadow: 0 2px 6px rgba(225,29,72,.15);
     color: #E11D48;
-    text-decoration: none;
-}
-
-.btn-reschedule {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 9px 20px;
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .18s;
-    background: var(--vittae-purple);
-    border: 1.5px solid transparent;
-    color: #fff;
-    text-decoration: none;
-}
-
-.btn-reschedule:hover {
-    background: var(--vittae-purple-dark);
-    box-shadow: 0 4px 12px rgba(124,58,237,.3);
-    color: #fff;
     text-decoration: none;
 }
 
@@ -419,4 +410,98 @@
 .empty-text {
     font-size: 14px;
     color: var(--text-muted);
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay.modal-ativo {
+    display: flex !important;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.modal-icon {
+    font-size: 2.5rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+}
+
+.modal-text {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eee;
+    color: #333;
+    border: none;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .18s;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+    text-decoration: none;
+    color: #333;
+}
+
+.btn-confirmar-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .18s;
+}
+
+.btn-confirmar-cancel:hover {
+    background: #c0392b;
+    text-decoration: none;
+    color: #fff;
 }

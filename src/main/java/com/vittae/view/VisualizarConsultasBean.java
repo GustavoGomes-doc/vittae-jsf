@@ -18,137 +18,139 @@ import com.vittae.service.ConsultaService;
 @ViewScoped
 public class VisualizarConsultasBean implements Serializable {
 
-	private List<Consulta> consultas;
-	private Consulta consultaSelecionada;
-	private String filtroTexto;
-	private String filtroStatus;
+    private List<Consulta> consultas;
+    private Consulta consultaSelecionada;
+    private Consulta consultaParaCancelar;
+    private String filtroTexto;
+    private String filtroStatus;
+    private boolean exibirModalCancelamento = false;
 
-	// Service que faz as chamadas HTTP pro Back
-	private ConsultaService service = new ConsultaService();
+    private ConsultaService service = new ConsultaService();
 
-	@PostConstruct
-	public void init() {
-		filtroStatus = "todas";
-		carregarConsultas();
-	}
+    @PostConstruct
+    public void init() {
+        filtroStatus = "todas";
+        carregarConsultas();
+    }
 
-	// ─── CARREGAR LISTA DO BANCO ─────────────────────────
-	public void carregarConsultas() {
-		try {
-			consultas = service.listarTodas();
-		} catch (Exception e) {
-			consultas = new ArrayList<>();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Erro ao carregar consultas: " + e.getMessage(), null));
-		}
-	}
-	
-	  public List<Consulta> getConsultasFiltradas() {
-	        if (consultas == null) {
-	            return new ArrayList<>();
-	        }
-	 
-	        return consultas.stream()
-	                .filter(this::passaFiltroStatus)
-	                .filter(this::passaFiltroTexto)
-	                .collect(Collectors.toList());
-	    }
-	 
-	    private boolean passaFiltroStatus(Consulta c) {
-	        if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas")) {
-	            return true;
-	        }
-	        return c.getStatus() != null &&
-	               c.getStatus().toString().equalsIgnoreCase(filtroStatus);
-	    }
-	 
-	    private boolean passaFiltroTexto(Consulta c) {
-	        String texto = filtroTexto.trim().toLowerCase();
+    // ─── CARREGAR ────────────────────────────────────────
+    public void carregarConsultas() {
+        try {
+            consultas = service.listarTodas();
+        } catch (Exception e) {
+            consultas = new ArrayList<>();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Erro ao carregar consultas: " + e.getMessage(), null));
+        }
+    }
 
-	        boolean nomeOk = c.getMedico() != null
-	                && c.getMedico().getNome() != null
-	                && c.getMedico().getNome().toLowerCase().contains(texto);
+    // ─── FILTROS ─────────────────────────────────────────
+    public List<Consulta> getConsultasFiltradas() {
+        if (consultas == null) return new ArrayList<>();
+        return consultas.stream()
+                .filter(this::passaFiltroStatus)
+                .filter(this::passaFiltroTexto)
+                .collect(Collectors.toList());
+    }
 
-	        boolean especOk = false;
-	        if (c.getMedico() != null && c.getMedico().getEspecialidades() != null) {
-	            especOk = c.getMedico().getEspecialidades().stream()
-	                    .filter(e -> e != null)
-	                    .anyMatch(e -> e.toLowerCase().contains(texto));
-	        }
+    private boolean passaFiltroStatus(Consulta c) {
+        if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas")) return true;
+        return c.getStatus() != null &&
+               c.getStatus().toString().equalsIgnoreCase(filtroStatus);
+    }
 
-	        return nomeOk || especOk;
-	    }
-	    
-	    public void filtrar() {}
+    private boolean passaFiltroTexto(Consulta c) {
+        if (filtroTexto == null || filtroTexto.trim().isEmpty()) return true;
+        String texto = filtroTexto.trim().toLowerCase();
 
-	// ─── DETALHAR ────────────────────────────────────────
-	// Clica na mesma = fecha, clica em outra = abre
-	public void detalhar(Consulta c) {
-		if (consultaSelecionada != null && consultaSelecionada.getId().equals(c.getId())) {
-			consultaSelecionada = null;
-		} else {
-			consultaSelecionada = c;
-		}
-	}
+        boolean nomeOk = c.getMedico() != null
+                && c.getMedico().getNome() != null
+                && c.getMedico().getNome().toLowerCase().contains(texto);
 
-	// ─── CANCELAR ────────────────────────────────────────
-	public void cancelar(Consulta c) {
-		try {
-			service.cancelar(c.getId(), c);
-			carregarConsultas(); // recarrega a lista do banco
-			consultaSelecionada = null;
+        boolean especOk = false;
+        if (c.getMedico() != null && c.getMedico().getEspecialidades() != null) {
+            especOk = c.getMedico().getEspecialidades().stream()
+                    .filter(e -> e != null)
+                    .anyMatch(e -> e.toLowerCase().contains(texto));
+        }
+        return nomeOk || especOk;
+    }
 
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Consulta cancelada com sucesso!", null));
-		} catch (Exception e) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao cancelar: " + e.getMessage(), null));
-		}
-	}
-	
-	//helpers
+    public void filtrar() {}
 
+    // ─── DETALHAR ────────────────────────────────────────
+    public void detalhar(Consulta c) {
+        if (consultaSelecionada != null && consultaSelecionada.getId().equals(c.getId())) {
+            consultaSelecionada = null;
+        } else {
+            consultaSelecionada = c;
+        }
+    }
+
+    // ─── CANCELAR COM MODAL ───────────────────────────────
+    public void prepararCancelamento(Consulta c) {
+        this.consultaParaCancelar = c;
+        this.exibirModalCancelamento = true;
+    }
+
+    public void confirmarCancelamento() {
+        if (consultaParaCancelar != null) {
+            cancelar(consultaParaCancelar);
+        }
+        fecharModal();
+    }
+
+    public void fecharModal() {
+        this.exibirModalCancelamento = false;
+        this.consultaParaCancelar = null;
+    }
+
+    public void cancelar(Consulta c) {
+        try {
+            service.cancelar(c.getId(), c);
+            carregarConsultas();
+            consultaSelecionada = null;
+            addInfo("Consulta cancelada com sucesso!");
+        } catch (Exception e) {
+            addErro("Erro ao cancelar: " + e.getMessage());
+        }
+    }
+
+    // ─── REMARCAR ────────────────────────────────────────
+    public void prepararRemarcar(Consulta c) {
+        this.consultaSelecionada = c;
+        addInfo("Funcionalidade de remarcação em breve!");
+    }
+
+    // ─── HELPERS ─────────────────────────────────────────
     private void addInfo(String msg) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
- 
+
     private void addErro(String msg) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 
-	public List<Consulta> getConsultas() {
-		return consultas;
-	}
+    // ─── GETTERS E SETTERS ────────────────────────────────
+    public List<Consulta> getConsultas() { return consultas; }
+    public void setConsultas(List<Consulta> consultas) { this.consultas = consultas; }
 
-	public void setConsultas(List<Consulta> consultas) {
-		this.consultas = consultas;
-	}
+    public Consulta getConsultaSelecionada() { return consultaSelecionada; }
+    public void setConsultaSelecionada(Consulta c) { this.consultaSelecionada = c; }
 
-	public Consulta getConsultaSelecionada() {
-		return consultaSelecionada;
-	}
+    public Consulta getConsultaParaCancelar() { return consultaParaCancelar; }
+    public void setConsultaParaCancelar(Consulta c) { this.consultaParaCancelar = c; }
 
-	public void setConsultaSelecionada(Consulta c) {
-		this.consultaSelecionada = c;
-	}
+    public String getFiltroTexto() { return filtroTexto; }
+    public void setFiltroTexto(String filtroTexto) { this.filtroTexto = filtroTexto; }
 
-	public String getFiltroTexto() {
-		return filtroTexto;
-	}
+    public String getFiltroStatus() { return filtroStatus; }
+    public void setFiltroStatus(String filtroStatus) { this.filtroStatus = filtroStatus; }
 
-	public void setFiltroTexto(String filtroTexto) {
-		this.filtroTexto = filtroTexto;
-	}
-
-	public String getFiltroStatus() {
-		return filtroStatus;
-	}
-
-	public void setFiltroStatus(String filtroStatus) {
-		this.filtroStatus = filtroStatus;
-	}
-	
-	
+    public boolean isExibirModalCancelamento() { return exibirModalCancelamento; }
+    public void setExibirModalCancelamento(boolean exibirModalCancelamento) {
+        this.exibirModalCancelamento = exibirModalCancelamento;
+    }
 }

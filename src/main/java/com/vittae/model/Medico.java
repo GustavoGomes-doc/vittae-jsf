@@ -18,9 +18,9 @@ public class Medico extends Usuario {
 	private double valorConsulta; 
 	private String telefone;
 	
-	@JsonManagedReference
 	private List<String> especialidades;
 	
+	@JsonManagedReference
 	private List<Disponibilidade> disponibilidades;
 	private List<Consulta> consultas;
 

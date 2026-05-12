@@ -1,14 +1,14 @@
 package com.vittae.model;
 
 import com.vittae.model.enums.Status;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
 // Classes puras, prontas para virar JSON
 public class Consulta {
-	
-	
+
 	private Long id;
 	private Medico medico;
 	private Paciente paciente;
@@ -16,18 +16,29 @@ public class Consulta {
 	private LocalDate dataAgendado;
 	private LocalDate dataConsulta;
 	private LocalTime hora;
-	
+	private BigDecimal valorConsulta;
+	private String local;
 
 	public Consulta() {
 	}
-	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta,
-			LocalTime hora) {
+
+	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta, String local,
+			BigDecimal valorConsulta, LocalTime hora) {
 		this.medico = medico;
 		this.paciente = paciente;
 		this.status = status;
 		this.dataAgendado = dataAgendado;
 		this.dataConsulta = dataConsulta;
 		this.hora = hora;
+		this.valorConsulta = valorConsulta;
+	}
+
+	public String getLocal() {
+		return local;
+	}
+
+	public void setLocal(String local) {
+		this.local = local;
 	}
 
 	public Long getId() {
@@ -40,6 +51,14 @@ public class Consulta {
 
 	public Medico getMedico() {
 		return medico;
+	}
+
+	public BigDecimal getValorConsulta() {
+		return valorConsulta;
+	}
+
+	public void setValorConsulta(BigDecimal valorConsulta) {
+		this.valorConsulta = valorConsulta;
 	}
 
 	public void setMedico(Medico medico) {
@@ -85,5 +104,5 @@ public class Consulta {
 	public void setHora(LocalTime hora) {
 		this.hora = hora;
 	}
-	
+
 }
