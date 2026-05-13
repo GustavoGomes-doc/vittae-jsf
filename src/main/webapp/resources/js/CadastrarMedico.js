@@ -5,24 +5,26 @@ function toggleHorario(checkbox, divId) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const form = document.getElementById('formCadastro');
-    const cpfInput = document.getElementById('formCadastro:cpfMedico');
-    const cepInput = document.getElementById('formCadastro:cepMedico');
-    const fotoInput = document.getElementById('formCadastro:fotoMedico');
+    const form          = document.getElementById('formCadastro');
+    const cpfInput      = document.getElementById('formCadastro:cpfMedico');
+    const cepInput      = document.getElementById('formCadastro:cepMedico');
+    const fotoInput     = document.getElementById('formCadastro:fotoMedico');
     const telefoneInput = document.getElementById('formCadastro:telefoneMedico');
-    const fotoCirculo = document.getElementById('fotoCirculo');
-    const fotoPreview = document.getElementById('fotoPreview');
-    const fotoIcone = document.getElementById('fotoIcone');
+    const fotoCirculo   = document.getElementById('fotoCirculo');
+    const fotoPreview   = document.getElementById('fotoPreview');
+    const fotoIcone     = document.getElementById('fotoIcone');
 
     const ESPECIALIDADES = [
-        'Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia',
-        'Ginecologia', 'Oftalmologia', 'Neurologia', 'Psiquiatria',
-        'Endocrinologia', 'Urologia', 'Otorrinolaringologia',
-        'Gastroenterologia', 'Clínico Geral', 'Oncologia',
-        'Reumatologia', 'Infectologia'
+        'Cardiologia','Dermatologia','Pediatria','Ortopedia',
+        'Ginecologia','Oftalmologia','Neurologia','Psiquiatria',
+        'Endocrinologia','Urologia','Otorrinolaringologia',
+        'Gastroenterologia','Clínico Geral','Oncologia',
+        'Reumatologia','Infectologia'
     ];
 
     let especialidadesSelecionadas = [];
+
+    // ── FOTO ─────────────────────────────────────────────────
 
     if (fotoCirculo) fotoCirculo.addEventListener('click', () => fotoInput.click());
 
@@ -44,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // MÁSCARAS
+    // ── MÁSCARAS ─────────────────────────────────────────────
+
     if (cpfInput) {
         cpfInput.addEventListener('input', function () {
             let v = this.value.replace(/\D/g, '').slice(0, 11);
@@ -53,6 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
                  .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
             this.value = v;
         });
+        cpfInput.addEventListener('blur', function () {
+            const cpf = this.value.replace(/\D/g, '');
+            const ok = cpf.length === 11;
+            marcarErro('formCadastro:cpfMedico', 'cpf', !ok, 'CPF incompleto');
+        });
     }
 
     if (cepInput) {
@@ -60,6 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let v = this.value.replace(/\D/g, '').slice(0, 8);
             if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
             this.value = v;
+        });
+        cepInput.addEventListener('blur', function () {
+            const cep = this.value.replace(/\D/g, '');
+            marcarErro('formCadastro:cepMedico', 'cep', cep.length !== 8, 'CEP inválido');
         });
     }
 
@@ -73,9 +85,125 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             this.value = v;
         });
+        telefoneInput.addEventListener('blur', function () {
+            const tel = this.value.replace(/\D/g, '');
+            marcarErro('formCadastro:telefoneMedico', 'telefone', tel.length < 10, 'Telefone inválido');
+        });
     }
 
-    // CHIPS
+    // Nome
+    const nomeInput = document.getElementById('formCadastro:nomeMedico');
+    if (nomeInput) {
+        nomeInput.addEventListener('blur', function () {
+            const ok = this.value.trim().length > 0;
+            marcarErro('formCadastro:nomeMedico', 'nome', !ok, 'Nome é obrigatório');
+        });
+    }
+
+    // CRM: só números, máx 6
+    const crmInput = document.getElementById('formCadastro:crmMedico');
+    if (crmInput) {
+        crmInput.setAttribute('maxlength', '6');
+        crmInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+        crmInput.addEventListener('blur', function () {
+            const ok = /^\d{1,6}$/.test(this.value.trim());
+            marcarErro('formCadastro:crmMedico', 'crm', !ok, 'CRM deve ter até 6 dígitos numéricos');
+        });
+    }
+
+    // UF
+    const ufEl = document.getElementById('formCadastro:ufCrm');
+    if (ufEl) {
+        ufEl.addEventListener('change', function () {
+            marcarErro('formCadastro:ufCrm', 'uf', !this.value, 'Selecione a UF do CRM');
+        });
+    }
+
+    // Valor da consulta: máscara 0,00
+	const valorInput = document.getElementById('formCadastro:valorConsulta');
+	if (valorInput) {
+	    valorInput.addEventListener('input', function (e) {
+	        let value = e.target.value.replace(/\D/g, "");
+	        value = (value / 100).toFixed(2) + "";
+	        value = value.replace(".", ",");
+	        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+	        e.target.value = value;
+	    });
+	}
+
+    // Duração: só inteiros, máx 3 dígitos
+    const duracaoInput = document.getElementById('formCadastro:tempoConsulta');
+    if (duracaoInput) {
+        duracaoInput.setAttribute('maxlength', '3');
+        duracaoInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 3);
+        });
+        duracaoInput.addEventListener('blur', function () {
+            const t = parseInt(this.value);
+            marcarErro('formCadastro:tempoConsulta', 'tempo',
+                isNaN(t) || t < 5 || t > 999, 'Duração deve ser entre 5 e 999 minutos');
+        });
+    }
+
+    // Data de nascimento: máscara DD/MM/AAAA + validação 24 anos
+	const dataNascInput = document.getElementById('formCadastro:dataNascimento');
+	if (dataNascInput) {
+	    dataNascInput.addEventListener('blur', function () {
+	        const partes = this.value.split('/');
+	        let erro = true;
+	        if (partes.length === 3 && partes[2].length === 4) {
+	            const dataNasc = new Date(partes[2], partes[1] - 1, partes[0]);
+	            const hoje = new Date();
+	            
+	            // Cálculo preciso de idade
+	            let idade = hoje.getFullYear() - dataNasc.getFullYear();
+	            const m = hoje.getMonth() - dataNasc.getMonth();
+	            if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
+	                idade--;
+	            }
+	            
+	            erro = isNaN(dataNasc.getTime()) || idade < 24;
+	        }
+	        marcarErro('formCadastro:dataNascimento', 'nasc', erro, 'O médico deve ter no mínimo 24 anos');
+	    });
+	}
+
+        dataNascInput.addEventListener('blur', function () {
+            const partes = this.value.split('/');
+            let erro = true;
+            if (partes.length === 3 && partes[2].length === 4) {
+                const nascDate = new Date(+partes[2], +partes[1] - 1, +partes[0]);
+                const hoje = new Date();
+                const idade = hoje.getFullYear() - nascDate.getFullYear()
+                    - (hoje < new Date(hoje.getFullYear(), nascDate.getMonth(), nascDate.getDate()) ? 1 : 0);
+                erro = isNaN(nascDate.getTime()) || idade < 24;
+            }
+            marcarErro('formCadastro:dataNascimento', 'nasc', erro, 'O médico deve ter no mínimo 24 anos');
+        });
+    
+
+    // Email
+    const emailInput = document.getElementById('formCadastro:emailMedico');
+    if (emailInput) {
+        emailInput.addEventListener('blur', function () {
+            const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim());
+            marcarErro('formCadastro:emailMedico', 'email', !ok, 'E-mail inválido');
+        });
+    }
+
+    // Senha
+    const senhaInput = document.getElementById('formCadastro:senhaMedico');
+    if (senhaInput) {
+        senhaInput.addEventListener('blur', function () {
+            marcarErro('formCadastro:senhaMedico', 'senha',
+                this.value.length < 6, 'Mínimo 6 caracteres');
+        });
+    }
+
+    // ── CHIPS ─────────────────────────────────────────────────
+
     function inicializarChips() {
         const container = document.getElementById('chipsContainer');
         if (!container) return;
@@ -117,104 +245,118 @@ document.addEventListener('DOMContentLoaded', () => {
         if (contador) contador.textContent = `${especialidadesSelecionadas.length}/3 selecionadas`;
     }
 
-    // VALIDAÇÃO
+    // ── HELPERS DE ERRO ───────────────────────────────────────
+
+    function marcarErro(inputId, sufixo, temErro, msg) {
+        const el = document.getElementById(inputId);
+        if (el) el.classList.toggle('input-invalido', temErro);
+        temErro ? exibirErro(sufixo, msg) : ocultarErro(sufixo);
+    }
+
     function exibirErro(sufixo, msg) {
         const span = document.getElementById(`err-${sufixo}`);
-        if (span) { if (msg) span.textContent = msg; span.classList.add('visivel'); }
+        if (!span) return;
+        if (msg) span.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+        span.classList.add('visivel');
     }
+
     function ocultarErro(sufixo) {
         const span = document.getElementById(`err-${sufixo}`);
         if (span) span.classList.remove('visivel');
     }
-    function marcarInputErro(inputId, temErro) {
-        const el = document.getElementById(inputId);
-        if (el) el.classList.toggle('input-invalido', temErro);
-    }
 
-    function validarFormulario() {
+    // ── VALIDAÇÃO COMPLETA NO SUBMIT ──────────────────────────
+
+    function validarTudo() {
         let valido = true;
 
-        const nomeEl = document.getElementById('formCadastro:nomeMedico');
-        const nome = nomeEl ? nomeEl.value.trim() : '';
-        marcarInputErro('formCadastro:nomeMedico', !nome);
-        if (!nome) { exibirErro('nome'); valido = false; } else ocultarErro('nome');
+        const nome = nomeInput ? nomeInput.value.trim() : '';
+        if (!nome) { marcarErro('formCadastro:nomeMedico', 'nome', true, 'Nome é obrigatório'); valido = false; }
+        else marcarErro('formCadastro:nomeMedico', 'nome', false);
 
         const cpf = cpfInput ? cpfInput.value.replace(/\D/g, '') : '';
-        marcarInputErro('formCadastro:cpfMedico', cpf.length !== 11);
-        if (cpf.length !== 11) { exibirErro('cpf'); valido = false; } else ocultarErro('cpf');
+        if (cpf.length !== 11) { marcarErro('formCadastro:cpfMedico', 'cpf', true, 'CPF incompleto'); valido = false; }
+        else marcarErro('formCadastro:cpfMedico', 'cpf', false);
 
-        const telefone = telefoneInput ? telefoneInput.value.replace(/\D/g, '') : '';
-        marcarInputErro('formCadastro:telefoneMedico', telefone.length < 10);
-        if (telefone.length < 10) { exibirErro('telefone'); valido = false; } else ocultarErro('telefone');
+        const tel = telefoneInput ? telefoneInput.value.replace(/\D/g, '') : '';
+        if (tel.length < 10) { marcarErro('formCadastro:telefoneMedico', 'telefone', true, 'Telefone inválido'); valido = false; }
+        else marcarErro('formCadastro:telefoneMedico', 'telefone', false);
 
-        const nascEl = document.getElementById('formCadastro:dataNascimento');
-        const nasc = nascEl ? nascEl.value : '';
-        marcarInputErro('formCadastro:dataNascimento', !nasc);
-        if (!nasc) { exibirErro('nasc'); valido = false; } else ocultarErro('nasc');
+        // Data + 24 anos
+        const nascVal = dataNascInput ? dataNascInput.value : '';
+        const partes = nascVal.split('/');
+        let nascOk = false;
+        if (partes.length === 3 && partes[2].length === 4) {
+            const nascDate = new Date(+partes[2], +partes[1] - 1, +partes[0]);
+            const hoje = new Date();
+            const idade = hoje.getFullYear() - nascDate.getFullYear()
+                - (hoje < new Date(hoje.getFullYear(), nascDate.getMonth(), nascDate.getDate()) ? 1 : 0);
+            nascOk = !isNaN(nascDate.getTime()) && idade >= 24;
+        }
+        if (!nascOk) { marcarErro('formCadastro:dataNascimento', 'nasc', true, 'O médico deve ter no mínimo 24 anos'); valido = false; }
+        else marcarErro('formCadastro:dataNascimento', 'nasc', false);
 
-        const crmEl = document.getElementById('formCadastro:crmMedico');
-        const crm = crmEl ? crmEl.value.trim() : '';
-        marcarInputErro('formCadastro:crmMedico', !crm);
-        if (!crm) { exibirErro('crm'); valido = false; } else ocultarErro('crm');
+        const crm = crmInput ? crmInput.value.trim() : '';
+        if (!/^\d{1,6}$/.test(crm)) { marcarErro('formCadastro:crmMedico', 'crm', true, 'CRM deve ter até 6 dígitos numéricos'); valido = false; }
+        else marcarErro('formCadastro:crmMedico', 'crm', false);
 
-        const ufEl = document.getElementById('formCadastro:ufCrm');
         const uf = ufEl ? ufEl.value : '';
-        marcarInputErro('formCadastro:ufCrm', !uf);
-        if (!uf) { exibirErro('uf'); valido = false; } else ocultarErro('uf');
+        if (!uf) { marcarErro('formCadastro:ufCrm', 'uf', true, 'Selecione a UF do CRM'); valido = false; }
+        else marcarErro('formCadastro:ufCrm', 'uf', false);
 
         const cep = cepInput ? cepInput.value.replace(/\D/g, '') : '';
-        marcarInputErro('formCadastro:cepMedico', cep.length !== 8);
-        if (cep.length !== 8) { exibirErro('cep'); valido = false; } else ocultarErro('cep');
+        if (cep.length !== 8) { marcarErro('formCadastro:cepMedico', 'cep', true, 'CEP inválido'); valido = false; }
+        else marcarErro('formCadastro:cepMedico', 'cep', false);
 
-        const valorEl = document.getElementById('formCadastro:valorConsulta');
-        const valor = valorEl ? parseFloat(valorEl.value) : 0;
-        marcarInputErro('formCadastro:valorConsulta', isNaN(valor) || valor <= 0);
-        if (isNaN(valor) || valor <= 0) { exibirErro('valor'); valido = false; } else ocultarErro('valor');
+        const valorRaw = valorInput ? valorInput.value.replace(',', '.') : '';
+        const valor = parseFloat(valorRaw);
+        if (isNaN(valor) || valor <= 0) { marcarErro('formCadastro:valorConsulta', 'valor', true, 'Informe um valor maior que zero'); valido = false; }
+        else marcarErro('formCadastro:valorConsulta', 'valor', false);
 
-        const tempoEl = document.getElementById('formCadastro:tempoConsulta');
-        const tempo = tempoEl ? parseInt(tempoEl.value) : 0;
-        marcarInputErro('formCadastro:tempoConsulta', isNaN(tempo) || tempo < 5);
-        if (isNaN(tempo) || tempo < 5) { exibirErro('tempo'); valido = false; } else ocultarErro('tempo');
+        const tempo = duracaoInput ? parseInt(duracaoInput.value) : 0;
+        if (isNaN(tempo) || tempo < 5 || tempo > 999) { marcarErro('formCadastro:tempoConsulta', 'tempo', true, 'Duração deve ser entre 5 e 999 minutos'); valido = false; }
+        else marcarErro('formCadastro:tempoConsulta', 'tempo', false);
 
         if (especialidadesSelecionadas.length === 0) {
-            exibirErro('especialidade'); valido = false;
+            exibirErro('especialidade', 'Selecione ao menos uma especialidade'); valido = false;
         } else ocultarErro('especialidade');
 
-		const checkboxes = document.querySelectorAll('#formCadastro input[type="checkbox"]');
-		const diasMarcados = Array.from(
-		    document.querySelectorAll('#formCadastro input[type="checkbox"]')
-		).some(el => el.checked);
+        const diasMarcados = Array.from(
+            document.querySelectorAll('#formCadastro input[type="checkbox"]')
+        ).some(el => el.checked);
+        if (!diasMarcados) { exibirErro('disp', 'Selecione ao menos um dia de disponibilidade'); valido = false; }
+        else ocultarErro('disp');
 
-        if (!diasMarcados) {
-            exibirErro('disp', 'Selecione ao menos um dia de disponibilidade.');
-            valido = false;
-        } else ocultarErro('disp');
+        const email = emailInput ? emailInput.value.trim() : '';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { marcarErro('formCadastro:emailMedico', 'email', true, 'E-mail inválido'); valido = false; }
+        else marcarErro('formCadastro:emailMedico', 'email', false);
 
-        const emailEl = document.getElementById('formCadastro:emailMedico');
-        const email = emailEl ? emailEl.value.trim() : '';
-        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        marcarInputErro('formCadastro:emailMedico', !emailValido);
-        if (!emailValido) { exibirErro('email'); valido = false; } else ocultarErro('email');
-
-        const senhaEl = document.getElementById('formCadastro:senhaMedico');
-        const senha = senhaEl ? senhaEl.value : '';
-        marcarInputErro('formCadastro:senhaMedico', senha.length < 6);
-        if (senha.length < 6) { exibirErro('senha'); valido = false; } else ocultarErro('senha');
+        const senha = senhaInput ? senhaInput.value : '';
+        if (senha.length < 6) { marcarErro('formCadastro:senhaMedico', 'senha', true, 'Mínimo 6 caracteres'); valido = false; }
+        else marcarErro('formCadastro:senhaMedico', 'senha', false);
 
         return valido;
     }
 
-    // SUBMIT
+    // ── SUBMIT ────────────────────────────────────────────────
+
     if (form) {
         form.addEventListener('submit', function (e) {
-            if (!validarFormulario()) {
+            // Converte vírgula → ponto antes de enviar
+            if (valorInput) valorInput.value = valorInput.value.replace(',', '.');
+
+            if (!validarTudo()) {
                 e.preventDefault();
                 mostrarToast('Por favor, corrija os erros no formulário.', 'erro');
+                // Rola até o primeiro erro
+                const primeiro = document.querySelector('.input-invalido');
+                if (primeiro) primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     }
 
-    // TOAST
+    // ── TOAST ─────────────────────────────────────────────────
+
     function mostrarToast(mensagem, tipo = 'sucesso') {
         const toast = document.getElementById('toast');
         if (!toast) return;
@@ -223,7 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => toast.classList.remove('visivel'), 3000);
     }
 
-    // INIT
+    // ── INIT ──────────────────────────────────────────────────
+
     inicializarChips();
 
 }); // fim do DOMContentLoaded

@@ -13,7 +13,7 @@ import com.vittae.model.Medico;
 
 public class CadastrarMedicoService {
 
-    private static final String API_URL = "http://localhost:8081/api/medicos";
+    private static final String API_URL = "http://localhost:8082/api/medicos";
 
     public void salvarMedico(Medico medico) throws Exception {
         try {

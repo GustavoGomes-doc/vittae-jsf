@@ -2,12 +2,16 @@ package com.vittae.view;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.temporal.ChronoUnit;
+import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -17,7 +21,6 @@ import javax.inject.Named;
 import javax.servlet.http.Part;
 
 import com.vittae.model.Disponibilidade;
-import com.vittae.model.Especialidade;
 import com.vittae.model.Medico;
 import com.vittae.model.enums.DiaSemana;
 import com.vittae.service.CadastrarMedicoService;
@@ -34,6 +37,7 @@ public class CadastrarMedicoBean implements Serializable {
 	private List<String> listaUfs;
 	private Part foto;
 	private String especialidadesSelecionadas;
+	private String dataNascimentoStr;
 
 	@PostConstruct
 	public void init() {
@@ -43,7 +47,6 @@ public class CadastrarMedicoBean implements Serializable {
 		this.listaUfs = Arrays.asList("AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
 				"PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO");
 
-		// Inicializa os dias com os valores exatos que o seu Enum DiaSemana espera
 		this.listaDias = new ArrayList<>();
 		listaDias.add(new DiaUI("Segunda-feira", "SEGUNDA"));
 		listaDias.add(new DiaUI("Terça-feira", "TERCA"));
@@ -54,29 +57,86 @@ public class CadastrarMedicoBean implements Serializable {
 	}
 
 	public void salvar() {
+	    FacesContext ctx = FacesContext.getCurrentInstance();
+	    boolean valido = true;
+
+	    // 1. Validação de idade mínima (24 anos)
+	    if (dto.getDataNascimento() == null) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	            "Data inválida", "A data de nascimento é obrigatória."));
+	        valido = false;
+	    } else {
+	        long idade = java.time.temporal.ChronoUnit.YEARS.between(dto.getDataNascimento(), java.time.LocalDate.now());
+	        if (idade < 24) {
+	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	                "Médico muito jovem", "O profissional deve ter no mínimo 24 anos."));
+	            valido = false;
+	        }
+	    }
+
+	    // 2. Validação de CRM (apenas números, máx 6)
+	    if (dto.getCrm() == null || !dto.getCrm().matches("\\d{1,6}")) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	            "CRM inválido", "O CRM deve conter apenas números (máx. 6 dígitos)."));
+	        valido = false;
+	    }
+
+	    // 3. Validação de Valor da Consulta (Dinheiro)
+	    if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	            "Valor inválido", "O valor da consulta deve ser maior que zero."));
+	        valido = false;
+	    }
+
+	    // 4. Validação de Duração
+	    if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 0 || dto.getTempoConsultaMinutos() > 999) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	            "Duração inválida", "A duração deve ser entre 1 e 999 minutos."));
+	        valido = false;
+	    }
+
+	    // Se houver qualquer erro acima, para a execução aqui
+	    if (!valido) {
+	        return;
+	    }
+
+	    try {
+	        // O RQE não precisa ser validado nem "removido" aqui, 
+	        // basta não ter o campo na tela que ele irá nulo ou vazio no DTO.
+	        service.salvarMedico(dto);
+	        
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Médico cadastrado com sucesso!"));
+	        
+	        // Opcional: Limpar o DTO após salvar para limpar o formulário
+	        this.dto = new Medico(); 
+	        this.dataNascimentoStr = null; // se estiver usando a string auxiliar
+	        
+	    } catch (Exception e) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro no sistema", e.getMessage()));
+	    }
+	
+
 		try {
 			if (foto != null) {
 				InputStream input = foto.getInputStream();
 				dto.setFoto(input.readAllBytes());
 			}
 
-			//Sintaxe limpa com Java Streams
+			// Sintaxe limpa com Java Streams
 			if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
-                List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
-                    .map(String::trim) // Limpa os espaços em branco
-                    .collect(Collectors.toList());
-                
-                dto.setEspecialidades(listaEsp);
-            }
+				List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(",")).map(String::trim).collect(Collectors.toList());
 
-			//processar Disponibilidades (Com LocalTime e Enum)
+				dto.setEspecialidades(listaEsp);
+			}
+
+			// processar Disponibilidades (Com LocalTime e Enum)
 			DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
 
 			List<Disponibilidade> disponibilidades = listaDias.stream().filter(DiaUI::isSelecionado).map(dia -> {
 				Disponibilidade d = new Disponibilidade();
 				d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
 
-				//conversão de String da tela para LocalTime do Java
+				// conversão de String da tela para LocalTime do Java
 				if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty()) {
 					d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
 				}
@@ -104,7 +164,6 @@ public class CadastrarMedicoBean implements Serializable {
 		}
 	}
 
-	// --- Getters e Setters do Bean ---
 	public Medico getDto() {
 		return dto;
 	}
@@ -112,7 +171,6 @@ public class CadastrarMedicoBean implements Serializable {
 	public void setDto(Medico dto) {
 		this.dto = dto;
 	}
-	
 
 	public List<DiaUI> getListaDias() {
 		return listaDias;
@@ -146,7 +204,14 @@ public class CadastrarMedicoBean implements Serializable {
 		this.especialidadesSelecionadas = especialidadesSelecionadas;
 	}
 
-	// --- Classe Auxiliar para gerenciar a repetição de dias na tela ---
+	public String getDataNascimentoStr() {
+		return dataNascimentoStr;
+	}
+
+	public void setDataNascimentoStr(String dataNascimentoStr) {
+		this.dataNascimentoStr = dataNascimentoStr;
+	}
+
 	public static class DiaUI {
 		private String label;
 		private String valorEnum;
