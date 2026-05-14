@@ -1,66 +1,39 @@
 package com.vittae.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "medico")
-@PrimaryKeyJoinColumn(name = "id_usuario")
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.vittae.model.enums.Perfil;
+
 public class Medico extends Usuario {
-    // resto do código igual...
 
-	@Lob
 	private byte[] foto;
-	
-	@Column(columnDefinition = "TEXT")
-	private String biografia;
-	
-	@Column(nullable = false)
 	private String crm;
-	
-	@Column(length = 2)
 	private String ufCrm;
-	
-	private String rqe;
-	
-	private int tempoConsultaMinutos;
+	private Integer tempoConsultaMinutos;
 	private LocalDate dataNascimento;
-	private String cep;
-	private double valorConsulta; 
+	private BigDecimal valorConsulta; 
 	private String telefone;
-
-	@ManyToMany
-	@JoinTable(name = "medico_especialidade", joinColumns = @JoinColumn(name = "id_medico"), inverseJoinColumns = @JoinColumn(name = "id_especialidade"))
-	private List<Especialidade> especialidades;
-
-	@OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
+	
+	@JsonManagedReference
+	private List<String> especialidades;
+	
 	private List<Disponibilidade> disponibilidades;
-
-	@OneToMany(mappedBy = "medico")
-	private List<Consulta> consultas;
-
+	
 	public Medico() {
+		super();
+		this.setPerfil(Perfil.MEDICO);
 	}
 
-	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, double valorConsulta, String ufCrm, int tempoConsultaMinutos, String rqe, String biografia, List<Especialidade> especialidades, String telefone) {
+
+	public Medico(byte[] foto, LocalDate dataNascimento, String crm, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, List<String> especialidades, String telefone) {
 		this.foto = foto;
 		this.dataNascimento = dataNascimento;
 		this.crm = crm;
-		this.cep = cep;
 		this.valorConsulta = valorConsulta;
 		this.ufCrm = ufCrm;
-		this.rqe = rqe;
-		this.biografia = biografia;
 		this.tempoConsultaMinutos = tempoConsultaMinutos;
 		this.especialidades = especialidades;
 		this.telefone = telefone;
@@ -74,13 +47,6 @@ public class Medico extends Usuario {
 		this.telefone = telefone;
 	}
 
-	public String getBiografia() {
-		return biografia;
-	}
-
-	public void setBiografia(String biografia) {
-		this.biografia = biografia;
-	}
 
 	public String getUfCrm() {
 		return ufCrm;
@@ -90,13 +56,6 @@ public class Medico extends Usuario {
 		this.ufCrm = ufCrm;
 	}
 
-	public String getRqe() {
-		return rqe;
-	}
-
-	public void setRqe(String rqe) {
-		this.rqe = rqe;
-	}
 
 	public Integer getTempoConsultaMinutos() {
 		return tempoConsultaMinutos;
@@ -130,29 +89,22 @@ public class Medico extends Usuario {
 		this.crm = crm;
 	}
 
-	public String getCep() {
-		return cep;
-	}
-
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
-
-	public double getValorConsulta() {
+	
+	public BigDecimal getValorConsulta() {
 		return valorConsulta;
 	}
 
-	public void setValorConsulta(double valorConsulta) {
+	public void setValorConsulta(BigDecimal valorConsulta) {
 		this.valorConsulta = valorConsulta;
 	}
 
-	public List<Especialidade> getEspecialidades() {
-		return especialidades;
-	}
+	public List<String> getEspecialidades() {
+        return especialidades;
+    }
 
-	public void setEspecialidades(List<Especialidade> especialidades) {
-		this.especialidades = especialidades;
-	}
+	public void setEspecialidades(List<String> especialidades) {
+        this.especialidades = especialidades;
+    }
 
 	public List<Disponibilidade> getDisponibilidades() {
 		return disponibilidades;
@@ -162,11 +114,4 @@ public class Medico extends Usuario {
 		this.disponibilidades = disponibilidades;
 	}
 
-	public List<Consulta> getConsultas() {
-		return consultas;
-	}
-
-	public void setConsultas(List<Consulta> consultas) {
-		this.consultas = consultas;
-	}
 }

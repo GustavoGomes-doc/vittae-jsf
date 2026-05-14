@@ -6,17 +6,8 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-
-
-
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
-
 	<ui:define name="corpo">
-		<script>
-			document.querySelector('.search-bar').style.visibility = 'hidden';
-		</script>
-		<!-- resto do conteúdo -->
-		<!-- resto do conteúdo -->
 
 		<div class="header-pagina">
 			<h1>Cadastrar Novo Médico</h1>
@@ -30,10 +21,10 @@
 
 		<h:form id="formCadastro" enctype="multipart/form-data">
 
-			<!-- ── FOTO ── -->
+			<!--foto-->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-camera"> <!-- -->
+					<i class="fas fa-camera">
 					</i> Foto do Médico
 				</div>
 				<div class="foto-upload-area">
@@ -54,127 +45,130 @@
 				</div>
 			</div>
 
-			<!-- ── DADOS PESSOAIS ── -->
+			<!-- dados pessoais -->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-id-card"> <!-- -->
+					<i class="fas fa-id-card">
 					</i> Dados Pessoais
 				</div>
 				<div class="form-grid-2">
 
 					<div class="form-group">
-						<h:outputLabel for="nomeMedico" value="Nome Completo " />
+						<h:outputLabel for="nomeMedico" value="Nome Completo" />
 						<span class="req">*</span>
 						<h:inputText id="nomeMedico"
 							value="#{cadastrarMedicoBean.dto.nome}"
-							placeholder="Ex: Dr. Ricardo Lima" required="true" />
-						<h:message for="nomeMedico" styleClass="erro-msg" />
+							placeholder="Ex: Dr. Ricardo Lima" />
+						<span class="erro-msg" id="err-nome"> <i
+							class="fas fa-exclamation-circle"> 
+						</i> Nome é obrigatório
+						</span>
 					</div>
 
 					<div class="form-group">
-						<h:outputLabel for="telefoneMedico" value="Telefone " />
+						<h:outputLabel for="telefoneMedico" value="Telefone" />
 						<span class="req">*</span>
 						<h:inputText id="telefoneMedico"
 							value="#{cadastrarMedicoBean.dto.telefone}"
-							placeholder="Ex: (11) 99999-9999" maxlength="15" required="true" />
-						<h:message for="telefoneMedico" styleClass="erro-msg" />
+							placeholder="Ex: (11) 99999-9999" maxlength="15" />
+						<span class="erro-msg" id="err-telefone"> <i
+							class="fas fa-exclamation-circle"> 
+						</i> Telefone inválido
+						</span>
 					</div>
 
 					<div class="form-group">
-						<h:outputLabel for="cpfMedico" value="CPF " />
+						<h:outputLabel for="cpfMedico" value="CPF" />
 						<span class="req">*</span>
 						<h:inputText id="cpfMedico" value="#{cadastrarMedicoBean.dto.cpf}"
-							placeholder="000.000.000-00" maxlength="14" required="true" />
-						<h:message for="cpfMedico" styleClass="erro-msg" />
+							placeholder="000.000.000-00" maxlength="14" />
+						<span class="erro-msg" id="err-cpf"> <i
+							class="fas fa-exclamation-circle"> 
+						</i> CPF incompleto
+						</span>
 					</div>
 
 					<div class="form-group">
-						<h:outputLabel for="dataNascimento" value="Data de Nascimento " />
+						<h:outputLabel for="dataNascimento" value="Data de Nascimento" />
 						<span class="req">*</span>
 						<h:inputText id="dataNascimento"
-							value="#{cadastrarMedicoBean.dto.dataNascimento}">
-							<f:passThroughAttribute name="type" value="date" />
-							<f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+							value="#{cadastrarMedicoBean.dto.dataNascimento}"
+							placeholder="DD/MM/AAAA" maxlength="10">
+							<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
 						</h:inputText>
-						<h:message for="dataNascimento" styleClass="erro-msg" />
-					</div>
 
-					<div class="form-group col-full">
-						<h:outputLabel for="biografia" value="Biografia " />
-						<span class="opcional">(opcional)</span>
-						<h:inputTextarea id="biografia"
-							value="#{cadastrarMedicoBean.dto.biografia}"
-							placeholder="Breve apresentação do profissional..." />
+						<h:message for="dataNascimento" styleClass="erro-msg" />
 					</div>
 
 				</div>
 			</div>
 
-			<!-- ── REGISTRO PROFISSIONAL ── -->
+			<!--registro profissional -->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-id-badge"> <!-- -->
+					<i class="fas fa-id-badge">
 					</i> Registro Profissional
 				</div>
 				<div class="form-grid-3">
 
-					<div class="form-group">
-						<h:outputLabel for="crmMedico" value="CRM " />
-						<span class="req">*</span>
-						<h:inputText id="crmMedico" value="#{cadastrarMedicoBean.dto.crm}"
-							placeholder="Ex: 123456" required="true" />
-						<h:message for="crmMedico" styleClass="erro-msg" />
-					</div>
+					<div class="form-grid-3">
+						<div class="form-group">
+							<h:outputLabel for="crmMedico" value="CRM" />
+							<span class="req">*</span>
+							<h:inputText id="crmMedico"
+								value="#{cadastrarMedicoBean.dto.crm}" placeholder="Ex: 123456"
+								maxlength="6" />
+							<span class="erro-msg" id="err-crm"> <i
+								class="fas fa-exclamation-circle"></i> CRM deve ter até 6
+								dígitos numéricos
+							</span>
+						</div>
 
-					<div class="form-group">
-						<h:outputLabel for="ufCrm" value="UF do CRM " />
-						<span class="req">*</span>
-						<h:selectOneMenu id="ufCrm"
-							value="#{cadastrarMedicoBean.dto.ufCrm}" required="true">
-							<f:selectItem itemValue="" itemLabel="Selecione" />
-							<f:selectItems value="#{cadastrarMedicoBean.listaUfs}" />
-						</h:selectOneMenu>
-						<h:message for="ufCrm" styleClass="erro-msg" />
-					</div>
+						<div class="form-group">
+							<h:outputLabel for="ufCrm" value="UF do CRM" />
+							<span class="req">*</span>
+							<h:selectOneMenu id="ufCrm"
+								value="#{cadastrarMedicoBean.dto.ufCrm}">
+								<f:selectItem itemValue="" itemLabel="Selecione" />
+								<f:selectItems value="#{cadastrarMedicoBean.listaUfs}" />
+							</h:selectOneMenu>
+							<span class="erro-msg" id="err-uf"> <i
+								class="fas fa-exclamation-circle"></i> Selecione a UF do CRM
+							</span>
+						</div>
 
-					<div class="form-group">
-						<h:outputLabel for="rqeMedico" value="RQE " />
-						<span class="opcional">(opcional)</span>
-						<h:inputText id="rqeMedico" value="#{cadastrarMedicoBean.dto.rqe}"
-							placeholder="Ex: 12345" />
-					</div>
-
-					<div class="form-group">
-						<h:outputLabel for="cepMedico" value="CEP " />
-						<span class="req">*</span>
-						<h:inputText id="cepMedico" value="#{cadastrarMedicoBean.dto.cep}"
-							placeholder="00000-000" maxlength="9" required="true" />
-						<h:message for="cepMedico" styleClass="erro-msg" />
-					</div>
-
-					<div class="form-group">
-						<h:outputLabel for="valorConsulta" value="Valor da Consulta (R$) " />
-						<span class="req">*</span>
-						<h:inputText id="valorConsulta"
-							value="#{cadastrarMedicoBean.dto.valorConsulta}"
-							placeholder="Ex: 350.00" required="true" />
-						<h:message for="valorConsulta" styleClass="erro-msg" />
+						<div class="form-group">
+							<h:outputLabel for="valorConsulta" value="Valor da Consulta (R$)" />
+							<span class="req">*</span>
+							<h:inputText id="valorConsulta"
+								value="#{cadastrarMedicoBean.dto.valorConsulta}"
+								placeholder="Ex: 350,00">
+								<f:convertNumber minFractionDigits="2" locale="pt_BR" />
+							</h:inputText>
+							<span class="erro-msg" id="err-valor"> <i
+								class="fas fa-exclamation-circle"></i> Informe um valor maior
+								que zero
+							</span>
+						</div>
 					</div>
 
 					<div class="form-group">
 						<h:outputLabel for="tempoConsulta"
-							value="Duração da Consulta (min) " />
+							value="Duração da Consulta (min)" />
 						<span class="req">*</span>
 						<h:inputText id="tempoConsulta"
 							value="#{cadastrarMedicoBean.dto.tempoConsultaMinutos}"
-							placeholder="Ex: 30" required="true" />
-						<h:message for="tempoConsulta" styleClass="erro-msg" />
+							placeholder="Ex: 30" maxlength="3" />
+						<span class="erro-msg" id="err-tempo"> <i
+							class="fas fa-exclamation-circle"> <!-- -->
+						</i> Duração deve ser entre 5 e 999 minutos
+						</span>
 					</div>
 
 				</div>
 			</div>
 
-			<!-- ── ESPECIALIDADES (chips visuais via JS + campo oculto pro Bean) ── -->
+			<!-- especialidades-->
 			<div class="secao-form">
 				<div class="secao-titulo">
 					<i class="fas fa-stethoscope"> <!-- -->
@@ -185,113 +179,57 @@
 				</div>
 				<div class="chips-contador" id="chipsContador">0/3
 					selecionadas</div>
-				<span class="erro-msg" id="err-especialidade"> <!-- -->
+				<span class="erro-msg" id="err-especialidade"> <i
+					class="fas fa-exclamation-circle"> <!-- -->
+				</i> Selecione ao menos uma especialidade
 				</span>
-				<!-- Campo oculto: JS preenche, Bean lê -->
 				<h:inputHidden id="especialidadesHidden"
 					value="#{cadastrarMedicoBean.especialidadesSelecionadas}" />
 			</div>
 
-			<!-- ── DISPONIBILIDADE (checkboxes JSF nativos) ── -->
+			<!-- disp -->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-calendar-alt"> <!-- -->
-					</i> Disponibilidade Semanal
+					<i class="fas fa-calendar-alt"></i> Disponibilidade Semanal
 				</div>
-				<div class="check-grid">
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSegunda"
-							value="#{cadastrarMedicoBean.dispSegunda}"
-							onclick="toggleHorario(this, 'horario-SEGUNDA')" />
-						<h:outputLabel value="Segunda-feira" />
-						<div class="horario-wrap" id="horario-SEGUNDA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSegunda}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSegunda}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+				<div class="disp-table" id="dispTable">
+					<ui:repeat value="#{cadastrarMedicoBean.listaDias}" var="dia">
+						<div class="disp-row" id="row-#{dia.valorEnum}">
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispTerca"
-							value="#{cadastrarMedicoBean.dispTerca}"
-							onclick="toggleHorario(this, 'horario-TERCA')" />
-						<h:outputLabel value="Terça-feira" />
-						<div class="horario-wrap" id="horario-TERCA" style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioTerca}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimTerca}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+							<label class="disp-check"> <h:selectBooleanCheckbox
+									value="#{dia.selecionado}" styleClass="disp-checkbox"
+									onclick="toggleDisp(this, '#{dia.valorEnum}')" /> #{dia.label}
+							</label>
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispQuarta"
-							value="#{cadastrarMedicoBean.dispQuarta}"
-							onclick="toggleHorario(this, 'horario-QUARTA')" />
-						<h:outputLabel value="Quarta-feira" />
-						<div class="horario-wrap" id="horario-QUARTA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioQuarta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimQuarta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+							<div class="disp-time-wrap">
+								<span class="disp-time-label">Início</span>
+								<h:inputText value="#{dia.horaInicio}"
+									styleClass="input-hora-texto" placeholder="08:00" maxlength="5"
+									data-dia="#{dia.valorEnum}" data-tipo="inicio" />
+								<span class="erro-hora" id="err-hora-#{dia.valorEnum}"
+									style="display: none"> <i
+									class="fas fa-exclamation-circle"></i> <span
+									class="err-hora-msg">Horário inválido</span>
+								</span>
+							</div>
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispQuinta"
-							value="#{cadastrarMedicoBean.dispQuinta}"
-							onclick="toggleHorario(this, 'horario-QUINTA')" />
-						<h:outputLabel value="Quinta-feira" />
-						<div class="horario-wrap" id="horario-QUINTA"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioQuinta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimQuinta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+							<div class="disp-time-wrap">
+								<span class="disp-time-label">Fim</span>
+								<h:inputText value="#{dia.horaFim}"
+									styleClass="input-hora-texto" placeholder="17:00" maxlength="5"
+									data-dia="#{dia.valorEnum}" data-tipo="fim" />
+							</div>
 
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSexta"
-							value="#{cadastrarMedicoBean.dispSexta}"
-							onclick="toggleHorario(this, 'horario-SEXTA')" />
-						<h:outputLabel value="Sexta-feira" />
-						<div class="horario-wrap" id="horario-SEXTA" style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSexta}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSexta}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
 						</div>
-					</div>
-
-					<div class="check-item">
-						<h:selectBooleanCheckbox id="dispSabado"
-							value="#{cadastrarMedicoBean.dispSabado}"
-							onclick="toggleHorario(this, 'horario-SABADO')" />
-						<h:outputLabel value="Sábado" />
-						<div class="horario-wrap" id="horario-SABADO"
-							style="display: none">
-							<h:inputText value="#{cadastrarMedicoBean.horaInicioSabado}"
-								placeholder="08:00" styleClass="input-hora" maxlength="5" />
-							<span>às</span>
-							<h:inputText value="#{cadastrarMedicoBean.horaFimSabado}"
-								placeholder="18:00" styleClass="input-hora" maxlength="5" />
-						</div>
-					</div>
+					</ui:repeat>
 				</div>
-				<span class="erro-msg" id="err-disp"> <!-- -->
+				<span class="erro-msg" id="err-disp"> <i
+					class="fas fa-exclamation-circle"></i> Selecione ao menos um dia de
+					disponibilidade
 				</span>
 			</div>
 
-			<!-- ── ACESSO AO SISTEMA ── -->
+			<!-- sistema -->
 			<div class="secao-form">
 				<div class="secao-titulo">
 					<i class="fas fa-lock"> <!-- -->
@@ -300,35 +238,37 @@
 				<div class="form-grid-2">
 
 					<div class="form-group">
-						<h:outputLabel for="emailMedico" value="E-mail de Acesso " />
+						<h:outputLabel for="emailMedico" value="E-mail de Acesso" />
 						<span class="req">*</span>
 						<h:inputText id="emailMedico"
 							value="#{cadastrarMedicoBean.dto.email}"
-							placeholder="medico@vittae.com" required="true" />
-						<h:message for="emailMedico" styleClass="erro-msg" />
+							placeholder="medico@vittae.com" />
+						<span class="erro-msg" id="err-email"> <i
+							class="fas fa-exclamation-circle"> <!-- -->
+						</i> E-mail inválido
+						</span>
 					</div>
 
 					<div class="form-group">
-						<h:outputLabel for="senhaMedico" value="Senha Temporária " />
+						<h:outputLabel for="senhaMedico" value="Senha Temporária" />
 						<span class="req">*</span>
 						<h:inputSecret id="senhaMedico"
 							value="#{cadastrarMedicoBean.dto.senha}"
-							placeholder="Mínimo 6 caracteres" required="true" />
-						<h:message for="senhaMedico" styleClass="erro-msg" />
+							placeholder="Mínimo 6 caracteres" />
+						<span class="erro-msg" id="err-senha"> <i
+							class="fas fa-exclamation-circle"> <!-- -->
+						</i> Mínimo 6 caracteres
+						</span>
 					</div>
 
 				</div>
 			</div>
 
-			<!-- ── AÇÕES ── -->
+			<!--salvar-->
 			<div class="form-actions">
-				<h:commandButton value="Cancelar" styleClass="btn-cancelar"
-					action="/index?faces-redirect=true" immediate="true" />
 				<h:commandButton value="Salvar Cadastro" styleClass="btn-salvar"
 					action="#{cadastrarMedicoBean.salvar}" />
 			</div>
-
-			<h:messages style="color: red; font-weight: bold;" />
 
 		</h:form>
 
@@ -336,10 +276,9 @@
 			<!-- -->
 		</div>
 
-		<h:outputScript library="js" name="CadastrarMedico.js" />
-		<h:outputScript library="js" name="Admin.js" />
+		<h:outputScript library="js" name="cadastrar.js" />
+		<h:outputScript library="js" name="admin.js" />
 
 	</ui:define>
-
 </ui:composition>
 </html>

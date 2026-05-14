@@ -1,46 +1,22 @@
 package com.vittae.model;
 
 import com.vittae.model.enums.Status;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "consulta")
+// Classes puras, prontas para virar JSON
 public class Consulta {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@ManyToOne
-	@JoinColumn(name = "id_medico")
 	private Medico medico;
-
-	@ManyToOne
-	@JoinColumn(name = "id_paciente")
 	private Paciente paciente;
-
-	@Enumerated(EnumType.STRING)
 	private Status status;
-
 	private LocalDate dataAgendado;
 	private LocalDate dataConsulta;
 	private LocalTime hora;
 
 	public Consulta() {
 	}
-
 	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta,
 			LocalTime hora) {
 		this.medico = medico;
