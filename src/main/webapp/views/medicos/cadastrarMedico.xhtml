@@ -193,35 +193,45 @@
 			</div>
 
 			<!-- ── DISPONIBILIDADE ── -->
+			<!-- ── DISPONIBILIDADE ── -->
 			<div class="secao-form">
 				<div class="secao-titulo">
-					<i class="fas fa-calendar-alt"> <!-- -->
-					</i> Disponibilidade Semanal
+					<i class="fas fa-calendar-alt"></i> Disponibilidade Semanal
 				</div>
-				<div class="check-grid">
+				<div class="disp-table" id="dispTable">
 					<ui:repeat value="#{cadastrarMedicoBean.listaDias}" var="dia">
-						<div class="check-item">
-							<h:selectBooleanCheckbox value="#{dia.selecionado}"
-								onclick="toggleHorario(this, 'horario-#{dia.valorEnum}')" />
-							<h:outputLabel value="#{dia.label}" />
-							<div class="horario-wrap" id="horario-#{dia.valorEnum}"
-								style="#{dia.selecionado ? '' : 'display: none'}">
-								<h:inputText value="#{dia.horaInicio}" styleClass="input-hora">
-									<f:passThroughAttribute name="type" value="time" />
-									<f:convertDateTime type="localTime" pattern="HH:mm" />
-								</h:inputText>
-								<span>às</span>
-								<h:inputText value="#{dia.horaFim}" styleClass="input-hora">
-									<f:passThroughAttribute name="type" value="time" />
-									<f:convertDateTime type="localTime" pattern="HH:mm" />
-								</h:inputText>
+						<div class="disp-row" id="row-#{dia.valorEnum}">
+
+							<label class="disp-check"> <h:selectBooleanCheckbox
+									value="#{dia.selecionado}" styleClass="disp-checkbox"
+									onclick="toggleDisp(this, '#{dia.valorEnum}')" /> #{dia.label}
+							</label>
+
+							<div class="disp-time-wrap">
+								<span class="disp-time-label">Início</span>
+								<h:inputText value="#{dia.horaInicio}"
+									styleClass="input-hora-texto" placeholder="08:00" maxlength="5"
+									data-dia="#{dia.valorEnum}" data-tipo="inicio" />
+								<span class="erro-hora" id="err-hora-#{dia.valorEnum}"
+									style="display: none"> <i
+									class="fas fa-exclamation-circle"></i> <span
+									class="err-hora-msg">Horário inválido</span>
+								</span>
 							</div>
+
+							<div class="disp-time-wrap">
+								<span class="disp-time-label">Fim</span>
+								<h:inputText value="#{dia.horaFim}"
+									styleClass="input-hora-texto" placeholder="17:00" maxlength="5"
+									data-dia="#{dia.valorEnum}" data-tipo="fim" />
+							</div>
+
 						</div>
 					</ui:repeat>
 				</div>
 				<span class="erro-msg" id="err-disp"> <i
-					class="fas fa-exclamation-circle"> <!-- -->
-				</i> Selecione ao menos um dia de disponibilidade
+					class="fas fa-exclamation-circle"></i> Selecione ao menos um dia de
+					disponibilidade
 				</span>
 			</div>
 

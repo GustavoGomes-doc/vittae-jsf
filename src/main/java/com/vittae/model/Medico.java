@@ -11,7 +11,6 @@ public class Medico extends Usuario {
 	private byte[] foto;
 	private String crm;
 	private String ufCrm;
-	private String rqe;
 	private Integer tempoConsultaMinutos;
 	private LocalDate dataNascimento;
 	private BigDecimal valorConsulta; 
@@ -21,18 +20,16 @@ public class Medico extends Usuario {
 	private List<String> especialidades;
 	
 	private List<Disponibilidade> disponibilidades;
-	private List<Consulta> consultas;	
 
 	public Medico() {
 	}
 
-	public Medico(byte[] foto, LocalDate dataNascimento, String crm, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, String rqe, List<String> especialidades, String telefone) {
+	public Medico(byte[] foto, LocalDate dataNascimento, String crm, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, List<String> especialidades, String telefone) {
 		this.foto = foto;
 		this.dataNascimento = dataNascimento;
 		this.crm = crm;
 		this.valorConsulta = valorConsulta;
 		this.ufCrm = ufCrm;
-		this.rqe = rqe;
 		this.tempoConsultaMinutos = tempoConsultaMinutos;
 		this.especialidades = especialidades;
 		this.telefone = telefone;
@@ -55,13 +52,6 @@ public class Medico extends Usuario {
 		this.ufCrm = ufCrm;
 	}
 
-	public String getRqe() {
-		return rqe;
-	}
-
-	public void setRqe(String rqe) {
-		this.rqe = rqe;
-	}
 
 	public Integer getTempoConsultaMinutos() {
 		return tempoConsultaMinutos;
@@ -120,11 +110,4 @@ public class Medico extends Usuario {
 		this.disponibilidades = disponibilidades;
 	}
 
-	public List<Consulta> getConsultas() {
-		return consultas;
-	}
-
-	public void setConsultas(List<Consulta> consultas) {
-		this.consultas = consultas;
-	}
 }

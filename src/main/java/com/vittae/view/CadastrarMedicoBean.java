@@ -66,7 +66,7 @@ public class CadastrarMedicoBean implements Serializable {
 	            "Data inválida", "A data de nascimento é obrigatória."));
 	        valido = false;
 	    } else {
-	        long idade = java.time.temporal.ChronoUnit.YEARS.between(dto.getDataNascimento(), java.time.LocalDate.now());
+	        long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalTime.now());
 	        if (idade < 24) {
 	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
 	                "Médico muito jovem", "O profissional deve ter no mínimo 24 anos."));
@@ -82,14 +82,18 @@ public class CadastrarMedicoBean implements Serializable {
 	    }
 
 	    // 3. Validação de Valor da Consulta (Dinheiro)
-	    if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(java.math.BigDecimal.ZERO) <= 0) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	    if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(BigDecimal.ZERO) <= 0) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 	            "Valor inválido", "O valor da consulta deve ser maior que zero."));
 	        valido = false;
+	    } else if (dto.getValorConsulta().compareTo(new BigDecimal("1000.00")) > 0) {
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+	            "Valor excedido", "O valor da consulta não pode ultrapassar R$ 1.000,00."));
+	        valido = false;
 	    }
-
+	    
 	    // 4. Validação de Duração
-	    if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 0 || dto.getTempoConsultaMinutos() > 999) {
+	    if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 20 || dto.getTempoConsultaMinutos() > 90) {
 	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
 	            "Duração inválida", "A duração deve ser entre 1 e 999 minutos."));
 	        valido = false;
@@ -101,67 +105,48 @@ public class CadastrarMedicoBean implements Serializable {
 	    }
 
 	    try {
-	        // O RQE não precisa ser validado nem "removido" aqui, 
-	        // basta não ter o campo na tela que ele irá nulo ou vazio no DTO.
+	        // Foto
+	        if (foto != null) {
+	            InputStream input = foto.getInputStream();
+	            dto.setFoto(input.readAllBytes());
+	        }
+
+	        // Especialidades
+	        if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
+	            List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
+	                .map(String::trim)
+	                .collect(Collectors.toList());
+	            dto.setEspecialidades(listaEsp);
+	        }
+
+	        // Disponibilidades
+	        DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
+	        List<Disponibilidade> disponibilidades = listaDias.stream()
+	            .filter(DiaUI::isSelecionado)
+	            .map(dia -> {
+	                Disponibilidade d = new Disponibilidade();
+	                d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
+	                if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty())
+	                    d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
+	                if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty())
+	                    d.setHoraFim(LocalTime.parse(dia.getHoraFim(), parser));
+	                d.setMedico(dto);
+	                return d;
+	            }).collect(Collectors.toList());
+	        dto.setDisponibilidades(disponibilidades);
+
+	        // Salva UMA única vez
 	        service.salvarMedico(dto);
-	        
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Médico cadastrado com sucesso!"));
-	        
-	        // Opcional: Limpar o DTO após salvar para limpar o formulário
-	        this.dto = new Medico(); 
-	        this.dataNascimentoStr = null; // se estiver usando a string auxiliar
-	        
+
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+	            "Sucesso!", "Médico cadastrado com sucesso."));
+
+	        init(); // limpa o formulário
+
 	    } catch (Exception e) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro no sistema", e.getMessage()));
+	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+	            "Erro", "Erro ao processar dados: " + e.getMessage()));
 	    }
-	
-
-		try {
-			if (foto != null) {
-				InputStream input = foto.getInputStream();
-				dto.setFoto(input.readAllBytes());
-			}
-
-			// Sintaxe limpa com Java Streams
-			if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
-				List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(",")).map(String::trim).collect(Collectors.toList());
-
-				dto.setEspecialidades(listaEsp);
-			}
-
-			// processar Disponibilidades (Com LocalTime e Enum)
-			DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
-
-			List<Disponibilidade> disponibilidades = listaDias.stream().filter(DiaUI::isSelecionado).map(dia -> {
-				Disponibilidade d = new Disponibilidade();
-				d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
-
-				// conversão de String da tela para LocalTime do Java
-				if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty()) {
-					d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
-				}
-				if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty()) {
-					d.setHoraFim(LocalTime.parse(dia.getHoraFim(), parser));
-				}
-
-				d.setMedico(dto);
-				return d;
-			}).collect(Collectors.toList());
-
-			dto.setDisponibilidades(disponibilidades);
-
-			// 4. Enviar para o Service (Spring Boot)
-			service.salvarMedico(dto);
-
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));
-
-			init(); // Limpa a tela para o próximo cadastro
-
-		} catch (Exception e) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro",
-					"Erro ao processar dados: " + e.getMessage()));
-		}
 	}
 
 	public Medico getDto() {

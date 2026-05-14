@@ -587,6 +587,57 @@ body {
 	font-size: 0.9rem;
 }
 
+/* ── Input hora texto ── */
+.input-hora-texto {
+    width: 90px;
+    padding: 7px 10px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    background: #fff;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.input-hora-texto:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124,58,237,.1);
+}
+
+.input-hora-texto:disabled,
+.input-hora-texto[readonly] {
+    opacity: .35;
+    pointer-events: none;
+    background: #f9fafb;
+}
+
+.input-hora-texto.input-invalido {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+
+/* ── Erro inline de hora ── */
+.erro-hora {
+    font-size: 11px;
+    color: #ef4444;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+}
+
+/* ── Linha ativa ── */
+.disp-row.ativa {
+    border-color: #a78bfa;
+    background: #faf5ff;
+}
+
 /* ── Boas-vindas ── */
 .welcome-banner {
 	background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
