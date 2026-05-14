@@ -23,6 +23,7 @@ import javax.servlet.http.Part;
 import com.vittae.model.Disponibilidade;
 import com.vittae.model.Medico;
 import com.vittae.model.enums.DiaSemana;
+import com.vittae.model.enums.Perfil;
 import com.vittae.service.CadastrarMedicoService;
 
 @Named
@@ -59,6 +60,13 @@ public class CadastrarMedicoBean implements Serializable {
 	public void salvar() {
 	    FacesContext ctx = FacesContext.getCurrentInstance();
 	    boolean valido = true;
+	    
+	    if(valido) {
+	    	dto.setPerfil(Perfil.MEDICO);
+	    	
+	    	ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+	    			"Sucesso", "Médico cadastrado com Sucesso!"));
+	    }
 
 	    // 1. Validação de idade mínima (24 anos)
 	    if (dto.getDataNascimento() == null) {
@@ -66,10 +74,15 @@ public class CadastrarMedicoBean implements Serializable {
 	            "Data inválida", "A data de nascimento é obrigatória."));
 	        valido = false;
 	    } else {
-	        long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalTime.now());
+	        long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalDate.now());
+	        
 	        if (idade < 24) {
 	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
 	                "Médico muito jovem", "O profissional deve ter no mínimo 24 anos."));
+	            valido = false;
+	        } else if (idade > 80) { // <-- NOVA VALIDAÇÃO AQUI
+	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+	                "Idade inválida", "O profissional não pode ter mais de 80 anos."));
 	            valido = false;
 	        }
 	    }

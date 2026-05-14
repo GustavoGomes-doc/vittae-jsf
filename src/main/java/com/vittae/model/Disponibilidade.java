@@ -11,7 +11,6 @@ public class Disponibilidade {
 
 	private LocalTime horaInicio;
 	private LocalTime horaFim;
-
 	private DiaSemana diaSemana;
 	
 	@JsonBackReference

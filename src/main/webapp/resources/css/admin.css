@@ -589,53 +589,52 @@ body {
 
 /* ── Input hora texto ── */
 .input-hora-texto {
-    width: 90px;
-    padding: 7px 10px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    background: #fff;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    letter-spacing: 1px;
-    text-align: center;
+	width: 90px;
+	padding: 7px 10px;
+	border: 1.5px solid #e5e7eb;
+	border-radius: 8px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 13px;
+	font-weight: 600;
+	color: #374151;
+	background: #fff;
+	outline: none;
+	transition: border-color .2s, box-shadow .2s;
+	letter-spacing: 1px;
+	text-align: center;
 }
 
 .input-hora-texto:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124,58,237,.1);
+	border-color: #7c3aed;
+	box-shadow: 0 0 0 3px rgba(124, 58, 237, .1);
 }
 
-.input-hora-texto:disabled,
-.input-hora-texto[readonly] {
-    opacity: .35;
-    pointer-events: none;
-    background: #f9fafb;
+.input-hora-texto:disabled, .input-hora-texto[readonly] {
+	opacity: .35;
+	pointer-events: none;
+	background: #f9fafb;
 }
 
 .input-hora-texto.input-invalido {
-    border-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+	border-color: #ef4444;
+	box-shadow: 0 0 0 3px rgba(239, 68, 68, .1);
 }
 
 /* ── Erro inline de hora ── */
 .erro-hora {
-    font-size: 11px;
-    color: #ef4444;
-    margin-top: 3px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 600;
+	font-size: 11px;
+	color: #ef4444;
+	margin-top: 3px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 600;
 }
 
 /* ── Linha ativa ── */
 .disp-row.ativa {
-    border-color: #a78bfa;
-    background: #faf5ff;
+	border-color: #a78bfa;
+	background: #faf5ff;
 }
 
 /* ── Boas-vindas ── */
@@ -987,11 +986,43 @@ body {
 	background: #f1f5f9;
 }
 
+.form-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative; /* Importante para ancorar o erro */
+    padding-bottom: 18px; /* Espaço fixo reservado para a mensagem de erro */
+}
+
+.form-group .erro-msg, .form-group span.erro-msg {
+    position: absolute;
+    bottom: -2px; /* Fica coladinho no chão da div */
+    left: 0;
+    margin: 0;
+    font-size: 11px;
+}
+
+.form-group label {
+	margin-bottom: auto; /* Empurra o label pra cima e o input pra baixo */
+	padding-bottom: 6px;
+}
+
+.form-group input, .form-group select {
+	height: 44px; /* Trava a altura idêntica para inputs e selects */
+	box-sizing: border-box;
+}
+
+/* Garante que o textarea da bio não fique espremido com 44px */
+.form-group textarea {
+	height: auto;
+	min-height: 85px;
+}
+
 @media ( max-width : 1100px) {
 	.stats-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
-	.quick-access {
+	.quick-access 	{
 		grid-template-columns: repeat(2, 1fr);
 	}
 }

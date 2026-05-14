@@ -1,5 +1,7 @@
 package com.vittae.model;
 
+import com.vittae.model.enums.Perfil;
+
 public class Usuario {
 
 	private Long id;
@@ -8,6 +10,7 @@ public class Usuario {
 	private String senha;
 	private String nome;
 	private String email;
+	private Perfil perfil;
 
 	public Usuario() {
 	}
@@ -58,4 +61,14 @@ public class Usuario {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public Perfil getPerfil() {
+		return perfil;
+	}
+
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
+	}
+	
+	
 }
