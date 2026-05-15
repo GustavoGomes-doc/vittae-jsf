@@ -214,6 +214,7 @@
     }
 
     function validarDados() {
+		console.log(document.querySelector('[id$="motivoConsulta"]'));
         var ok = true;
 
         var nome = document.getElementById('fAg:pacNome');
@@ -267,7 +268,7 @@
             } else { esconderErro('errRespParent', rParent); }
         }
 		
-		var motivo = document.getElementById('motivoConsulta');
+		var motivo = document.getElementById('fAg:motivoConsulta');
 		if (!motivo || motivo.value.trim().length < 5) {
 		    mostrarErro('errMotivo', motivo); ok = false;
 		} else { esconderErro('errMotivo', motivo); }
@@ -353,27 +354,30 @@
     /* ═══════════════════════════════════════════════
        MÉDICO
     ═══════════════════════════════════════════════ */
-    window.selecionarMedico = function(card, id, nome, valor) {
-        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
-            c.classList.remove('selected');
-        });
-        card.classList.add('selected');
+	window.selecionarMedico = function(card) {
+	    document.querySelectorAll('.ag-medico-card').forEach(function(c) {
+	        c.classList.remove('selected');
+	    });
+	    card.classList.add('selected');
 
-        var hidden = document.getElementById('fAg:medicoIdHidden');
-        if (hidden) hidden.value = id;
+	    var id    = card.getAttribute('data-id');
+	    var nome  = card.getAttribute('data-nome');
+	    var valor = card.getAttribute('data-valor');
 
-        state.medicoId    = id;
-        state.medicoNome  = nome;
-        state.medicoValor = valor;
+	    var hidden = document.getElementById('fAg:medicoIdHidden');
+	    if (hidden) hidden.value = id;
 
-        atualizarResumo('medico', nome);
-        atualizarResumo('valor', valor);
-        esconderErro('errMedico', null);
+	    state.medicoId    = id;
+	    state.medicoNome  = nome;
+	    state.medicoValor = valor;
 
-        // Atualizar subtítulo step 4
-        var sub = document.getElementById('subDataHora');
-        if (sub) sub.textContent = 'Com ' + nome + '.';
-    };
+	    atualizarResumo('medico', nome);
+	    atualizarResumo('valor', valor);
+	    esconderErro('errMedico', null);
+
+	    var sub = document.getElementById('subDataHora');
+	    if (sub) sub.textContent = 'Com ' + nome + '.';
+	};
 
     window.filtrarMedicos = function() {
         var q = (document.getElementById('buscaMedico').value || '').toLowerCase();

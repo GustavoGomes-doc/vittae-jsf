@@ -136,26 +136,6 @@
 							</div>
 						</div>
 
-						<!-- seção 3: convênio -->
-						<div class="ag-section">
-							<div class="ag-section-title">
-								<div class="ag-section-num">3</div>
-								Convênio e Atendimento
-							</div>
-							<div class="ag-row ag-row-2">
-								<div class="ag-field">
-									<label class="ag-label">Forma de atendimento <span class="req">*</span></label>
-									<select id="formaAtendimento" class="ag-select" onchange="toggleConvenio(this.value)">
-										<option value="particular">Particular</option>
-										<option value="convenio">Convênio</option>
-									</select>
-								</div>
-								<div class="ag-field ag-convenio-num" id="campoCarteirinha">
-									<label class="ag-label">Número da carteirinha</label>
-									<input type="text" class="ag-input" placeholder="Não aplicável" id="numCarteirinha" />
-								</div>
-							</div>
-						</div>
 
 						<!-- responsável legal (menor de idade) -->
 						<div class="ag-responsavel" id="blocoResponsavel">
@@ -200,7 +180,7 @@
 						<!-- seção 4: histórico de saúde -->
 						<div class="ag-section">
 							<div class="ag-section-title">
-								<div class="ag-section-num">4</div>
+								<div class="ag-section-num">3</div>
 								Histórico de Saúde
 							</div>
 
@@ -341,9 +321,8 @@
 
 						<div class="ag-medicos-grid" id="medicosGrid">
 							<ui:repeat value="#{agendamentoBean.listaMedicos}" var="med">
-								<div class="ag-medico-card"
-									onclick="selecionarMedico(this, '#{med.id}', '#{med.nome}', #{med.valorConsulta})"
-									data-nome="#{med.nome}" data-crm="#{med.crm}" data-id="#{med.id}">
+								<div class="ag-medico-card" data-nome="#{med.nome}" data-crm="#{med.crm}" data-id="#{med.id}" 
+								data-valor="#{med.valorConsulta}" onclick="selecionarMedico(this)">
 									<div class="ag-medico-check">
 										<i class="fas fa-check"><!-- --></i>
 									</div>
@@ -372,6 +351,10 @@
 											<span class="ag-medico-info-label">Consulta</span>
 											<span class="ag-medico-info-value">R$ #{med.valorConsulta}</span>
 										</div>
+										<div class="ag-medico-info-item">
+       										<span class="ag-medico-info-label">Telefone</span>
+        									<span class="ag-medico-info-value">#{med.telefone}</span>
+    									</div>
 									</div>
 								</div>
 							</ui:repeat>

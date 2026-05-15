@@ -255,7 +255,7 @@
 				<h:commandButton value="Cancelar" styleClass="btn-cancelar"
 					action="/index?faces-redirect=true" immediate="true" />
 				<h:commandButton value="Salvar Cadastro" styleClass="btn-salvar"
-					action="#{cadastrarMedicoBean.salvar}" />
+					actionListener="#{cadastrarMedicoBean.salvar}" />
 			</div>
 
 			<h:messages showDetail="true" showSummary="true" tooltip="true"

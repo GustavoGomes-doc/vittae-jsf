@@ -12,6 +12,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -82,7 +83,7 @@ public class AgendarConsultaBean implements Serializable {
 			paciente.setCpf(pacienteCpf != null ? pacienteCpf.replaceAll("\\D", "") : "");
 			paciente.setTelefone(pacienteTelefone);
 			dto.setPaciente(paciente);
-			paciente.setGenero(pacienteGenero);           // ← adicionar
+			paciente.setGenero(pacienteGenero); // ← adicionar
 			paciente.setNascimento(pacienteNascimento);
 
 			service.salvarAgendamento(dto);
@@ -100,6 +101,7 @@ public class AgendarConsultaBean implements Serializable {
 	}
 
 	// ── MedicoUI ──
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MedicoUI {
 		private Long id;
 		private String nome;
@@ -108,6 +110,7 @@ public class AgendarConsultaBean implements Serializable {
 		private List<String> especialidades;
 		private Integer tempoConsultaMinutos;
 		private Double valorConsulta;
+		private String foto;
 
 		public String getIniciais() {
 			if (nome == null)
@@ -176,6 +179,14 @@ public class AgendarConsultaBean implements Serializable {
 
 		public void setValorConsulta(Double valorConsulta) {
 			this.valorConsulta = valorConsulta;
+		}
+
+		public String getFoto() {
+			return foto;
+		}
+
+		public void setFoto(String foto) {
+			this.foto = foto;
 		}
 	}
 
@@ -259,8 +270,6 @@ public class AgendarConsultaBean implements Serializable {
 	public void setPacienteNascimento(String pacienteNascimento) {
 		this.pacienteNascimento = pacienteNascimento;
 	}
-
-	
 
 	public String getPacienteGenero() {
 		return pacienteGenero;

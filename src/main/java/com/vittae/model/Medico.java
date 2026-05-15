@@ -1,5 +1,6 @@
 package com.vittae.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -8,14 +9,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class Medico extends Usuario {
 
 	private byte[] foto;
-	private String biografia;
 	private String crm;
 	private String ufCrm;
-	private String rqe;
 	private Integer tempoConsultaMinutos;
 	private LocalDate dataNascimento;
-	private String cep;
-	private double valorConsulta; 
+	private BigDecimal valorConsulta; 
 	private String telefone;
 	
 	@JsonManagedReference
@@ -27,15 +25,12 @@ public class Medico extends Usuario {
 	public Medico() {
 	}
 
-	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, double valorConsulta, String ufCrm, Integer tempoConsultaMinutos, String rqe, String biografia, List<String> especialidades, String telefone) {
+	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, List<String> especialidades, String telefone) {
 		this.foto = foto;
 		this.dataNascimento = dataNascimento;
 		this.crm = crm;
-		this.cep = cep;
 		this.valorConsulta = valorConsulta;
 		this.ufCrm = ufCrm;
-		this.rqe = rqe;
-		this.biografia = biografia;
 		this.tempoConsultaMinutos = tempoConsultaMinutos;
 		this.especialidades = especialidades;
 		this.telefone = telefone;
@@ -49,13 +44,6 @@ public class Medico extends Usuario {
 		this.telefone = telefone;
 	}
 
-	public String getBiografia() {
-		return biografia;
-	}
-
-	public void setBiografia(String biografia) {
-		this.biografia = biografia;
-	}
 
 	public String getUfCrm() {
 		return ufCrm;
@@ -63,14 +51,6 @@ public class Medico extends Usuario {
 
 	public void setUfCrm(String ufCrm) {
 		this.ufCrm = ufCrm;
-	}
-
-	public String getRqe() {
-		return rqe;
-	}
-
-	public void setRqe(String rqe) {
-		this.rqe = rqe;
 	}
 
 	public Integer getTempoConsultaMinutos() {
@@ -105,19 +85,11 @@ public class Medico extends Usuario {
 		this.crm = crm;
 	}
 
-	public String getCep() {
-		return cep;
-	}
-
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
-
-	public double getValorConsulta() {
+	public BigDecimal getValorConsulta() {
 		return valorConsulta;
 	}
 
-	public void setValorConsulta(double valorConsulta) {
+	public void setValorConsulta(BigDecimal valorConsulta) {
 		this.valorConsulta = valorConsulta;
 	}
 
