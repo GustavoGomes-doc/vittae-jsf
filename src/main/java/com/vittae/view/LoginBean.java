@@ -109,14 +109,16 @@ public class LoginBean implements Serializable {
             String telLimpo = this.telefone != null ? this.telefone.replaceAll("\\D", "") : "";
             String cepLimpo = this.cep != null ? this.cep.replaceAll("\\D", "") : "";
 
+            // ✅ CORREÇÃO 1: Ajustei para ter exatamente 6 variáveis para os 6 espaços (%s)
             String jsonBody = String.format(
-                "{\"nome\":\"%s\", \"email\":\"%s\", \"cpf\":\"%s\", \"cep\" :\"%s\", \"senha\":\"%s\", \"telefone\":\"%s\", \"perfil\":\"PACIENTE\"}",
-                this.nome, this.email, cpfLimpo, this.cep, this.senhaCadastro, telLimpo, cepLimpo
+                "{\"nome\":\"%s\", \"email\":\"%s\", \"cpf\":\"%s\", \"cep\":\"%s\", \"senha\":\"%s\", \"telefone\":\"%s\", \"perfil\":\"PACIENTE\"}",
+                this.nome, this.email, cpfLimpo, cepLimpo, this.senhaCadastro, telLimpo
             );
             
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8081/api/auth/cadastrar")) 
+                    // ✅ CORREÇÃO 2: A URL agora aponta para /api/usuarios/cadastrar
+                    .uri(URI.create("http://localhost:8081/api/usuarios/cadastrar")) 
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();

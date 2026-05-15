@@ -27,14 +27,16 @@ public class LoginFilter extends AbstractFilter implements Filter {
 		HttpServletResponse res = (HttpServletResponse) response;
 		HttpSession session = req.getSession();
 		
-		//verifica se a página requisitada já é a de login
+		// 1. Verifica qual página o usuário está tentando acessar
 		String reqURI = req.getRequestURI();
-		if (reqURI.contains("/login.xhtml")) {
-			//se for a tela de login, deixa passar sem barrar
+		
+		// 2. SE FOR A TELA DE LOGIN (que também tem o cadastro), DEIXA PASSAR!
+		if (reqURI.contains("/login.xhtml") || reqURI.contains("/cadastrar.xhtml")) {
 			chain.doFilter(request, response);
 			return; 
 		}
 		
+		// 3. Se for qualquer outra página (como o painel de médicos), verifica a sessão
 		Usuario user = (Usuario) session.getAttribute("usuario");
 		
 		if (session.isNew() || user == null) {
