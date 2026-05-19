@@ -185,15 +185,17 @@
 							</div>
 
 							<div class="ag-row ag-row-1">
-								<div class="ag-field">
-									<label class="ag-label">Motivo da consulta <span class="req">*</span></label>
-									<textarea id="motivoConsulta" class="ag-input ag-textarea"
-										placeholder="Descreva brevemente o motivo ou sintomas (ajuda o médico a se preparar)"></textarea>
-									<span class="ag-error-msg" id="errMotivo">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Descreva o motivo
-									</span>
-								</div>
-							</div>
+							    <div class="ag-field">
+							        <label class="ag-label">Motivo da consulta <span class="req">*</span></label>
+							        <h:inputTextarea id="motivoConsulta"
+							            value="#{agendamentoBean.observacoes}"
+							            styleClass="ag-input ag-textarea"
+							            p:placeholder="Descreva brevemente o motivo ou sintomas (ajuda o médico a se preparar)"
+							            required="true"
+							            requiredMessage="Descreva o motivo" />
+							        <h:message for="motivoConsulta" styleClass="ag-error-msg" />
+							    </div>
+</div>
 
 							<div class="ag-row ag-row-3">
 								<div class="ag-field">

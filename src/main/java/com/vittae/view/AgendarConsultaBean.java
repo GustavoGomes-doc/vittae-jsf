@@ -128,6 +128,7 @@ public class AgendarConsultaBean implements Serializable {
 		public Integer getTempoConsultaMinutos() {
 			return tempoConsultaMinutos;
 		}
+		
 
 		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
 			this.tempoConsultaMinutos = tempoConsultaMinutos;

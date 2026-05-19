@@ -21,6 +21,7 @@ import com.vittae.model.Especialidade;
 import com.vittae.model.Medico;
 import com.vittae.model.enums.DiaSemana;
 import com.vittae.service.CadastrarMedicoService;
+import com.vittae.service.MedicoEnvioDTO;
 
 @Named
 @ViewScoped
@@ -54,54 +55,57 @@ public class CadastrarMedicoBean implements Serializable {
 	}
 
 	public void salvar() {
-		try {
-			if (foto != null) {
-				InputStream input = foto.getInputStream();
-				dto.setFoto(input.readAllBytes());
-			}
+	    try {
+	        // monta o DTO de envio
+	        MedicoEnvioDTO medicoDTO = new MedicoEnvioDTO();
+	        medicoDTO.setNome(dto.getNome());
+	        medicoDTO.setCpf(dto.getCpf());
+	        medicoDTO.setEmail(dto.getEmail());
+	        medicoDTO.setSenha(dto.getSenha());
+	        medicoDTO.setCrm(dto.getCrm());
+	        medicoDTO.setUfCrm(dto.getUfCrm());
+	        medicoDTO.setValorConsulta(dto.getValorConsulta());
+	        medicoDTO.setTempoConsultaMinutos(dto.getTempoConsultaMinutos());
+	        medicoDTO.setDataNascimento(dto.getDataNascimento());
 
-			//Sintaxe limpa com Java Streams
-			if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
-                List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
-                    .map(String::trim) // Limpa os espaços em branco
-                    .collect(Collectors.toList());
-                
-                dto.setEspecialidades(listaEsp);
-            }
+	        // foto
+	        if (foto != null) {
+	            InputStream input = foto.getInputStream();
+	            medicoDTO.setFoto(input.readAllBytes());
+	        }
 
-			//processar Disponibilidades (Com LocalTime e Enum)
-			DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
+	        // especialidades
+	        if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
+	            List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
+	                .map(String::trim)
+	                .collect(Collectors.toList());
+	            medicoDTO.setEspecialidades(listaEsp);
+	        }
 
-			List<Disponibilidade> disponibilidades = listaDias.stream().filter(DiaUI::isSelecionado).map(dia -> {
-				Disponibilidade d = new Disponibilidade();
-				d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
+	        // disponibilidades
+	        List<MedicoEnvioDTO.DisponibilidadeEnvioDTO> disponibilidades = listaDias.stream()
+	            .filter(DiaUI::isSelecionado)
+	            .map(dia -> {
+	                MedicoEnvioDTO.DisponibilidadeEnvioDTO d = new MedicoEnvioDTO.DisponibilidadeEnvioDTO();
+	                d.setDiaSemana(dia.getValorEnum());
+	                d.setHoraInicio(dia.getHoraInicio());
+	                d.setHoraFim(dia.getHoraFim());
+	                return d;
+	            })
+	            .collect(Collectors.toList());
+	        medicoDTO.setDisponibilidades(disponibilidades);
 
-				//conversão de String da tela para LocalTime do Java
-				if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty()) {
-					d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
-				}
-				if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty()) {
-					d.setHoraFim(LocalTime.parse(dia.getHoraFim(), parser));
-				}
+	        service.salvarMedico(medicoDTO);
 
-				d.setMedico(dto);
-				return d;
-			}).collect(Collectors.toList());
+	        FacesContext.getCurrentInstance().addMessage(null,
+	            new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));
 
-			dto.setDisponibilidades(disponibilidades);
+	        init();
 
-			// 4. Enviar para o Service (Spring Boot)
-			service.salvarMedico(dto);
-
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));
-
-			init(); // Limpa a tela para o próximo cadastro
-
-		} catch (Exception e) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro",
-					"Erro ao processar dados: " + e.getMessage()));
-		}
+	    } catch (Exception e) {
+	        FacesContext.getCurrentInstance().addMessage(null,
+	            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro", "Erro ao processar dados: " + e.getMessage()));
+	    }
 	}
 
 	// --- Getters e Setters do Bean ---
