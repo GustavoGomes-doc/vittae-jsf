@@ -12,7 +12,7 @@ public class Disponibilidade {
 	private LocalTime horaInicio;
 	private LocalTime horaFim;
 	private DiaSemana diaSemana;
-	
+
 	@JsonBackReference
 	private Medico medico;
 
@@ -39,7 +39,9 @@ public class Disponibilidade {
 		return diaSemana;
 	}
 
-	public void setDiaSemana(DiaSemana diaSemana) { this.diaSemana = diaSemana; }
+	public void setDiaSemana(DiaSemana diaSemana) {
+		this.diaSemana = diaSemana;
+	}
 
 	public Long getId() {
 		return id;

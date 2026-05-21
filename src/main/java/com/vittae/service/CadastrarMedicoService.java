@@ -5,17 +5,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
-
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature; // Import obrigatório para configurar a data
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.Medico;
 
+
 public class CadastrarMedicoService {
 
     private static final String API_URL = "http://localhost:8082/api/medicos";
 
-    public void salvarMedico(Medico medico) throws Exception {
+    public void salvarMedico(MedicoEnvioDTO dto) throws Exception {
         try {
             // Configurar o Jackson para entender datas (LocalDate e LocalTime)
             ObjectMapper mapper = new ObjectMapper();
@@ -23,7 +25,7 @@ public class CadastrarMedicoService {
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
             // Converter o objeto Medico para String JSON
-            String json = mapper.writeValueAsString(medico);
+            String json = mapper.writeValueAsString(dto);
             
             // Dica de Ouro: Deixe esse print para você ver no console do Eclipse como o JSON ficou!
             System.out.println("Enviando JSON: " + json);
@@ -55,3 +57,4 @@ public class CadastrarMedicoService {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-@import url('https://googleapis.com');
+
 
 :root {
     --primary: #7c3aed;
@@ -10,7 +10,7 @@
 }
 
 
-
+@import url('https://googleapis.com');
 
 * {
     margin: 0;
@@ -37,7 +37,7 @@ body {
 }
 
 .sidebar {
-    width: 260px;
+    width: 220px;
     background: var(--white);
     padding: 2rem 1.5rem;
     display: flex;
@@ -89,9 +89,9 @@ body {
 }
 
 .main-content {
-    margin-left: 260px;
+    margin-left: 220px;
     flex: 1;
-    padding: 2rem 3rem;
+    padding: 1rem 1.5rem;
 }
 
 .topbar {

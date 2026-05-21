@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vittae.model.enums.Perfil;
 
+
 public class Medico extends Usuario {
 
 	private byte[] foto;
@@ -21,14 +22,15 @@ public class Medico extends Usuario {
 	private List<String> especialidades;
 	
 	private List<Disponibilidade> disponibilidades;
-	
+
+	private List<Consulta> consultas;
+
 	public Medico() {
 		super();
 		this.setPerfil(Perfil.MEDICO);
 	}
 
-
-	public Medico(byte[] foto, LocalDate dataNascimento, String crm, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, List<String> especialidades, String telefone) {
+	public Medico(byte[] foto, LocalDate dataNascimento, String crm, String cep, BigDecimal valorConsulta, String ufCrm, Integer tempoConsultaMinutos, List<String> especialidades, String telefone) {
 		this.foto = foto;
 		this.dataNascimento = dataNascimento;
 		this.crm = crm;
@@ -55,7 +57,6 @@ public class Medico extends Usuario {
 	public void setUfCrm(String ufCrm) {
 		this.ufCrm = ufCrm;
 	}
-
 
 	public Integer getTempoConsultaMinutos() {
 		return tempoConsultaMinutos;
@@ -88,7 +89,6 @@ public class Medico extends Usuario {
 	public void setCrm(String crm) {
 		this.crm = crm;
 	}
-
 	
 	public BigDecimal getValorConsulta() {
 		return valorConsulta;

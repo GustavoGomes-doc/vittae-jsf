@@ -136,6 +136,7 @@
 							</div>
 						</div>
 
+<<<<<<< HEAD
 						<!-- seção 3: convênio -->
 						<div class="ag-section">
 							<div class="ag-section-title">
@@ -156,6 +157,8 @@
 								</div>
 							</div>
 						</div>
+=======
+>>>>>>> agendar-consultas
 
 						<!-- responsável legal (menor de idade) -->
 						<div class="ag-responsavel" id="blocoResponsavel">
@@ -200,11 +203,16 @@
 						<!-- seção 4: histórico de saúde -->
 						<div class="ag-section">
 							<div class="ag-section-title">
+<<<<<<< HEAD
 								<div class="ag-section-num">4</div>
+=======
+								<div class="ag-section-num">3</div>
+>>>>>>> agendar-consultas
 								Histórico de Saúde
 							</div>
 
 							<div class="ag-row ag-row-1">
+<<<<<<< HEAD
 								<div class="ag-field">
 									<label class="ag-label">Motivo da consulta <span class="req">*</span></label>
 									<textarea id="motivoConsulta" class="ag-input ag-textarea"
@@ -214,6 +222,19 @@
 									</span>
 								</div>
 							</div>
+=======
+							    <div class="ag-field">
+							        <label class="ag-label">Motivo da consulta <span class="req">*</span></label>
+							        <h:inputTextarea id="motivoConsulta"
+							            value="#{agendamentoBean.observacoes}"
+							            styleClass="ag-input ag-textarea"
+							            p:placeholder="Descreva brevemente o motivo ou sintomas (ajuda o médico a se preparar)"
+							            required="true"
+							            requiredMessage="Descreva o motivo" />
+							        <h:message for="motivoConsulta" styleClass="ag-error-msg" />
+							    </div>
+</div>
+>>>>>>> agendar-consultas
 
 							<div class="ag-row ag-row-3">
 								<div class="ag-field">
@@ -341,9 +362,14 @@
 
 						<div class="ag-medicos-grid" id="medicosGrid">
 							<ui:repeat value="#{agendamentoBean.listaMedicos}" var="med">
+<<<<<<< HEAD
 								<div class="ag-medico-card"
 									onclick="selecionarMedico(this, '#{med.id}', '#{med.nome}', #{med.valorConsulta})"
 									data-nome="#{med.nome}" data-crm="#{med.crm}" data-id="#{med.id}">
+=======
+								<div class="ag-medico-card" data-nome="#{med.nome}" data-crm="#{med.crm}" data-id="#{med.id}" 
+								data-valor="#{med.valorConsulta}" onclick="selecionarMedico(this)">
+>>>>>>> agendar-consultas
 									<div class="ag-medico-check">
 										<i class="fas fa-check"><!-- --></i>
 									</div>
@@ -372,6 +398,13 @@
 											<span class="ag-medico-info-label">Consulta</span>
 											<span class="ag-medico-info-value">R$ #{med.valorConsulta}</span>
 										</div>
+<<<<<<< HEAD
+=======
+										<div class="ag-medico-info-item">
+       										<span class="ag-medico-info-label">Telefone</span>
+        									<span class="ag-medico-info-value">#{med.telefone}</span>
+    									</div>
+>>>>>>> agendar-consultas
 									</div>
 								</div>
 							</ui:repeat>
@@ -528,4 +561,8 @@
 
 	</ui:define>
 </ui:composition>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> agendar-consultas

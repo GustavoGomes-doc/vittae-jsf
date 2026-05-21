@@ -2,16 +2,15 @@ package com.vittae.view;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.temporal.ChronoUnit;
-import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -25,6 +24,8 @@ import com.vittae.model.Medico;
 import com.vittae.model.enums.DiaSemana;
 import com.vittae.model.enums.Perfil;
 import com.vittae.service.CadastrarMedicoService;
+import com.vittae.service.MedicoEnvioDTO;
+import com.vittae.service.MedicoEnvioDTO.DisponibilidadeEnvioDTO;
 
 @Named
 @ViewScoped
@@ -58,109 +59,112 @@ public class CadastrarMedicoBean implements Serializable {
 	}
 
 	public void salvar() {
-	    FacesContext ctx = FacesContext.getCurrentInstance();
-	    boolean valido = true;
-	    
-	    if(valido) {
-	    	dto.setPerfil(Perfil.MEDICO);
-	    	
-	    	ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-	    			"Sucesso", "Médico cadastrado com Sucesso!"));
-	    }
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		boolean valido = true;
 
-	    // 1. Validação de idade mínima (24 anos)
-	    if (dto.getDataNascimento() == null) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "Data inválida", "A data de nascimento é obrigatória."));
-	        valido = false;
-	    } else {
-	        long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalDate.now());
-	        
-	        if (idade < 24) {
-	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	                "Médico muito jovem", "O profissional deve ter no mínimo 24 anos."));
-	            valido = false;
-	        } else if (idade > 80) { // <-- NOVA VALIDAÇÃO AQUI
-	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	                "Idade inválida", "O profissional não pode ter mais de 80 anos."));
-	            valido = false;
-	        }
-	    }
+		// 1. Validação de data de nascimento e idade
+		if (dto.getDataNascimento() == null) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Data inválida",
+					"A data de nascimento é obrigatória."));
+			valido = false;
+		} else {
+			long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalDate.now());
+			if (idade < 24) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Médico muito jovem",
+						"O profissional deve ter no mínimo 24 anos."));
+				valido = false;
+			} else if (idade > 80) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Idade inválida",
+						"O profissional não pode ter mais de 80 anos."));
+				valido = false;
+			}
+		}
 
-	    // 2. Validação de CRM (apenas números, máx 6)
-	    if (dto.getCrm() == null || !dto.getCrm().matches("\\d{1,6}")) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "CRM inválido", "O CRM deve conter apenas números (máx. 6 dígitos)."));
-	        valido = false;
-	    }
+		// 2. Validação de CRM (apenas números, máx 6 dígitos)
+		if (dto.getCrm() == null || !dto.getCrm().matches("\\d{1,6}")) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "CRM inválido",
+					"O CRM deve conter apenas números (máx. 6 dígitos)."));
+			valido = false;
+		}
 
-	    // 3. Validação de Valor da Consulta (Dinheiro)
-	    if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(BigDecimal.ZERO) <= 0) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Valor inválido", "O valor da consulta deve ser maior que zero."));
-	        valido = false;
-	    } else if (dto.getValorConsulta().compareTo(new BigDecimal("1000.00")) > 0) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Valor excedido", "O valor da consulta não pode ultrapassar R$ 1.000,00."));
-	        valido = false;
-	    }
-	    
-	    // 4. Validação de Duração
-	    if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 20 || dto.getTempoConsultaMinutos() > 90) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "Duração inválida", "A duração deve ser entre 1 e 999 minutos."));
-	        valido = false;
-	    }
+		// 3. Validação de valor da consulta
+		if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(BigDecimal.ZERO) <= 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Valor inválido",
+					"O valor da consulta deve ser maior que zero."));
+			valido = false;
+		} else if (dto.getValorConsulta().compareTo(new BigDecimal("1000.00")) > 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Valor excedido",
+					"O valor da consulta não pode ultrapassar R$ 1.000,00."));
+			valido = false;
+		}
 
-	    // Se houver qualquer erro acima, para a execução aqui
-	    if (!valido) {
-	        return;
-	    }
+		// 4. Validação de duração da consulta (entre 21 e 90 minutos)
+		if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 20
+				|| dto.getTempoConsultaMinutos() > 90) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Duração inválida",
+					"A duração deve ser entre 21 e 90 minutos."));
+			valido = false;
+		}
 
-	    try {
-	        // Foto
-	        if (foto != null) {
-	            InputStream input = foto.getInputStream();
-	            dto.setFoto(input.readAllBytes());
-	        }
+		if (!valido) {
+			return;
+		}
 
-	        // Especialidades
-	        if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
-	            List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
-	                .map(String::trim)
-	                .collect(Collectors.toList());
-	            dto.setEspecialidades(listaEsp);
-	        }
+		try {
+			// Monta o DTO de envio
+			MedicoEnvioDTO medicoDTO = new MedicoEnvioDTO();
+			medicoDTO.setNome(dto.getNome());
+			medicoDTO.setCpf(dto.getCpf());
+			medicoDTO.setEmail(dto.getEmail());
+			medicoDTO.setSenha(dto.getSenha());
+			medicoDTO.setCrm(dto.getCrm());
+			medicoDTO.setUfCrm(dto.getUfCrm());
+			medicoDTO.setValorConsulta(dto.getValorConsulta());
+			medicoDTO.setTempoConsultaMinutos(dto.getTempoConsultaMinutos());
+			medicoDTO.setDataNascimento(dto.getDataNascimento());
 
-	        // Disponibilidades
-	        DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
-	        List<Disponibilidade> disponibilidades = listaDias.stream()
-	            .filter(DiaUI::isSelecionado)
-	            .map(dia -> {
-	                Disponibilidade d = new Disponibilidade();
-	                d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
-	                if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty())
-	                    d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
-	                if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty())
-	                    d.setHoraFim(LocalTime.parse(dia.getHoraFim(), parser));
-	                d.setMedico(dto);
-	                return d;
-	            }).collect(Collectors.toList());
-	        dto.setDisponibilidades(disponibilidades);
+			// Foto
+			if (foto != null) {
+				InputStream input = foto.getInputStream();
+				medicoDTO.setFoto(input.readAllBytes());
+			}
 
-	        // Salva UMA única vez
-	        service.salvarMedico(dto);
+			// Especialidades
+			if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
+				List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(",")).map(String::trim)
+						.collect(Collectors.toList());
+				medicoDTO.setEspecialidades(listaEsp);
+			}
 
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-	            "Sucesso!", "Médico cadastrado com sucesso."));
+			// Disponibilidades — converte DiaUI para DisponibilidadeEnvioDTO
+			DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
+			List<DisponibilidadeEnvioDTO> disponibilidades = listaDias.stream().filter(DiaUI::isSelecionado)
+					.map(dia -> {
+						DisponibilidadeEnvioDTO d = new DisponibilidadeEnvioDTO();
+						d.setDiaSemana(dia.getValorEnum());
+						if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty())
+							d.setHoraInicio(dia.getHoraInicio());
+						if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty())
+							d.setHoraFim(dia.getHoraFim());
+						return d;
+					}).collect(Collectors.toList());
+			medicoDTO.setDisponibilidades(disponibilidades);
 
-	        init(); // limpa o formulário
+			// Envia para a API
+			service.salvarMedico(medicoDTO);
 
-	    } catch (Exception e) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Erro", "Erro ao processar dados: " + e.getMessage()));
-	    }
+			ctx.addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));
+
+			init(); // limpa o formulário
+
+		} catch (Exception e) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro",
+					"Erro ao processar dados: " + e.getMessage()));
+		}
 	}
+
+	// ── Getters e Setters ────────────────────────────────────────────────────
 
 	public Medico getDto() {
 		return dto;
@@ -209,6 +213,8 @@ public class CadastrarMedicoBean implements Serializable {
 	public void setDataNascimentoStr(String dataNascimentoStr) {
 		this.dataNascimentoStr = dataNascimentoStr;
 	}
+
+	// ── Classe interna DiaUI ─────────────────────────────────────────────────
 
 	public static class DiaUI {
 		private String label;
