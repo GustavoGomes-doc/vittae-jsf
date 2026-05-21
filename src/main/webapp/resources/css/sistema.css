@@ -351,6 +351,10 @@ td {
     display: flex;
 }
 
+.modal-overlay[style] {
+    display: revert;
+}
+
 .modal-content {
     background: white;
     border-radius: 16px;
