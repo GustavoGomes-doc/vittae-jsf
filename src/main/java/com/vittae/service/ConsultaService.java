@@ -101,6 +101,7 @@ public class ConsultaService {
 	    HttpRequest request = HttpRequest.newBuilder()
 	            .uri(URI.create(API_URL + "/" + id))
 	            .header("Content-Type", "application/json")
+	            .GET()
 	            .PUT(HttpRequest.BodyPublishers.ofString(json))
 	            .build();
 
