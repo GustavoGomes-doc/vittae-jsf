@@ -61,6 +61,8 @@ public class CadastrarMedicoBean implements Serializable {
 	public void salvar() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		boolean valido = true;
+		
+		
 
 		// 1. Validação de data de nascimento e idade
 		if (dto.getDataNascimento() == null) {
@@ -122,6 +124,9 @@ public class CadastrarMedicoBean implements Serializable {
 			medicoDTO.setValorConsulta(dto.getValorConsulta());
 			medicoDTO.setTempoConsultaMinutos(dto.getTempoConsultaMinutos());
 			medicoDTO.setDataNascimento(dto.getDataNascimento());
+			medicoDTO.setFoto(dto.getFoto()); 
+			medicoDTO.setTelefone(dto.getTelefone());
+			medicoDTO.setPerfil(Perfil.MEDICO);
 
 			// Foto
 			if (foto != null) {
