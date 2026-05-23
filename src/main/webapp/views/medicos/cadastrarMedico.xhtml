@@ -141,9 +141,10 @@
 							<h:outputLabel for="valorConsulta" value="Valor da Consulta (R$)" />
 							<span class="req">*</span>
 							<h:inputText id="valorConsulta"
-								value="#{cadastrarMedicoBean.dto.valorConsulta}"
-								placeholder="Ex: 350,00">
-								<f:convertNumber minFractionDigits="2" locale="pt_BR" />
+   								value="#{cadastrarMedicoBean.dto.valorConsulta}"
+   								placeholder="Ex: 350,00">
+   	 							<f:convertNumber minFractionDigits="2" maxFractionDigits="2" 
+                     			type="number" locale="pt_BR" integerOnly="false"/>
 							</h:inputText>
 							<span class="erro-msg" id="err-valor"> <i
 								class="fas fa-exclamation-circle"></i> Informe um valor maior

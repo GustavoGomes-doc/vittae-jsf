@@ -3,19 +3,18 @@ package com.vittae.service;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature; // Import obrigatório para configurar a data
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.vittae.model.Medico;
+import com.vittae.dto.MedicoEnvioDTO;
 
 
 public class CadastrarMedicoService {
 
-    private static final String API_URL = "http://localhost:8081/api/medicos";
+    private static final String API_URL = "http://localhost:8082/api/medicos";
 
     public void salvarMedico(MedicoEnvioDTO dto) throws Exception {
         try {

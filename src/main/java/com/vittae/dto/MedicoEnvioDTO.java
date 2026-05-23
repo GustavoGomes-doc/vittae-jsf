@@ -1,4 +1,4 @@
-package com.vittae.service;
+package com.vittae.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

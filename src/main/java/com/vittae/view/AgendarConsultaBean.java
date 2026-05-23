@@ -64,6 +64,7 @@ public class AgendarConsultaBean implements Serializable {
 
 	public String salvarAgendamento() {
 		try {
+			
 			AgendamentoDTO dto = new AgendamentoDTO();
 			dto.setEspecialidade(especialidade);
 			dto.setTipoConsulta(tipoConsulta);

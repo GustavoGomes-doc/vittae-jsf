@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -19,13 +18,11 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.Part;
 
-import com.vittae.model.Disponibilidade;
+import com.vittae.dto.MedicoEnvioDTO;
+import com.vittae.dto.MedicoEnvioDTO.DisponibilidadeEnvioDTO;
 import com.vittae.model.Medico;
-import com.vittae.model.enums.DiaSemana;
 import com.vittae.model.enums.Perfil;
 import com.vittae.service.CadastrarMedicoService;
-import com.vittae.service.MedicoEnvioDTO;
-import com.vittae.service.MedicoEnvioDTO.DisponibilidadeEnvioDTO;
 
 @Named
 @ViewScoped

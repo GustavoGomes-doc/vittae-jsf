@@ -443,9 +443,10 @@
 						<button type="button" class="ag-btn ag-btn-primary"
 							id="btnProximo" onclick="proximoStep()">Próximo →</button>
 						<h:commandButton id="btnSubmitJSF"
-							value="Confirmar Agendamento ✓"
-							action="#{agendamentoBean.salvarAgendamento}"
-							styleClass="ag-btn ag-btn-success" style="display:none" />
+						    value="Confirmar Agendamento ✓"
+						    action="#{agendamentoBean.salvarAgendamento}"
+						    styleClass="ag-btn ag-btn-success" style="display:none"
+						    onclick="return prepararSubmit()" />
 					</div>
 
 				</div>
@@ -503,13 +504,31 @@
 				<!-- /ag-sidebar -->
 
 			</div>
+			
+			<div id="modalSucesso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+   				ckground:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+				    <div style="background:#1e1b4b; border-radius:16px; padding:40px; max-width:480px; width:90%;
+				        text-align:center; border:1px solid #4f46e5; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+				        <div style="font-size:56px; margin-bottom:16px;">✅</div>
+				        <h2 style="color:#a5b4fc; margin:0 0 8px">Consulta Agendada!</h2>
+				        <p style="color:#c7d2fe; margin:0 0 6px">Seu agendamento foi confirmado com sucesso.</p>
+				        <div id="modalResumoTexto" style="background:#312e81; border-radius:10px; padding:16px;
+				            margin:20px 0; color:#e0e7ff; font-size:14px; line-height:1.8; text-align:left;">
+				        </div>
+				        <button type="button" onclick="fecharModalEIr()"
+				            style="background:#4f46e5; color:white; border:none; padding:12px 32px;
+				            border-radius:8px; font-size:15px; cursor:pointer; width:100%">
+				            Novo Agendamento
+				        </button>
+					</div>
+			</div>
 			<!-- /ag-wrapper -->
 
 			<h:messages showDetail="true" showSummary="true" tooltip="true"
 				style="color:red;font-weight:bold;padding:10px;margin:0 32px;" />
 		</h:form>
 
-		<h:outputScript library="js" name="AgendarConsulta.js" />
+		<h:outputScript library="js" name="agendar.js" />
 
 	</ui:define>
 </ui:composition>
