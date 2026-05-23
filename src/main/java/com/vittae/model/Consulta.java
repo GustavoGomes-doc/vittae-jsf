@@ -1,10 +1,10 @@
 package com.vittae.model;
 
-import com.vittae.model.enums.Status;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import com.vittae.model.enums.Status;
 
 // Classes puras, prontas para virar JSON
 public class Consulta {
@@ -13,33 +13,35 @@ public class Consulta {
 	private Medico medico;
 	private Paciente paciente;
 	private Status status;
-	private LocalDate dataAgendado;
 	private LocalDate dataConsulta;
 	private LocalTime hora;
 	private BigDecimal valorConsulta;
-	private String local;
+	private Especialidade especialidade;
+	
+	private String respNome;
+	
+	private String respCpf;
+	
+	private String respParentesco;
+	
 
 	public Consulta() {
 	}
 
-	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta, String local,
-			BigDecimal valorConsulta, LocalTime hora) {
+	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta,
+			BigDecimal valorConsulta, LocalTime hora, Especialidade especialidade, String respNome, String respCpf, String respParentesco) {
 		this.medico = medico;
 		this.paciente = paciente;
 		this.status = status;
-		this.dataAgendado = dataAgendado;
 		this.dataConsulta = dataConsulta;
 		this.hora = hora;
 		this.valorConsulta = valorConsulta;
+		this.especialidade = especialidade;
+		this.respCpf = respCpf;
+		this.respNome = respNome;
+		this.respParentesco = respParentesco;
 	}
 
-	public String getLocal() {
-		return local;
-	}
-
-	public void setLocal(String local) {
-		this.local = local;
-	}
 
 	public Long getId() {
 		return id;
@@ -81,14 +83,6 @@ public class Consulta {
 		this.status = status;
 	}
 
-	public LocalDate getDataAgendado() {
-		return dataAgendado;
-	}
-
-	public void setDataAgendado(LocalDate dataAgendado) {
-		this.dataAgendado = dataAgendado;
-	}
-
 	public LocalDate getDataConsulta() {
 		return dataConsulta;
 	}
@@ -104,5 +98,39 @@ public class Consulta {
 	public void setHora(LocalTime hora) {
 		this.hora = hora;
 	}
+
+	public Especialidade getEspecialidade() {
+		return especialidade;
+	}
+
+	public void setEspecialidade(Especialidade especialidade) {
+		this.especialidade = especialidade;
+	}
+
+	public String getRespNome() {
+		return respNome;
+	}
+
+	public void setRespNome(String respNome) {
+		this.respNome = respNome;
+	}
+
+	public String getRespCpf() {
+		return respCpf;
+	}
+
+	public void setRespCpf(String respCpf) {
+		this.respCpf = respCpf;
+	}
+
+	public String getRespParentesco() {
+		return respParentesco;
+	}
+
+	public void setRespParentesco(String respParentesco) {
+		this.respParentesco = respParentesco;
+	}
+	
+	
 
 }

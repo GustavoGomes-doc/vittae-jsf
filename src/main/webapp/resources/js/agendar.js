@@ -165,7 +165,7 @@
 
         var btnV = document.getElementById('btnVoltar');
         var btnP = document.getElementById('btnProximo');
-        var btnS = document.getElementById('fAg:btnSubmitJSF');
+        var btnS = document.getElementById('btnSubmitJSF');
 
         btnV.style.visibility = state.step === 1 ? 'hidden' : 'visible';
 
@@ -564,97 +564,91 @@
     }
 	
 	window.prepararSubmit = function() {
-	    // popular todos os hiddens antes do JSF submeter
-	    var dataH = document.getElementById('fAg:dataConsultaHidden');
-	    var horaH = document.getElementById('fAg:horaConsultaHidden');
-	    var tipoH = document.getElementById('fAg:tipoConsultaHidden');
+	        // 1. Lógica para pegar os dados do responsável legal (se o bloco estiver visível)
+	        var respNome = null;
+	        var respCpf = null;
+	        var respParentesco = null;
 
-	    if (!state.dataSelecionada || !state.horaSelecionada || !state.tipoConsulta) {
-	        mostrarErro('errData', null);
-	        return false;
-	    }
-
-	    if (dataH) dataH.value = state.dataSelecionada;
-	    if (horaH) horaH.value = state.horaSelecionada;
-	    if (tipoH) tipoH.value = state.tipoConsulta;
-
-	    // mostra o modal ANTES do submit (JSF vai processar em background)
-	    mostrarModalSucesso();
-	    return false; // impede o submit JSF — vamos chamar via fetch
-	};
-
-	function mostrarModalSucesso() {
-	    // monta o resumo no modal
-	    var dataFormatada = formatarDataBR(state.dataSelecionada);
-	    var resumo = document.getElementById('modalResumoTexto');
-	    if (resumo) {
-	        resumo.innerHTML =
-	            '<b>👤 Paciente:</b> ' + (state.pacienteNome || '—') + '<br>' +
-	            '<b>🩺 Especialidade:</b> ' + (state.especialidade || '—') + '<br>' +
-	            '<b>👨‍⚕️ Médico:</b> ' + (state.medicoNome || '—') + '<br>' +
-	            '<b>📅 Data:</b> ' + dataFormatada + ' às ' + state.horaSelecionada + '<br>' +
-	            '<b>🏥 Tipo:</b> ' + (state.tipoConsulta || '—') + '<br>' +
-	            '<b>💰 Valor:</b> R$ ' + (state.medicoValor ? parseFloat(state.medicoValor).toFixed(2).replace('.',',') : '—');
-	    }
-
-	    var modal = document.getElementById('modalSucesso');
-	    if (modal) {
-	        modal.style.display = 'flex';
-	    }
-
-	    // envia para o backend via fetch direto (sem JSF)
-	    enviarAgendamento();
-	}
-
-	function enviarAgendamento() {
-	    var payload = {
-	        tipoConsulta: state.tipoConsulta,
-	        especialidade: state.especialidade,
-	        dataAgendado: new Date().toISOString().split('T')[0],
-	        dataConsulta: state.dataSelecionada,
-	        hora: state.horaSelecionada + ':00',
-	        medicoId: parseInt(state.medicoId),
-	        observacoes: (document.getElementById('fAg:motivoConsulta') || {}).value || '',
-	        paciente: {
-	            nome: (document.getElementById('fAg:pacNome') || {}).value || '',
-	            cpf: ((document.getElementById('fAg:pacCpf') || {}).value || '').replace(/\D/g,''),
-	            telefone: (document.getElementById('fAg:pacTelefone') || {}).value || '',
-	            genero: (document.getElementById('fAg:pacGenero') || {}).value || '',
-	            nascimento: (document.getElementById('fAg:pacNascimento') || {}).value || ''
+	        var blocoResponsavel = document.getElementById('blocoResponsavel');
+	        if (blocoResponsavel && blocoResponsavel.classList.contains('visible')) {
+	            respNome = (document.getElementById('respNome') || {}).value || null;
+	            respCpf = ((document.getElementById('respCpf') || {}).value || '').replace(/\D/g, '');
+	            respParentesco = (document.getElementById('respParentesco') || {}).value || null;
 	        }
+
+	        // 2. Montando o Payload
+			var payload = {
+			            especialidade: state.especialidade,
+			            dataConsulta: state.dataSelecionada,
+			            hora: state.horaSelecionada + ':00',
+			            medicoId: parseInt(state.medicoId),
+			            observacoes: (document.getElementById('fAg:motivoConsulta') || {}).value || '',
+			            respNome: respNome,
+			            respCpf: respCpf,
+			            respParentesco: respParentesco,
+			            paciente: {
+			                nome: (document.getElementById('fAg:pacNome') || {}).value || '',
+			                cpf: ((document.getElementById('fAg:pacCpf') || {}).value || '').replace(/\D/g,''),
+			                telefone: (document.getElementById('fAg:pacTelefone') || {}).value || '',
+			                genero: (document.getElementById('fAg:pacGenero') || {}).value || '',
+			                nascimento: (document.getElementById('fAg:pacNascimento') || {}).value || ''
+			            }
+			        };
+
+	        // 3. Fazendo o POST para a API
+	        fetch('http://localhost:8082/api/agendamentos', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify(payload)
+	        })
+	        .then(function(r) {
+	            if (!r.ok) throw new Error('Status ' + r.status);
+	            console.log('Agendamento salvo no backend!');
+	            // 4. Só exibe o modal de sucesso SE o backend retornar 200/201
+	            mostrarModalSucesso(); 
+	        })
+	        .catch(function(err) {
+	            console.error('Erro ao salvar agendamento:', err);
+	            alert('Não foi possível realizar o agendamento. Verifique os dados ou tente novamente mais tarde.');
+	        });
 	    };
 
-	    fetch('http://localhost:8082/api/agendamentos', {
-	        method: 'POST',
-	        headers: { 'Content-Type': 'application/json' },
-	        body: JSON.stringify(payload)
-	    })
-	    .then(function(r) {
-	        if (!r.ok) throw new Error('Status ' + r.status);
-	        console.log('Agendamento salvo!');
-	    })
-	    .catch(function(err) {
-	        console.error('Erro ao salvar agendamento:', err);
-	        // modal continua aberto mesmo com erro — pode adicionar mensagem se quiser
-	    });
-	}
+	    function mostrarModalSucesso() {
+	        // Monta o resumo no modal
+	        var dataFormatada = formatarDataBR(state.dataSelecionada);
+	        var resumo = document.getElementById('modalResumoTexto');
+	        if (resumo) {
+	            resumo.innerHTML =
+	                '<b>👤 Paciente:</b> ' + (state.pacienteNome || '—') + '<br>' +
+	                '<b>🩺 Especialidade:</b> ' + (state.especialidade || '—') + '<br>' +
+	                '<b>👨‍⚕️ Médico:</b> ' + (state.medicoNome || '—') + '<br>' +
+	                '<b>📅 Data:</b> ' + dataFormatada + ' às ' + state.horaSelecionada + '<br>' +
+	                '<b>🏥 Tipo:</b> ' + (state.tipoConsulta || '—') + '<br>' +
+	                '<b>💰 Valor:</b> R$ ' + (state.medicoValor ? parseFloat(state.medicoValor).toFixed(2).replace('.',',') : '—');
+	        }
 
-	window.fecharModalEIr = function() {
-	    window.location.reload();
-	};
+	        var modal = document.getElementById('modalSucesso');
+	        if (modal) {
+	            modal.style.display = 'flex';
+	        }
+	    }
 
-	function formatarDataBR(iso) {
-	    if (!iso) return '—';
-	    var p = iso.split('-');
-	    return p[2] + '/' + p[1] + '/' + p[0];
-	}
+	    window.fecharModalEIr = function() {
+	        window.location.reload();
+	    };
 
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+	    function formatarDataBR(iso) {
+	        if (!iso) return '—';
+	        var p = iso.split('-');
+	        return p[2] + '/' + p[1] + '/' + p[0];
+	    }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+	    function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-})();
+		if (document.readyState === 'loading') {
+		        document.addEventListener('DOMContentLoaded', init);
+		    } else {
+		        init();
+		    }
+
+		})();

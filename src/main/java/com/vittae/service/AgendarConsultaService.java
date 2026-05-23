@@ -61,25 +61,21 @@ public class AgendarConsultaService {
 	// ── DTO interno que espelha o AgendamentoDTO do Spring ──────────────────
 
 	public static class AgendamentoDTO {
-		private String tipoConsulta;
 		private String especialidade;
-		private LocalDate dataAgendado;
 		private LocalDate dataConsulta;
 		private LocalTime hora;
 		private Long medicoId;
 		private String observacoes;
 		private PacienteDTO paciente;
+		
+		// Novos campos do responsável legal
+		private String respNome;
+		private String respCpf;
+		private String respParentesco;;
 
 		public AgendamentoDTO() {
 		}
 
-		public String getTipoConsulta() {
-			return tipoConsulta;
-		}	
-
-		public void setTipoConsulta(String tipoConsulta) {
-			this.tipoConsulta = tipoConsulta;
-		}
 
 		public String getEspecialidade() {
 			return especialidade;
@@ -89,13 +85,6 @@ public class AgendarConsultaService {
 			this.especialidade = especialidade;
 		}
 
-		public LocalDate getDataAgendado() {
-			return dataAgendado;
-		}
-
-		public void setDataAgendado(LocalDate dataAgendado) {
-			this.dataAgendado = dataAgendado;
-		}
 
 		public LocalDate getDataConsulta() {
 			return dataConsulta;
@@ -136,6 +125,38 @@ public class AgendarConsultaService {
 		public void setPaciente(PacienteDTO paciente) {
 			this.paciente = paciente;
 		}
+
+
+		public String getRespNome() {
+			return respNome;
+		}
+
+
+		public void setRespNome(String respNome) {
+			this.respNome = respNome;
+		}
+
+
+		public String getRespCpf() {
+			return respCpf;
+		}
+
+
+		public void setRespCpf(String respCpf) {
+			this.respCpf = respCpf;
+		}
+
+
+		public String getRespParentesco() {
+			return respParentesco;
+		}
+
+
+		public void setRespParentesco(String respParentesco) {
+			this.respParentesco = respParentesco;
+		}
+		
+		
 	}
 
 	public static class PacienteDTO {

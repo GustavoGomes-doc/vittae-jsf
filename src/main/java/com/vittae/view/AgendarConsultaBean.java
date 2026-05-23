@@ -67,13 +67,11 @@ public class AgendarConsultaBean implements Serializable {
 			
 			AgendamentoDTO dto = new AgendamentoDTO();
 			dto.setEspecialidade(especialidade);
-			dto.setTipoConsulta(tipoConsulta);
 			dto.setMedicoId(medicoId);
 			dto.setObservacoes(observacoes);
 
 			if (dataConsulta != null && !dataConsulta.isEmpty()) {
 				dto.setDataConsulta(LocalDate.parse(dataConsulta));
-				dto.setDataAgendado(LocalDate.now());
 			}
 			if (horaConsulta != null && !horaConsulta.isEmpty()) {
 				dto.setHora(LocalTime.parse(horaConsulta));
@@ -92,7 +90,7 @@ public class AgendarConsultaBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Consulta agendada com sucesso."));
 
-			return "/views/pacientes/agendarConsulta?faces-redirect=true";
+			return "/views/pacientes/visualizarConsulta?faces-redirect=true";
 
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,

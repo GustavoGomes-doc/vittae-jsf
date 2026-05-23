@@ -190,26 +190,11 @@
 							        <h:inputTextarea id="motivoConsulta"
 							            value="#{agendamentoBean.observacoes}"
 							            styleClass="ag-input ag-textarea"
-							            p:placeholder="Descreva brevemente o motivo ou sintomas (ajuda o médico a se preparar)"
+							            p:placeholder="Descreva brevemente o motivo ou sintomas, medicamentos em uso, aleargias conhecidas, condicoes cronicas etc... (ajuda o médico a se preparar)"
 							            required="true"
 							            requiredMessage="Descreva o motivo" />
 							        <h:message for="motivoConsulta" styleClass="ag-error-msg" />
 							    </div>
-</div>
-
-							<div class="ag-row ag-row-3">
-								<div class="ag-field">
-									<label class="ag-label">Alergias conhecidas <span class="ag-label-hint">(opcional)</span></label>
-									<textarea id="alergias" class="ag-input ag-textarea" placeholder="Medicamentos, alimentos..."></textarea>
-								</div>
-								<div class="ag-field">
-									<label class="ag-label">Medicamentos em uso <span class="ag-label-hint">(opcional)</span></label>
-									<textarea id="medicamentos" class="ag-input ag-textarea" placeholder="Liste nomes e dosagens"></textarea>
-								</div>
-								<div class="ag-field">
-									<label class="ag-label">Condições crônicas <span class="ag-label-hint">(opcional)</span></label>
-									<textarea id="condicoesCronicas" class="ag-input ag-textarea" placeholder="Diabetes, hipertensão..."></textarea>
-								</div>
 							</div>
 
 							<!-- termos lgpd -->
@@ -442,11 +427,11 @@
 							id="btnVoltar" onclick="voltarStep()" style="visibility: hidden">← Voltar</button>
 						<button type="button" class="ag-btn ag-btn-primary"
 							id="btnProximo" onclick="proximoStep()">Próximo →</button>
-						<h:commandButton id="btnSubmitJSF"
-						    value="Confirmar Agendamento ✓"
-						    action="#{agendamentoBean.salvarAgendamento}"
-						    styleClass="ag-btn ag-btn-success" style="display:none"
-						    onclick="return prepararSubmit()" />
+						<button type="button" id="btnSubmitJSF"
+							  class="ag-btn ag-btn-success" style="display:none"
+							  onclick="prepararSubmit()">
+							  Confirmar Agendamento ✓
+						</button>
 					</div>
 
 				</div>
