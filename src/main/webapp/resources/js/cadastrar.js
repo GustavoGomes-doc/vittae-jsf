@@ -32,14 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var fotoPreview = document.getElementById('fotoPreview');
     var fotoIcone = document.getElementById('fotoIcone');
 
-    var ESPECIALIDADES = [
-        'Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia',
-        'Ginecologia', 'Oftalmologia', 'Neurologia', 'Psiquiatria',
-        'Endocrinologia', 'Urologia', 'Otorrinolaringologia',
-        'Gastroenterologia', 'Clínico Geral', 'Oncologia',
-        'Reumatologia', 'Infectologia'
-    ];
-
+    var ESPECIALIDADES = [];
+	
     var especialidadesSelecionadas = [];
 
 	
@@ -366,24 +360,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	
 	//chips especialidade
-    function inicializarChips() {
-        var container = document.getElementById('chipsContainer');
-        if (!container) return;
+	function inicializarChips() {
+	    var container = document.getElementById('chipsContainer');
+	    if (!container) return;
 
-        for (var c = 0; c < ESPECIALIDADES.length; c++) {
-            //isolando o escopo com uma IIFE para garantir o click com ES5
-            (function(nomeEspec) {
-                var chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.textContent = nomeEspec;
-                chip.setAttribute('data-nome', nomeEspec);
-                chip.addEventListener('click', function() {
-                    toggleChip(chip, nomeEspec);
-                });
-                container.appendChild(chip);
-            })(ESPECIALIDADES[c]);
-        }
-    }
+	    fetch('http://localhost:8082/api/especialidades')
+	        .then(function(r) { return r.json(); })
+	        .then(function(lista) {
+	            ESPECIALIDADES = lista.map(function(e) { return e.nome; });
+	            lista.forEach(function(esp) {
+	                var chip = document.createElement('div');
+	                chip.className = 'chip';
+	                chip.textContent = esp.nome;
+	                chip.setAttribute('data-nome', esp.nome);
+	                chip.addEventListener('click', function() {
+	                    toggleChip(chip, esp.nome);
+	                });
+	                container.appendChild(chip);
+	            });
+	        })
+	        .catch(function(err) {
+	            console.error('Erro ao carregar especialidades:', err);
+	        });
+	}
 
     function toggleChip(chip, nome) {
         if (chip.classList.contains('bloqueado')) return;

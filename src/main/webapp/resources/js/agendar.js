@@ -35,10 +35,15 @@
 
     function init() {
         aplicarMascaras();
+        aplicarCapitalizacao();
         monitorarNascimento();
         renderizarCalendario();
+		carregarEspecialidades();
     }
 
+    /* ═══════════════════════════════════════════════
+       MÁSCARAS
+    ═══════════════════════════════════════════════ */
     function aplicarMascaras() {
         document.querySelectorAll('.mask-cpf').forEach(function(el) {
             el.addEventListener('input', function(e) {
@@ -69,24 +74,116 @@
         });
     }
 
+    /* ═══════════════════════════════════════════════
+       CAPITALIZAÇÃO AUTOMÁTICA
+       Capitaliza a primeira letra de cada palavra
+    ═══════════════════════════════════════════════ */
+    function capitalizarPalavras(str) {
+        return str.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    }
+
+    function aplicarCapitalizacao() {
+        // Nome do paciente
+        var campoNome = document.getElementById('fAg:pacNome');
+        if (campoNome) {
+            campoNome.addEventListener('input', function(e) {
+                var pos = e.target.selectionStart;
+                var v = capitalizarPalavras(e.target.value);
+                e.target.value = v;
+                // preserva posição do cursor
+                e.target.setSelectionRange(pos, pos);
+            });
+        }
+
+        // Nome do responsável (campo nativo, não JSF)
+        var campoResp = document.getElementById('respNome');
+        if (campoResp) {
+            campoResp.addEventListener('input', function(e) {
+                var pos = e.target.selectionStart;
+                var v = capitalizarPalavras(e.target.value);
+                e.target.value = v;
+                e.target.setSelectionRange(pos, pos);
+            });
+        }
+    }
+
+    /* ═══════════════════════════════════════════════
+       MONITORAR NASCIMENTO
+       Regras:
+         - Data futura → inválida
+         - Menos de 1 ano → inválida
+         - 1 a 17 anos  → menor, abre bloco responsável
+         - 18+          → maior, fecha bloco
+    ═══════════════════════════════════════════════ */
     function monitorarNascimento() {
         var campo = document.getElementById('fAg:pacNascimento');
         if (!campo) return;
         campo.addEventListener('input', function() {
             var v = campo.value;
-            if (v.length < 10) { esconderMenor(); return; }
+            var hint  = document.getElementById('menorHint');
+            var errEl = document.getElementById('errNasc');
+
+            if (v.length < 10) {
+                esconderMenor();
+                esconderErro('errNasc', campo);
+                return;
+            }
+
             var partes = v.split('/');
-            if (partes.length !== 3) { esconderMenor(); return; }
-            var data = new Date(partes[2], partes[1]-1, partes[0]);
-            if (isNaN(data.getTime())) { esconderMenor(); return; }
+            if (partes.length !== 3) {
+                esconderMenor();
+                return;
+            }
+
+            var dia  = parseInt(partes[0], 10);
+            var mes  = parseInt(partes[1], 10);
+            var ano  = parseInt(partes[2], 10);
+            var data = new Date(ano, mes - 1, dia);
+
+            // Verifica se a data construída é coerente (evita 31/02 etc.)
+            var dataInvalida = isNaN(data.getTime())
+                || data.getDate()  !== dia
+                || data.getMonth() !== mes - 1
+                || data.getFullYear() !== ano;
+
+            if (dataInvalida) {
+                esconderMenor();
+                mostrarErro('errNasc', campo);
+                if (errEl) errEl.querySelector
+                    ? (errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida')
+                    : null;
+                return;
+            }
+
+            var agora = new Date();
+            // Data futura
+            if (data > agora) {
+                esconderMenor();
+                mostrarErro('errNasc', campo);
+                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
+                return;
+            }
+
             var idade = calcularIdade(data);
-            var hint = document.getElementById('menorHint');
-            var bloco = document.getElementById('blocoResponsavel');
+
+            // Menos de 1 ano — inválido para agendamento
+            if (idade < 1) {
+                esconderMenor();
+                mostrarErro('errNasc', campo);
+                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Idade inválida (menos de 1 ano)';
+                return;
+            }
+
+            // Data válida — limpa erro
+            esconderErro('errNasc', campo);
+
             if (idade < 18) {
-                hint.textContent = '⚠ ' + idade + ' anos • Menor de idade';
-                hint.classList.add('visible');
-                bloco.classList.add('visible');
-                atualizarResumo('paciente', campo.value ? obterNomePaciente() : null);
+                if (hint) {
+                    hint.textContent = '⚠ ' + idade + ' anos • Menor de idade';
+                    hint.classList.add('visible');
+                }
+                var bloco = document.getElementById('blocoResponsavel');
+                if (bloco) bloco.classList.add('visible');
             } else {
                 esconderMenor();
             }
@@ -94,10 +191,19 @@
     }
 
     function esconderMenor() {
-        var hint = document.getElementById('menorHint');
+        var hint  = document.getElementById('menorHint');
         var bloco = document.getElementById('blocoResponsavel');
-        if (hint) hint.classList.remove('visible');
-        if (bloco) bloco.classList.remove('visible');
+        if (hint)  hint.classList.remove('visible');
+        if (bloco) {
+            bloco.classList.remove('visible');
+            // Limpa campos do responsável ao esconder
+            var rNome = document.getElementById('respNome');
+            var rCpf  = document.getElementById('respCpf');
+            var rPar  = document.getElementById('respParentesco');
+            if (rNome) rNome.value = '';
+            if (rCpf)  rCpf.value  = '';
+            if (rPar)  rPar.value  = '';
+        }
     }
 
     function calcularIdade(dataNasc) {
@@ -190,34 +296,62 @@
         return true;
     }
 
+    /* ═══════════════════════════════════════════════
+       VALIDAÇÕES STEP 1
+    ═══════════════════════════════════════════════ */
     function validarDados() {
         var ok = true;
 
+        // Nome paciente
         var nome = document.getElementById('fAg:pacNome');
-        if (!nome || nome.value.trim().split(' ').length < 2) {
+        if (!nome || nome.value.trim().split(/\s+/).length < 2) {
             mostrarErro('errNome', nome); ok = false;
         } else { esconderErro('errNome', nome); }
 
+        // Nascimento
         var nasc = document.getElementById('fAg:pacNascimento');
+        var idadePaciente = null;
         if (!nasc || nasc.value.length < 10) {
             mostrarErro('errNasc', nasc); ok = false;
-        } else { esconderErro('errNasc', nasc); }
+        } else {
+            var partes = nasc.value.split('/');
+            var dia = parseInt(partes[0], 10);
+            var mes = parseInt(partes[1], 10);
+            var ano = parseInt(partes[2], 10);
+            var dataNasc = new Date(ano, mes - 1, dia);
+            var dataInvalida = isNaN(dataNasc.getTime())
+                || dataNasc.getDate()    !== dia
+                || dataNasc.getMonth()   !== mes - 1
+                || dataNasc.getFullYear() !== ano;
+            var agora = new Date();
+            idadePaciente = calcularIdade(dataNasc);
 
+            if (dataInvalida || dataNasc > agora || idadePaciente < 1) {
+                mostrarErro('errNasc', nasc); ok = false;
+            } else {
+                esconderErro('errNasc', nasc);
+            }
+        }
+
+        // CPF paciente
         var cpf = document.getElementById('fAg:pacCpf');
         if (!cpf || cpf.value.replace(/\D/g,'').length !== 11) {
             mostrarErro('errCpf', cpf); ok = false;
         } else { esconderErro('errCpf', cpf); }
 
+        // Gênero
         var sexo = document.getElementById('fAg:pacGenero');
         if (!sexo || !sexo.value) {
             mostrarErro('errSexo', sexo); ok = false;
         } else { esconderErro('errSexo', sexo); }
 
+        // Telefone
         var tel = document.getElementById('fAg:pacTelefone');
         if (!tel || tel.value.replace(/\D/g,'').length < 10) {
             mostrarErro('errTel', tel); ok = false;
         } else { esconderErro('errTel', tel); }
 
+        // Termos
         var t1 = document.getElementById('termoVerdade');
         var t2 = document.getElementById('termoLgpd');
         if (!t1 || !t1.checked) { mostrarErro('errTermo1', null); ok = false; }
@@ -225,12 +359,24 @@
         if (!t2 || !t2.checked) { mostrarErro('errTermo2', null); ok = false; }
         else { esconderErro('errTermo2', null); }
 
+        // Responsável legal (só se bloco visível e paciente for menor)
         var bloco = document.getElementById('blocoResponsavel');
-        if (bloco && bloco.classList.contains('visible')) {
+        if (bloco && bloco.classList.contains('visible') && idadePaciente !== null && idadePaciente < 18) {
             var rNome = document.getElementById('respNome');
+            var nomePaciente = nome ? nome.value.trim().toLowerCase() : '';
+            var nomeResp     = rNome ? rNome.value.trim().toLowerCase() : '';
+
             if (!rNome || !rNome.value.trim()) {
                 mostrarErro('errRespNome', rNome); ok = false;
-            } else { esconderErro('errRespNome', rNome); }
+            } else if (nomeResp === nomePaciente) {
+                // Nome do responsável igual ao do paciente
+                mostrarErro('errRespNome', rNome);
+                var errEl = document.getElementById('errRespNome');
+                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Nome deve ser diferente do paciente';
+                ok = false;
+            } else {
+                esconderErro('errRespNome', rNome);
+            }
 
             var rCpf = document.getElementById('respCpf');
             if (!rCpf || rCpf.value.replace(/\D/g,'').length !== 11) {
@@ -243,6 +389,7 @@
             } else { esconderErro('errRespParent', rParent); }
         }
 
+        // Motivo
         var motivo = document.getElementById('fAg:motivoConsulta');
         if (!motivo || motivo.value.trim().length < 5) {
             mostrarErro('errMotivo', motivo); ok = false;
@@ -306,6 +453,9 @@
         return el ? el.value.trim() : '';
     }
 
+    /* ═══════════════════════════════════════════════
+       ESPECIALIDADE
+    ═══════════════════════════════════════════════ */
     window.selecionarEsp = function(card, nome) {
         document.querySelectorAll('.ag-esp-card').forEach(function(c) {
             c.classList.remove('selected');
@@ -318,8 +468,81 @@
 
         atualizarResumo('especialidade', nome);
         esconderErro('errEsp', null);
-        filtrarMedicosPorEsp(nome);
+
+        // Busca médicos filtrados pelo endpoint
+        carregarMedicosPorEsp(nome);
     };
+
+    /* ═══════════════════════════════════════════════
+       MÉDICO — carrega da API filtrado por especialidade
+    ═══════════════════════════════════════════════ */
+    function carregarMedicosPorEsp(especialidade) {
+        var grid = document.getElementById('medicosGrid');
+        var sub  = document.getElementById('subMedico');
+        if (!grid) return;
+
+        grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">⏳ Carregando médicos...</div>';
+
+        fetch('http://localhost:8082/api/medicos?especialidade=' + encodeURIComponent(especialidade))
+            .then(function(r) { return r.json(); })
+            .then(function(medicos) {
+                renderizarCardsMedicos(medicos);
+                if (sub) sub.innerHTML = 'Profissionais em <strong>' + especialidade + '</strong>. Escolha o ideal para você.';
+            })
+            .catch(function(err) {
+                console.error('Erro ao carregar médicos:', err);
+                grid.innerHTML = '<div style="text-align:center;padding:32px;color:#f87171">Erro ao carregar médicos. Tente novamente.</div>';
+            });
+    }
+
+    function renderizarCardsMedicos(medicos) {
+        var grid = document.getElementById('medicosGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (!medicos || medicos.length === 0) {
+            grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">Nenhum médico disponível para essa especialidade.</div>';
+            return;
+        }
+
+        medicos.forEach(function(med) {
+            var iniciais = (med.nome || '').split(' ').map(function(p) { return p[0]; }).join('').slice(0,2).toUpperCase();
+            var cores = ['#4f46e5','#7c3aed','#2563eb','#0891b2','#059669','#d97706'];
+            var cor   = cores[med.id % cores.length] || '#4f46e5';
+
+            var card = document.createElement('div');
+            card.className = 'ag-medico-card';
+            card.setAttribute('data-nome', med.nome || '');
+            card.setAttribute('data-crm',  med.crm  || '');
+            card.setAttribute('data-id',   med.id   || '');
+            card.setAttribute('data-valor', med.valorConsulta || '');
+            card.onclick = function() { window.selecionarMedico(card); };
+
+            var fotoHtml = med.foto
+                ? '<img src="data:image/jpeg;base64,' + med.foto + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%" />'
+                : iniciais;
+
+            var tagsHtml = (med.especialidades || []).map(function(e) {
+                return '<span class="ag-medico-tag">' + e + '</span>';
+            }).join('');
+
+            var valor = med.valorConsulta ? parseFloat(med.valorConsulta).toFixed(2).replace('.',',') : '—';
+
+            card.innerHTML =
+                '<div class="ag-medico-check"><i class="fas fa-check"></i></div>' +
+                '<div class="ag-medico-avatar" style="background:' + cor + '">' + fotoHtml + '</div>' +
+                '<div class="ag-medico-nome">' + (med.nome || '') + '</div>' +
+                '<div class="ag-medico-crm">CRM ' + (med.crm || '') + '</div>' +
+                '<div class="ag-medico-tags">' + tagsHtml + '</div>' +
+                '<div class="ag-medico-info">' +
+                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Duração</span><span class="ag-medico-info-value">' + (med.tempoConsultaMinutos || '—') + ' min</span></div>' +
+                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Consulta</span><span class="ag-medico-info-value">R$ ' + valor + '</span></div>' +
+                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Telefone</span><span class="ag-medico-info-value">' + (med.telefone || '—') + '</span></div>' +
+                '</div>';
+
+            grid.appendChild(card);
+        });
+    }
 
     window.selecionarMedico = function(card) {
         document.querySelectorAll('.ag-medico-card').forEach(function(c) {
@@ -354,20 +577,6 @@
             c.style.display = (nome.includes(q) || crm.includes(q)) ? '' : 'none';
         });
     };
-
-    function filtrarMedicosPorEsp(esp) {
-        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
-            var tags = c.querySelectorAll('.ag-medico-tag');
-            if (tags.length === 0) { c.style.display = ''; return; }
-            var temEsp = false;
-            tags.forEach(function(t) {
-                if (t.textContent.trim().toLowerCase() === esp.toLowerCase()) temEsp = true;
-            });
-            c.style.display = temEsp ? '' : 'none';
-        });
-        var sub = document.getElementById('subMedico');
-        if (sub) sub.innerHTML = 'Profissionais em <strong>' + esp + '</strong>. Escolha o ideal para você.';
-    }
 
     window.selecionarTipo = function(card, tipo) {
         document.querySelectorAll('.ag-tipo-card').forEach(function(c) {
@@ -474,6 +683,28 @@
             grid.appendChild(div);
         }
     }
+	
+	function carregarEspecialidades() {
+	    fetch('http://localhost:8082/api/especialidades')
+	        .then(function(r) { return r.json(); })
+	        .then(function(especialidades) {
+	            var grid = document.getElementById('espGrid');
+	            if (!grid) return;
+	            grid.innerHTML = '';
+	            especialidades.forEach(function(esp) {
+	                var card = document.createElement('div');
+	                card.className = 'ag-esp-card';
+	                card.onclick = function() { window.selecionarEsp(card, esp.nome); };
+	                card.innerHTML =
+	                    '<div class="ag-esp-name">' + esp.nome + '</div>' +
+	                    '<div class="ag-esp-desc">' + (esp.descricao || '') + '</div>';
+	                grid.appendChild(card);
+	            });
+	        })
+	        .catch(function(err) {
+	            console.error('Erro ao carregar especialidades:', err);
+	        });
+	}
 
     function selecionarDia(iso, dNum) {
         state.dataSelecionada = iso;
@@ -562,93 +793,87 @@
             if (el)    el.textContent = valor ? 'R$ ' + parseFloat(valor).toFixed(2).replace('.',',') : '—';
         }
     }
-	
-	window.prepararSubmit = function() {
-	        // 1. Lógica para pegar os dados do responsável legal (se o bloco estiver visível)
-	        var respNome = null;
-	        var respCpf = null;
-	        var respParentesco = null;
 
-	        var blocoResponsavel = document.getElementById('blocoResponsavel');
-	        if (blocoResponsavel && blocoResponsavel.classList.contains('visible')) {
-	            respNome = (document.getElementById('respNome') || {}).value || null;
-	            respCpf = ((document.getElementById('respCpf') || {}).value || '').replace(/\D/g, '');
-	            respParentesco = (document.getElementById('respParentesco') || {}).value || null;
-	        }
+    /* ═══════════════════════════════════════════════
+       SUBMIT
+    ═══════════════════════════════════════════════ */
+    window.prepararSubmit = function() {
+        var respNome = null;
+        var respCpf = null;
+        var respParentesco = null;
 
-	        // 2. Montando o Payload
-			var payload = {
-			            especialidade: state.especialidade,
-			            dataConsulta: state.dataSelecionada,
-			            hora: state.horaSelecionada + ':00',
-			            medicoId: parseInt(state.medicoId),
-			            observacoes: (document.getElementById('fAg:motivoConsulta') || {}).value || '',
-			            respNome: respNome,
-			            respCpf: respCpf,
-			            respParentesco: respParentesco,
-			            paciente: {
-			                nome: (document.getElementById('fAg:pacNome') || {}).value || '',
-			                cpf: ((document.getElementById('fAg:pacCpf') || {}).value || '').replace(/\D/g,''),
-			                telefone: (document.getElementById('fAg:pacTelefone') || {}).value || '',
-			                genero: (document.getElementById('fAg:pacGenero') || {}).value || '',
-			                nascimento: (document.getElementById('fAg:pacNascimento') || {}).value || ''
-			            }
-			        };
+        var blocoResponsavel = document.getElementById('blocoResponsavel');
+        if (blocoResponsavel && blocoResponsavel.classList.contains('visible')) {
+            respNome      = (document.getElementById('respNome') || {}).value || null;
+            respCpf       = ((document.getElementById('respCpf') || {}).value || '').replace(/\D/g, '');
+            respParentesco = (document.getElementById('respParentesco') || {}).value || null;
+        }
 
-	        // 3. Fazendo o POST para a API
-	        fetch('http://localhost:8082/api/agendamentos', {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify(payload)
-	        })
-	        .then(function(r) {
-	            if (!r.ok) throw new Error('Status ' + r.status);
-	            console.log('Agendamento salvo no backend!');
-	            // 4. Só exibe o modal de sucesso SE o backend retornar 200/201
-	            mostrarModalSucesso(); 
-	        })
-	        .catch(function(err) {
-	            console.error('Erro ao salvar agendamento:', err);
-	            alert('Não foi possível realizar o agendamento. Verifique os dados ou tente novamente mais tarde.');
-	        });
-	    };
+        var payload = {
+            especialidade:  state.especialidade,
+            dataConsulta:   state.dataSelecionada,
+            hora:           state.horaSelecionada + ':00',
+            medicoId:       parseInt(state.medicoId),
+            observacoes:    (document.getElementById('fAg:motivoConsulta') || {}).value || '',
+            respNome:       respNome,
+            respCpf:        respCpf,
+            respParentesco: respParentesco,
+            paciente: {
+                nome:       (document.getElementById('fAg:pacNome')       || {}).value || '',
+                cpf:        ((document.getElementById('fAg:pacCpf')       || {}).value || '').replace(/\D/g,''),
+                telefone:   (document.getElementById('fAg:pacTelefone')   || {}).value || '',
+                genero:     (document.getElementById('fAg:pacGenero')     || {}).value || '',
+                nascimento: (document.getElementById('fAg:pacNascimento') || {}).value || ''
+            }
+        };
 
-	    function mostrarModalSucesso() {
-	        // Monta o resumo no modal
-	        var dataFormatada = formatarDataBR(state.dataSelecionada);
-	        var resumo = document.getElementById('modalResumoTexto');
-	        if (resumo) {
-	            resumo.innerHTML =
-	                '<b>👤 Paciente:</b> ' + (state.pacienteNome || '—') + '<br>' +
-	                '<b>🩺 Especialidade:</b> ' + (state.especialidade || '—') + '<br>' +
-	                '<b>👨‍⚕️ Médico:</b> ' + (state.medicoNome || '—') + '<br>' +
-	                '<b>📅 Data:</b> ' + dataFormatada + ' às ' + state.horaSelecionada + '<br>' +
-	                '<b>🏥 Tipo:</b> ' + (state.tipoConsulta || '—') + '<br>' +
-	                '<b>💰 Valor:</b> R$ ' + (state.medicoValor ? parseFloat(state.medicoValor).toFixed(2).replace('.',',') : '—');
-	        }
+        fetch('http://localhost:8082/api/agendamentos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(function(r) {
+            if (!r.ok) throw new Error('Status ' + r.status);
+            mostrarModalSucesso();
+        })
+        .catch(function(err) {
+            console.error('Erro ao salvar agendamento:', err);
+            alert('Não foi possível realizar o agendamento. Verifique os dados ou tente novamente mais tarde.');
+        });
+    };
 
-	        var modal = document.getElementById('modalSucesso');
-	        if (modal) {
-	            modal.style.display = 'flex';
-	        }
-	    }
+    function mostrarModalSucesso() {
+        var dataFormatada = formatarDataBR(state.dataSelecionada);
+        var resumo = document.getElementById('modalResumoTexto');
+        if (resumo) {
+            resumo.innerHTML =
+                '<b>👤 Paciente:</b> ' + (state.pacienteNome || '—') + '<br>' +
+                '<b>🩺 Especialidade:</b> ' + (state.especialidade || '—') + '<br>' +
+                '<b>👨‍⚕️ Médico:</b> ' + (state.medicoNome || '—') + '<br>' +
+                '<b>📅 Data:</b> ' + dataFormatada + ' às ' + state.horaSelecionada + '<br>' +
+                '<b>🏥 Tipo:</b> ' + (state.tipoConsulta || '—') + '<br>' +
+                '<b>💰 Valor:</b> R$ ' + (state.medicoValor ? parseFloat(state.medicoValor).toFixed(2).replace('.',',') : '—');
+        }
+        var modal = document.getElementById('modalSucesso');
+        if (modal) modal.style.display = 'flex';
+    }
 
-	    window.fecharModalEIr = function() {
-	        window.location.reload();
-	    };
+    window.fecharModalEIr = function() {
+        window.location.reload();
+    };
 
-	    function formatarDataBR(iso) {
-	        if (!iso) return '—';
-	        var p = iso.split('-');
-	        return p[2] + '/' + p[1] + '/' + p[0];
-	    }
+    function formatarDataBR(iso) {
+        if (!iso) return '—';
+        var p = iso.split('-');
+        return p[2] + '/' + p[1] + '/' + p[0];
+    }
 
-	    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-		if (document.readyState === 'loading') {
-		        document.addEventListener('DOMContentLoaded', init);
-		    } else {
-		        init();
-		    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
-		})();
+})();
