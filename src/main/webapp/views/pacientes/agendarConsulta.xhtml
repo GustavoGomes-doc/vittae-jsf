@@ -19,7 +19,6 @@
 			<div class="ag-wrapper">
 				<div class="ag-main">
 
-					<!-- stepper -->
 					<div class="ag-stepper">
 						<div class="ag-step">
 							<div class="ag-step-circle" id="sc1">1</div>
@@ -28,7 +27,7 @@
 								<span class="ag-step-name active" id="sn1">Dados</span>
 							</div>
 						</div>
-						<div class="ag-step-line" id="sl1"><!-- --></div>
+						<div class="ag-step-line" id="sl1"></div>
 						<div class="ag-step">
 							<div class="ag-step-circle" id="sc2">2</div>
 							<div class="ag-step-info">
@@ -36,7 +35,7 @@
 								<span class="ag-step-name" id="sn2">Especialidade</span>
 							</div>
 						</div>
-						<div class="ag-step-line" id="sl2"><!-- --></div>
+						<div class="ag-step-line" id="sl2"></div>
 						<div class="ag-step">
 							<div class="ag-step-circle" id="sc3">3</div>
 							<div class="ag-step-info">
@@ -44,7 +43,7 @@
 								<span class="ag-step-name" id="sn3">Médico</span>
 							</div>
 						</div>
-						<div class="ag-step-line" id="sl3"><!-- --></div>
+						<div class="ag-step-line" id="sl3"></div>
 						<div class="ag-step">
 							<div class="ag-step-circle" id="sc4">4</div>
 							<div class="ag-step-info">
@@ -54,15 +53,13 @@
 						</div>
 					</div>
 
-					<!-- ══ STEP 1: DADOS DO PACIENTE ══ -->
 					<div class="ag-step-panel active" id="panel1">
 						<div class="ag-step-badge">
-							<i class="fas fa-user"><!-- --></i> Passo 1 de 4
+							<i class="fas fa-user"></i> Passo 1 de 4
 						</div>
 						<h2 class="ag-step-title">Dados do Paciente</h2>
 						<p class="ag-step-sub">Preencha as informações para identificar o paciente.</p>
 
-						<!-- seção 1: identificação -->
 						<div class="ag-section">
 							<div class="ag-section-title">
 								<div class="ag-section-num">1</div>
@@ -75,7 +72,7 @@
 									<h:inputText id="pacNome" value="#{agendamentoBean.pacienteNome}"
 										styleClass="ag-input" p:placeholder="Maria Silva dos Santos" />
 									<span class="ag-error-msg" id="errNome">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Informe nome e sobrenome
+										<i class="fas fa-exclamation-circle"></i> Informe nome e sobrenome
 									</span>
 								</div>
 								<div class="ag-field">
@@ -83,9 +80,9 @@
 									<h:inputText id="pacNascimento" value="#{agendamentoBean.pacienteNascimento}"
 										styleClass="ag-input mask-nascimento"
 										p:placeholder="DD/MM/AAAA" p:maxlength="10" />
-									<span class="ag-menor-hint" id="menorHint">⚠ 17 anos • Menor de idade</span>
+									<span class="ag-menor-hint" id="menorHint"><i class="fas fa-exclamation-triangle"></i> 17 anos • Menor de idade</span>
 									<span class="ag-error-msg" id="errNasc">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Data inválida
+										<i class="fas fa-exclamation-circle"></i> Data inválida
 									</span>
 								</div>
 							</div>
@@ -97,7 +94,7 @@
 										styleClass="ag-input mask-cpf"
 										p:placeholder="000.000.000-00" p:maxlength="14" />
 									<span class="ag-error-msg" id="errCpf">
-										<i class="fas fa-exclamation-circle"><!-- --></i> CPF inválido
+										<i class="fas fa-exclamation-circle"></i> CPF inválido
 									</span>
 								</div>
 								<div class="ag-field">
@@ -111,13 +108,12 @@
 										<f:selectItem itemValue="outro"     itemLabel="Outro" />
 									</h:selectOneMenu>
 									<span class="ag-error-msg" id="errSexo">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Obrigatório
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
 									</span>
 								</div>
 							</div>
 						</div>
 
-						<!-- seção 2: contato -->
 						<div class="ag-section">
 							<div class="ag-section-title">
 								<div class="ag-section-num">2</div>
@@ -130,36 +126,44 @@
 										styleClass="ag-input mask-phone"
 										p:placeholder="(11) 99999-9999" p:maxlength="15" />
 									<span class="ag-error-msg" id="errTel">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Telefone inválido
+										<i class="fas fa-exclamation-circle"></i> Telefone inválido
 									</span>
 								</div>
 							</div>
 						</div>
 
-
-						<!-- responsável legal (menor de idade) -->
 						<div class="ag-responsavel" id="blocoResponsavel">
 							<div class="ag-responsavel-header">
-								<i class="fas fa-shield-alt"><!-- --></i>
+								<i class="fas fa-shield-alt"></i>
 								<h5>Responsável Legal</h5>
 							</div>
 							<p class="ag-responsavel-sub">Obrigatório para menores de 18 anos (Art. 8º do ECA e Resolução CFM 2.217/2018).</p>
 							<div class="ag-row ag-row-3">
+								
 								<div class="ag-field">
 									<label class="ag-label">Nome do responsável <span class="req">*</span></label>
 									<input type="text" class="ag-input" id="respNome" placeholder="Nome completo" />
 									<span class="ag-error-msg" id="errRespNome">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Obrigatório
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
 									</span>
 								</div>
+								
 								<div class="ag-field">
 									<label class="ag-label">CPF do responsável <span class="req">*</span></label>
-									<input type="text" class="ag-input mask-cpf" id="respCpf"
-										placeholder="000.000.000-00" maxlength="14" />
+									<input type="text" class="ag-input mask-cpf" id="respCpf" placeholder="000.000.000-00" maxlength="14" />
 									<span class="ag-error-msg" id="errRespCpf">
-										<i class="fas fa-exclamation-circle"><!-- --></i> CPF inválido
+										<i class="fas fa-exclamation-circle"></i> CPF inválido
 									</span>
 								</div>
+								
+								<div class="ag-field">
+									<label class="ag-label">Data de nascimento <span class="req">*</span></label>
+									<input type="text" class="ag-input mask-nascimento" id="respNascimento" placeholder="DD/MM/AAAA" maxlength="10" />
+									<span class="ag-error-msg" id="errRespNasc">
+										<i class="fas fa-exclamation-circle"></i> Data inválida
+									</span>
+								</div>
+								
 								<div class="ag-field">
 									<label class="ag-label">Grau de parentesco <span class="req">*</span></label>
 									<select class="ag-select" id="respParentesco">
@@ -171,13 +175,13 @@
 										<option value="outro">Outro</option>
 									</select>
 									<span class="ag-error-msg" id="errRespParent">
-										<i class="fas fa-exclamation-circle"><!-- --></i> Obrigatório
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
 									</span>
 								</div>
+
 							</div>
 						</div>
 
-						<!-- seção 4: histórico de saúde -->
 						<div class="ag-section">
 							<div class="ag-section-title">
 								<div class="ag-section-num">3</div>
@@ -197,10 +201,9 @@
 							    </div>
 							</div>
 
-							<!-- termos lgpd -->
 							<div class="ag-termos">
 								<div class="ag-termos-header">
-									<i class="fas fa-shield-alt" style="color: #818cf8"><!-- --></i>
+									<i class="fas fa-shield-alt" style="color: #818cf8"></i>
 									<h4>Termos e privacidade</h4>
 								</div>
 								<p class="ag-termos-sub">Lei nº 13.709/2018 (LGPD) e Código de Ética Médica</p>
@@ -213,7 +216,7 @@
 									</span>
 								</label>
 								<span class="ag-error-msg" id="errTermo1" style="color: #f87171; margin-top: -6px">
-									<i class="fas fa-exclamation-circle"><!-- --></i> Necessário declarar
+									<i class="fas fa-exclamation-circle"></i> Necessário declarar
 								</span>
 
 								<label class="ag-check-group" style="margin-top: 10px">
@@ -225,17 +228,14 @@
 									</span>
 								</label>
 								<span class="ag-error-msg" id="errTermo2" style="color: #f87171; margin-top: -6px">
-									<i class="fas fa-exclamation-circle"><!-- --></i> Necessário aceitar
+									<i class="fas fa-exclamation-circle"></i> Necessário aceitar
 								</span>
 							</div>
 						</div>
 					</div>
-					<!-- /panel1 -->
-
-					<!-- ══ STEP 2: ESPECIALIDADE ══ -->
 					<div class="ag-step-panel" id="panel2">
 						<div class="ag-step-badge">
-							<i class="fas fa-stethoscope"><!-- --></i> Passo 2 de 4
+							<i class="fas fa-stethoscope"></i> Passo 2 de 4
 						</div>
 						<h2 class="ag-step-title">Qual especialidade?</h2>
 						<p class="ag-step-sub">Selecione a área médica para ver os profissionais disponíveis.</p>
@@ -243,18 +243,14 @@
 						<h:inputHidden id="especialidadeHidden" value="#{agendamentoBean.especialidade}" />
 
 						<div class="ag-esp-grid" id="espGrid">
-    							<!-- carregado via JS -->
-								</div>
+							</div>
 						<span class="ag-error-msg" id="errEsp">
-							<i class="fas fa-exclamation-circle"><!-- --></i> Selecione uma especialidade
+							<i class="fas fa-exclamation-circle"></i> Selecione uma especialidade
 						</span>
 					</div>
-					<!-- /panel2 -->
-
-					<!-- ══ STEP 3: MÉDICO ══ -->
 					<div class="ag-step-panel" id="panel3">
 						<div class="ag-step-badge">
-							<i class="fas fa-user-md"><!-- --></i> Passo 3 de 4
+							<i class="fas fa-user-md"></i> Passo 3 de 4
 						</div>
 						<h2 class="ag-step-title">Escolha seu médico</h2>
 						<p class="ag-step-sub" id="subMedico">Profissionais disponíveis. Compare e escolha o ideal para você.</p>
@@ -262,61 +258,20 @@
 						<h:inputHidden id="medicoIdHidden" value="#{agendamentoBean.medicoId}" />
 
 						<div class="ag-medico-search">
-							<i class="fas fa-search"><!-- --></i>
+							<i class="fas fa-search"></i>
 							<input type="text" id="buscaMedico"
 								placeholder="Buscar por nome ou CRM..." oninput="filtrarMedicos()" />
 						</div>
 
 						<div class="ag-medicos-grid" id="medicosGrid">
-							<ui:repeat value="#{agendamentoBean.listaMedicos}" var="med">
-								<div class="ag-medico-card" data-nome="#{med.nome}" data-crm="#{med.crm}" data-id="#{med.id}" 
-								data-valor="#{med.valorConsulta}" onclick="selecionarMedico(this)">
-									<div class="ag-medico-check">
-										<i class="fas fa-check"><!-- --></i>
-									</div>
-									<div class="ag-medico-avatar" style="background: #{med.corAvatar}">
-										<ui:fragment rendered="#{not empty med.foto}">
-											<img src="data:image/jpeg;base64,#{med.foto}"
-												style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%" />
-										</ui:fragment>
-										<ui:fragment rendered="#{empty med.foto}">
-											#{med.iniciais}
-										</ui:fragment>
-									</div>
-									<div class="ag-medico-nome">#{med.nome}</div>
-									<div class="ag-medico-crm">CRM #{med.crm}</div>
-									<div class="ag-medico-tags">
-										<ui:repeat value="#{med.especialidades}" var="esp">
-											<span class="ag-medico-tag">#{esp}</span>
-										</ui:repeat>
-									</div>
-									<div class="ag-medico-info">
-										<div class="ag-medico-info-item">
-											<span class="ag-medico-info-label">Duração</span>
-											<span class="ag-medico-info-value">#{med.tempoConsultaMinutos} min</span>
-										</div>
-										<div class="ag-medico-info-item">
-											<span class="ag-medico-info-label">Consulta</span>
-											<span class="ag-medico-info-value">R$ #{med.valorConsulta}</span>
-										</div>
-										<div class="ag-medico-info-item">
-       										<span class="ag-medico-info-label">Telefone</span>
-        									<span class="ag-medico-info-value">#{med.telefone}</span>
-    									</div>
-									</div>
-								</div>
-							</ui:repeat>
-						</div>
+							</div>
 						<span class="ag-error-msg" id="errMedico">
-							<i class="fas fa-exclamation-circle"><!-- --></i> Selecione um médico
+							<i class="fas fa-exclamation-circle"></i> Selecione um médico
 						</span>
 					</div>
-					<!-- /panel3 -->
-
-					<!-- ══ STEP 4: DATA E HORÁRIO ══ -->
 					<div class="ag-step-panel" id="panel4">
 						<div class="ag-step-badge">
-							<i class="fas fa-calendar-alt"><!-- --></i> Passo 4 de 4
+							<i class="far fa-calendar-alt"></i> Passo 4 de 4
 						</div>
 						<h2 class="ag-step-title">Data e Horário</h2>
 						<p class="ag-step-sub" id="subDataHora">Escolha o melhor dia e horário para sua consulta.</p>
@@ -325,7 +280,6 @@
 						<h:inputHidden id="horaConsultaHidden"  value="#{agendamentoBean.horaConsulta}" />
 						<h:inputHidden id="tipoConsultaHidden"  value="#{agendamentoBean.tipoConsulta}" />
 
-						<!-- tipo de consulta -->
 						<div class="ag-section" style="margin-bottom: 16px">
 							<div class="ag-section-title">
 								<div class="ag-section-num">1</div>
@@ -333,35 +287,34 @@
 							</div>
 							<div class="ag-tipo-grid">
 								<div class="ag-tipo-card" onclick="selecionarTipo(this,'rotina')">
-									<div class="ag-tipo-icon">🩺</div>
+									<div class="ag-tipo-icon"><i class="fas fa-stethoscope"></i></div>
 									<div class="ag-tipo-name">Rotina</div>
 								</div>
 								<div class="ag-tipo-card" onclick="selecionarTipo(this,'retorno')">
-									<div class="ag-tipo-icon">🔁</div>
+									<div class="ag-tipo-icon"><i class="fas fa-sync-alt"></i></div>
 									<div class="ag-tipo-name">Retorno</div>
 								</div>
 								<div class="ag-tipo-card" onclick="selecionarTipo(this,'urgencia')">
-									<div class="ag-tipo-icon">🚨</div>
+									<div class="ag-tipo-icon"><i class="fas fa-star-of-life"></i></div>
 									<div class="ag-tipo-name">Urgência</div>
 								</div>
 							</div>
 							<span class="ag-error-msg" id="errTipo">
-								<i class="fas fa-exclamation-circle"><!-- --></i> Selecione o tipo de consulta
+								<i class="fas fa-exclamation-circle"></i> Selecione o tipo de consulta
 							</span>
 						</div>
 
-						<!-- calendário + horários -->
 						<div class="ag-calendar-wrapper">
 							<div class="ag-calendar">
 								<div class="ag-cal-header">
 									<button type="button" class="ag-cal-nav" onclick="navegarMes(-1)">&#8249;</button>
-									<h4 id="calMesAno"><!-- --></h4>
+									<h4 id="calMesAno"></h4>
 									<button type="button" class="ag-cal-nav" onclick="navegarMes(1)">&#8250;</button>
 								</div>
-								<div class="ag-cal-grid" id="calGrid"><!-- --></div>
+								<div class="ag-cal-grid" id="calGrid"></div>
 								<div class="ag-cal-legend">
-									<span><span class="ag-cal-legend-dot" style="background: #059669"><!-- --></span>Disponível</span>
-									<span><span class="ag-cal-legend-dot" style="background: #7c3aed"><!-- --></span>Selecionado</span>
+									<span><span class="ag-cal-legend-dot" style="background: #059669"></span>Disponível</span>
+									<span><span class="ag-cal-legend-dot" style="background: #7c3aed"></span>Selecionado</span>
 								</div>
 							</div>
 
@@ -370,19 +323,16 @@
 								<p class="ag-horarios-sub" id="horariosSub">Selecione uma data no calendário</p>
 								<div class="ag-horarios-grid" id="horariosGrid">
 									<div class="ag-horarios-empty">
-										<div class="ag-empty-icon">📅</div>
+										<div class="ag-empty-icon"><i class="far fa-calendar-alt"></i></div>
 										<div class="ag-empty-text">Selecione uma data</div>
 									</div>
 								</div>
 							</div>
 						</div>
 						<span class="ag-error-msg" id="errData" style="margin-top: 8px">
-							<i class="fas fa-exclamation-circle"><!-- --></i> Selecione data e horário
+							<i class="fas fa-exclamation-circle"></i> Selecione data e horário
 						</span>
 					</div>
-					<!-- /panel4 -->
-
-					<!-- botões de navegação — fora de todos os panels -->
 					<div class="ag-actions">
 						<button type="button" class="ag-btn ag-btn-secondary"
 							id="btnVoltar" onclick="voltarStep()" style="visibility: hidden">← Voltar</button>
@@ -391,20 +341,17 @@
 						<button type="button" id="btnSubmitJSF"
 							  class="ag-btn ag-btn-success" style="display:none"
 							  onclick="prepararSubmit()">
-							  Confirmar Agendamento ✓
+							  Confirmar Agendamento <i class="fas fa-check" style="margin-left: 8px"></i>
 						</button>
 					</div>
 
 				</div>
-				<!-- /ag-main -->
-
-				<!-- sidebar resumo -->
 				<div class="ag-sidebar">
 					<div class="ag-resumo-card">
 						<h4>Resumo</h4>
 
 						<div class="ag-resumo-item">
-							<div class="ag-resumo-icon pending" id="rIconPaciente">👤</div>
+							<div class="ag-resumo-icon pending" id="rIconPaciente"><i class="fas fa-user"></i></div>
 							<div>
 								<div class="ag-resumo-label">Paciente</div>
 								<div class="ag-resumo-value pending" id="rPaciente">pendente</div>
@@ -412,7 +359,7 @@
 						</div>
 
 						<div class="ag-resumo-item">
-							<div class="ag-resumo-icon pending" id="rIconEsp">🩺</div>
+							<div class="ag-resumo-icon pending" id="rIconEsp"><i class="fas fa-stethoscope"></i></div>
 							<div>
 								<div class="ag-resumo-label">Especialidade</div>
 								<div class="ag-resumo-value pending" id="rEspecialidade">pendente</div>
@@ -420,7 +367,7 @@
 						</div>
 
 						<div class="ag-resumo-item">
-							<div class="ag-resumo-icon pending" id="rIconMedico">👨‍⚕️</div>
+							<div class="ag-resumo-icon pending" id="rIconMedico"><i class="fas fa-user-md"></i></div>
 							<div>
 								<div class="ag-resumo-label">Médico</div>
 								<div class="ag-resumo-value pending" id="rMedico">pendente</div>
@@ -428,14 +375,14 @@
 						</div>
 
 						<div class="ag-resumo-item">
-							<div class="ag-resumo-icon pending" id="rIconData">📅</div>
+							<div class="ag-resumo-icon pending" id="rIconData"><i class="far fa-calendar-alt"></i></div>
 							<div>
 								<div class="ag-resumo-label">Data e Horário</div>
 								<div class="ag-resumo-value pending" id="rData">pendente</div>
 							</div>
 						</div>
 
-						<div class="ag-resumo-divider"><!-- --></div>
+						<div class="ag-resumo-divider"></div>
 
 						<div class="ag-resumo-footer" id="rValorBlock" style="display: none">
 							<div>
@@ -444,18 +391,16 @@
 							</div>
 						</div>
 
-						<p class="ag-resumo-nota">🔒 Dados protegidos pela LGPD e sigilo médico (CFM).</p>
+						<p class="ag-resumo-nota"><i class="fas fa-lock" style="margin-right: 6px"></i> Dados protegidos pela LGPD e sigilo médico (CFM).</p>
 					</div>
 				</div>
-				<!-- /ag-sidebar -->
+				</div>
 
-			</div>
-			
 			<div id="modalSucesso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-   				ckground:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+   				background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
 				    <div style="background:#1e1b4b; border-radius:16px; padding:40px; max-width:480px; width:90%;
 				        text-align:center; border:1px solid #4f46e5; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
-				        <div style="font-size:56px; margin-bottom:16px;">✅</div>
+				        <div style="font-size:56px; margin-bottom:16px; color:#10b981;"><i class="fas fa-check-circle"></i></div>
 				        <h2 style="color:#a5b4fc; margin:0 0 8px">Consulta Agendada!</h2>
 				        <p style="color:#c7d2fe; margin:0 0 6px">Seu agendamento foi confirmado com sucesso.</p>
 				        <div id="modalResumoTexto" style="background:#312e81; border-radius:10px; padding:16px;
@@ -468,7 +413,6 @@
 				        </button>
 					</div>
 			</div>
-			<!-- /ag-wrapper -->
 
 			<h:messages showDetail="true" showSummary="true" tooltip="true"
 				style="color:red;font-weight:bold;padding:10px;margin:0 32px;" />

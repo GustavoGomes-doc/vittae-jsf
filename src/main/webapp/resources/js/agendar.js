@@ -76,44 +76,33 @@
 
     /* ═══════════════════════════════════════════════
        CAPITALIZAÇÃO AUTOMÁTICA
-       Capitaliza a primeira letra de cada palavra
     ═══════════════════════════════════════════════ */
     function capitalizarPalavras(str) {
         return str.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
     }
 
     function aplicarCapitalizacao() {
-        // Nome do paciente
         var campoNome = document.getElementById('fAg:pacNome');
         if (campoNome) {
             campoNome.addEventListener('input', function(e) {
                 var pos = e.target.selectionStart;
-                var v = capitalizarPalavras(e.target.value);
-                e.target.value = v;
-                // preserva posição do cursor
+                e.target.value = capitalizarPalavras(e.target.value);
                 e.target.setSelectionRange(pos, pos);
             });
         }
 
-        // Nome do responsável (campo nativo, não JSF)
         var campoResp = document.getElementById('respNome');
         if (campoResp) {
             campoResp.addEventListener('input', function(e) {
                 var pos = e.target.selectionStart;
-                var v = capitalizarPalavras(e.target.value);
-                e.target.value = v;
+                e.target.value = capitalizarPalavras(e.target.value);
                 e.target.setSelectionRange(pos, pos);
             });
         }
     }
 
     /* ═══════════════════════════════════════════════
-       MONITORAR NASCIMENTO
-       Regras:
-         - Data futura → inválida
-         - Menos de 1 ano → inválida
-         - 1 a 17 anos  → menor, abre bloco responsável
-         - 18+          → maior, fecha bloco
+       MONITORAR NASCIMENTO (PACIENTE)
     ═══════════════════════════════════════════════ */
     function monitorarNascimento() {
         var campo = document.getElementById('fAg:pacNascimento');
@@ -140,24 +129,12 @@
             var ano  = parseInt(partes[2], 10);
             var data = new Date(ano, mes - 1, dia);
 
-            // Verifica se a data construída é coerente (evita 31/02 etc.)
             var dataInvalida = isNaN(data.getTime())
                 || data.getDate()  !== dia
                 || data.getMonth() !== mes - 1
                 || data.getFullYear() !== ano;
 
-            if (dataInvalida) {
-                esconderMenor();
-                mostrarErro('errNasc', campo);
-                if (errEl) errEl.querySelector
-                    ? (errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida')
-                    : null;
-                return;
-            }
-
-            var agora = new Date();
-            // Data futura
-            if (data > agora) {
+            if (dataInvalida || data > new Date()) {
                 esconderMenor();
                 mostrarErro('errNasc', campo);
                 if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
@@ -166,7 +143,6 @@
 
             var idade = calcularIdade(data);
 
-            // Menos de 1 ano — inválido para agendamento
             if (idade < 1) {
                 esconderMenor();
                 mostrarErro('errNasc', campo);
@@ -174,7 +150,6 @@
                 return;
             }
 
-            // Data válida — limpa erro
             esconderErro('errNasc', campo);
 
             if (idade < 18) {
@@ -196,13 +171,14 @@
         if (hint)  hint.classList.remove('visible');
         if (bloco) {
             bloco.classList.remove('visible');
-            // Limpa campos do responsável ao esconder
             var rNome = document.getElementById('respNome');
             var rCpf  = document.getElementById('respCpf');
             var rPar  = document.getElementById('respParentesco');
+            var rNasc = document.getElementById('respNascimento');
             if (rNome) rNome.value = '';
             if (rCpf)  rCpf.value  = '';
             if (rPar)  rPar.value  = '';
+            if (rNasc) rNasc.value = '';
         }
     }
 
@@ -271,7 +247,7 @@
 
         var btnV = document.getElementById('btnVoltar');
         var btnP = document.getElementById('btnProximo');
-        var btnS = document.getElementById('btnSubmitJSF');
+        var btnS = document.getElementById('btnSubmitJSF'); // Ou seu botão de confirmar
 
         btnV.style.visibility = state.step === 1 ? 'hidden' : 'visible';
 
@@ -308,25 +284,18 @@
             mostrarErro('errNome', nome); ok = false;
         } else { esconderErro('errNome', nome); }
 
-        // Nascimento
+        // Nascimento Paciente
         var nasc = document.getElementById('fAg:pacNascimento');
         var idadePaciente = null;
         if (!nasc || nasc.value.length < 10) {
             mostrarErro('errNasc', nasc); ok = false;
         } else {
             var partes = nasc.value.split('/');
-            var dia = parseInt(partes[0], 10);
-            var mes = parseInt(partes[1], 10);
-            var ano = parseInt(partes[2], 10);
-            var dataNasc = new Date(ano, mes - 1, dia);
-            var dataInvalida = isNaN(dataNasc.getTime())
-                || dataNasc.getDate()    !== dia
-                || dataNasc.getMonth()   !== mes - 1
-                || dataNasc.getFullYear() !== ano;
-            var agora = new Date();
+            var dataNasc = new Date(partes[2], partes[1] - 1, partes[0]);
+            var dataInvalida = isNaN(dataNasc.getTime()) || dataNasc > new Date();
             idadePaciente = calcularIdade(dataNasc);
 
-            if (dataInvalida || dataNasc > agora || idadePaciente < 1) {
+            if (dataInvalida || idadePaciente < 1) {
                 mostrarErro('errNasc', nasc); ok = false;
             } else {
                 esconderErro('errNasc', nasc);
@@ -359,30 +328,73 @@
         if (!t2 || !t2.checked) { mostrarErro('errTermo2', null); ok = false; }
         else { esconderErro('errTermo2', null); }
 
-        // Responsável legal (só se bloco visível e paciente for menor)
+        // RESPONSÁVEL LEGAL
         var bloco = document.getElementById('blocoResponsavel');
         if (bloco && bloco.classList.contains('visible') && idadePaciente !== null && idadePaciente < 18) {
+            
+            // 1. Nome do Responsável (Não pode ser igual ao paciente)
             var rNome = document.getElementById('respNome');
             var nomePaciente = nome ? nome.value.trim().toLowerCase() : '';
             var nomeResp     = rNome ? rNome.value.trim().toLowerCase() : '';
 
             if (!rNome || !rNome.value.trim()) {
-                mostrarErro('errRespNome', rNome); ok = false;
-            } else if (nomeResp === nomePaciente) {
-                // Nome do responsável igual ao do paciente
                 mostrarErro('errRespNome', rNome);
-                var errEl = document.getElementById('errRespNome');
-                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Nome deve ser diferente do paciente';
+                var errNomeEl = document.getElementById('errRespNome');
+                if (errNomeEl) errNomeEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Obrigatório';
+                ok = false;
+            } else if (nomeResp === nomePaciente) {
+                mostrarErro('errRespNome', rNome);
+                var errNomeEl = document.getElementById('errRespNome');
+                if (errNomeEl) errNomeEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Deve ser diferente do paciente';
                 ok = false;
             } else {
                 esconderErro('errRespNome', rNome);
             }
 
+            // 2. CPF do Responsável (Não pode ser igual ao paciente)
             var rCpf = document.getElementById('respCpf');
-            if (!rCpf || rCpf.value.replace(/\D/g,'').length !== 11) {
-                mostrarErro('errRespCpf', rCpf); ok = false;
-            } else { esconderErro('errRespCpf', rCpf); }
+            var cpfPacienteStr = cpf ? cpf.value.replace(/\D/g, '') : '';
+            var cpfRespStr = rCpf ? rCpf.value.replace(/\D/g, '') : '';
 
+            if (!rCpf || cpfRespStr.length !== 11) {
+                mostrarErro('errRespCpf', rCpf);
+                var errCpfEl = document.getElementById('errRespCpf');
+                if (errCpfEl) errCpfEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> CPF inválido';
+                ok = false;
+            } else if (cpfRespStr === cpfPacienteStr) {
+                mostrarErro('errRespCpf', rCpf);
+                var errCpfEl = document.getElementById('errRespCpf');
+                if (errCpfEl) errCpfEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Não pode ser igual ao do paciente';
+                ok = false;
+            } else {
+                esconderErro('errRespCpf', rCpf);
+            }
+
+            // 3. Nascimento do Responsável (+18 anos)
+            var rNasc = document.getElementById('respNascimento');
+            if (!rNasc || rNasc.value.length < 10) {
+                mostrarErro('errRespNasc', rNasc);
+                var errNascEl = document.getElementById('errRespNasc');
+                if (errNascEl) errNascEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
+                ok = false;
+            } else {
+                var partesR = rNasc.value.split('/');
+                var dataNascResp = new Date(partesR[2], partesR[1] - 1, partesR[0]);
+                
+                var dataInvalidaR = isNaN(dataNascResp.getTime()) || dataNascResp > new Date();
+                var idadeResp = calcularIdade(dataNascResp);
+
+                if (dataInvalidaR || idadeResp < 18) {
+                    mostrarErro('errRespNasc', rNasc);
+                    var errNascEl = document.getElementById('errRespNasc');
+                    if (errNascEl) errNascEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> O responsável deve ser maior de idade (+18)';
+                    ok = false;
+                } else {
+                    esconderErro('errRespNasc', rNasc);
+                }
+            }
+
+            // Parentesco
             var rParent = document.getElementById('respParentesco');
             if (!rParent || !rParent.value) {
                 mostrarErro('errRespParent', rParent); ok = false;
@@ -454,7 +466,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       ESPECIALIDADE
+       ESPECIALIDADE & MÉDICO
     ═══════════════════════════════════════════════ */
     window.selecionarEsp = function(card, nome) {
         document.querySelectorAll('.ag-esp-card').forEach(function(c) {
@@ -469,13 +481,9 @@
         atualizarResumo('especialidade', nome);
         esconderErro('errEsp', null);
 
-        // Busca médicos filtrados pelo endpoint
         carregarMedicosPorEsp(nome);
     };
 
-    /* ═══════════════════════════════════════════════
-       MÉDICO — carrega da API filtrado por especialidade
-    ═══════════════════════════════════════════════ */
     function carregarMedicosPorEsp(especialidade) {
         var grid = document.getElementById('medicosGrid');
         var sub  = document.getElementById('subMedico');
@@ -588,7 +596,7 @@
     };
 
     /* ═══════════════════════════════════════════════
-       CALENDÁRIO
+       CALENDÁRIO & HORÁRIOS
     ═══════════════════════════════════════════════ */
     function carregarDisponibilidade(medicoId) {
         fetch('http://localhost:8082/api/medicos/' + medicoId + '/horarios-livres')
@@ -631,6 +639,8 @@
         }
         return diasComSlots;
     }
+
+    function pad(n) { return n < 10 ? '0'+n : n; }
 
     function renderizarCalendario() {
         var grid = document.getElementById('calGrid');
@@ -685,13 +695,25 @@
     }
 	
 	function carregarEspecialidades() {
-	    fetch('http://localhost:8082/api/especialidades')
-	        .then(function(r) { return r.json(); })
-	        .then(function(especialidades) {
-	            var grid = document.getElementById('espGrid');
-	            if (!grid) return;
-	            grid.innerHTML = '';
-	            especialidades.forEach(function(esp) {
+	    Promise.all([
+	        fetch('http://localhost:8082/api/especialidades').then(function(r) { return r.json(); }),
+	        fetch('http://localhost:8082/api/medicos').then(function(r) { return r.json(); })
+	    ]).then(function(results) {
+	        var especialidades = results[0];
+	        var medicos = results[1];
+
+	        var comMedico = new Set();
+	        medicos.forEach(function(med) {
+	            (med.especialidades || []).forEach(function(e) { comMedico.add(e); });
+	        });
+
+	        var grid = document.getElementById('espGrid');
+	        if (!grid) return;
+	        grid.innerHTML = '';
+
+	        especialidades
+	            .filter(function(esp) { return comMedico.has(esp.nome); })
+	            .forEach(function(esp) {
 	                var card = document.createElement('div');
 	                card.className = 'ag-esp-card';
 	                card.onclick = function() { window.selecionarEsp(card, esp.nome); };
@@ -700,10 +722,9 @@
 	                    '<div class="ag-esp-desc">' + (esp.descricao || '') + '</div>';
 	                grid.appendChild(card);
 	            });
-	        })
-	        .catch(function(err) {
-	            console.error('Erro ao carregar especialidades:', err);
-	        });
+	    }).catch(function(err) {
+	        console.error('Erro ao carregar especialidades:', err);
+	    });
 	}
 
     function selecionarDia(iso, dNum) {
@@ -786,94 +807,93 @@
             if (el) { el.textContent = valor; el.classList.remove('pending'); }
             if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
         }
-        if (campo === 'valor') {
-            var block = document.getElementById('rValorBlock');
-            var el    = document.getElementById('rValor');
-            if (block) block.style.display = valor ? 'flex' : 'none';
-            if (el)    el.textContent = valor ? 'R$ ' + parseFloat(valor).toFixed(2).replace('.',',') : '—';
-        }
     }
 
     /* ═══════════════════════════════════════════════
-       SUBMIT
+       ENVIO FINAL PARA O BACKEND (SPRING BOOT)
     ═══════════════════════════════════════════════ */
-    window.prepararSubmit = function() {
-        var respNome = null;
-        var respCpf = null;
-        var respParentesco = null;
+    window.salvarAgendamento = function() {
+        if (!validarStep(4)) return; // Garante que a data/hora foi preenchida
 
-        var blocoResponsavel = document.getElementById('blocoResponsavel');
-        if (blocoResponsavel && blocoResponsavel.classList.contains('visible')) {
-            respNome      = (document.getElementById('respNome') || {}).value || null;
-            respCpf       = ((document.getElementById('respCpf') || {}).value || '').replace(/\D/g, '');
-            respParentesco = (document.getElementById('respParentesco') || {}).value || null;
+        // Captura dados do Responsável
+        var respNomeEl = document.getElementById('respNome');
+        var respCpfEl = document.getElementById('respCpf');
+        var respNascEl = document.getElementById('respNascimento');
+        var respParentescoEl = document.getElementById('respParentesco');
+
+        // Para facilitar no Spring Boot, vamos converter a data do responsável de DD/MM/YYYY para YYYY-MM-DD
+        var respDataIso = null;
+        if (respNascEl && respNascEl.value.trim() !== '') {
+            var p = respNascEl.value.split('/');
+            respDataIso = p[2] + '-' + p[1] + '-' + p[0];
+        }
+
+        // Para converter a data do paciente de DD/MM/YYYY para YYYY-MM-DD
+        var pacNascEl = document.getElementById('fAg:pacNascimento');
+        var pacDataIso = null;
+        if (pacNascEl && pacNascEl.value.trim() !== '') {
+            var p2 = pacNascEl.value.split('/');
+            pacDataIso = p2[2] + '-' + p2[1] + '-' + p2[0];
         }
 
         var payload = {
-            especialidade:  state.especialidade,
-            dataConsulta:   state.dataSelecionada,
-            hora:           state.horaSelecionada + ':00',
-            medicoId:       parseInt(state.medicoId),
-            observacoes:    (document.getElementById('fAg:motivoConsulta') || {}).value || '',
-            respNome:       respNome,
-            respCpf:        respCpf,
-            respParentesco: respParentesco,
+            especialidade: state.especialidade,
+            medicoId: state.medicoId,
+            dataConsulta: state.dataSelecionada, // Já está em ISO (YYYY-MM-DD)
+            hora: state.horaSelecionada,
+            observacoes: document.getElementById('fAg:motivoConsulta') ? document.getElementById('fAg:motivoConsulta').value : null,
+            tipoConsulta: state.tipoConsulta,
+            
+            // Dados do paciente
             paciente: {
-                nome:       (document.getElementById('fAg:pacNome')       || {}).value || '',
-                cpf:        ((document.getElementById('fAg:pacCpf')       || {}).value || '').replace(/\D/g,''),
-                telefone:   (document.getElementById('fAg:pacTelefone')   || {}).value || '',
-                genero:     (document.getElementById('fAg:pacGenero')     || {}).value || '',
-                nascimento: (document.getElementById('fAg:pacNascimento') || {}).value || ''
-            }
+                nome: document.getElementById('fAg:pacNome').value,
+                cpf: document.getElementById('fAg:pacCpf').value.replace(/\D/g, ''),
+                dataNascimento: pacDataIso, 
+                genero: document.getElementById('fAg:pacGenero').value,
+                telefone: document.getElementById('fAg:pacTelefone').value.replace(/\D/g, '')
+            },
+
+            // Dados do Responsável (serão null se o bloco não foi ativado/preenchido)
+            respNome: (respNomeEl && respNomeEl.value.trim() !== '') ? respNomeEl.value : null,
+            respCpf: (respCpfEl && respCpfEl.value.trim() !== '') ? respCpfEl.value.replace(/\D/g, '') : null,
+            respDataNascimento: respDataIso,
+            respParentesco: (respParentescoEl && respParentescoEl.value !== '') ? respParentescoEl.value : null
         };
+
+        // Desabilita o botão para evitar cliques duplos
+        var btn = document.getElementById('btnSubmitJSF');
+        if (btn) btn.disabled = true;
 
         fetch('http://localhost:8082/api/agendamentos', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(payload)
         })
-        .then(function(r) {
-            if (!r.ok) throw new Error('Status ' + r.status);
-            mostrarModalSucesso();
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Erro ao salvar agendamento na API');
+            }
+            return response.json();
         })
-        .catch(function(err) {
-            console.error('Erro ao salvar agendamento:', err);
-            alert('Não foi possível realizar o agendamento. Verifique os dados ou tente novamente mais tarde.');
+        .then(function(data) {
+            console.log('Agendamento salvo com sucesso no banco!', data);
+            
+            // Aqui você pode disparar a exibição do seu Modal de Sucesso HTML
+            // Exemplo fictício: document.getElementById('modalSucesso').style.display = 'block';
+            
+        })
+        .catch(function(error) {
+            console.error('Falha no POST:', error);
+            alert('Não foi possível concluir o agendamento. Tente novamente.');
+        })
+        .finally(function() {
+            if (btn) btn.disabled = false;
         });
     };
 
-    function mostrarModalSucesso() {
-        var dataFormatada = formatarDataBR(state.dataSelecionada);
-        var resumo = document.getElementById('modalResumoTexto');
-        if (resumo) {
-            resumo.innerHTML =
-                '<b>👤 Paciente:</b> ' + (state.pacienteNome || '—') + '<br>' +
-                '<b>🩺 Especialidade:</b> ' + (state.especialidade || '—') + '<br>' +
-                '<b>👨‍⚕️ Médico:</b> ' + (state.medicoNome || '—') + '<br>' +
-                '<b>📅 Data:</b> ' + dataFormatada + ' às ' + state.horaSelecionada + '<br>' +
-                '<b>🏥 Tipo:</b> ' + (state.tipoConsulta || '—') + '<br>' +
-                '<b>💰 Valor:</b> R$ ' + (state.medicoValor ? parseFloat(state.medicoValor).toFixed(2).replace('.',',') : '—');
-        }
-        var modal = document.getElementById('modalSucesso');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    window.fecharModalEIr = function() {
-        window.location.reload();
-    };
-
-    function formatarDataBR(iso) {
-        if (!iso) return '—';
-        var p = iso.split('-');
-        return p[2] + '/' + p[1] + '/' + p[0];
-    }
-
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    // Inicializa a tela
+    init();
 
 })();
