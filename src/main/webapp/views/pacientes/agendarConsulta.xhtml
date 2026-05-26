@@ -53,12 +53,42 @@
 						</div>
 					</div>
 
+<<<<<<< HEAD
 					<div class="ag-step-panel active" id="panel1">
 						<div class="ag-step-badge">
 							<i class="fas fa-user"></i> Passo 1 de 4
 						</div>
 						<h2 class="ag-step-title">Dados do Paciente</h2>
 						<p class="ag-step-sub">Preencha as informações para identificar o paciente.</p>
+=======
+                    <div id="lista-consultas" class="appointment-container">
+                        
+                        <ui:repeat value="#{visualizarConsultasBean.consultas}" var="consulta">
+                            
+                            <div class="consulta-card" 
+                            	
+                                 data-status="#{consulta.status.toString().toLowerCase()}" 
+                                 data-medico="#{consulta.medico.nome}" 
+                                 data-especialidade="#{consulta.medico.especialidade}">
+                                 
+                                <div class="card-header">
+                                    <div class="doctor-info">
+                                        <div class="avatar">
+                                            <i class="fas fa-user-md" style="color: white; font-size: 14px;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="doctor-name">#{consulta.medico.nome}</div>
+                                            <div class="doctor-specialty">
+                                                <i class="fas fa-stethoscope"></i> #{consulta.medico.especialidade}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <span class="badge badge-#{consulta.status.toString().toLowerCase()}">
+                                        <span class="badge-dot"></span>#{consulta.status}
+                                    </span>
+                                </div>
+>>>>>>> 3985d8d (Adicionei os botões remarcar e cancelar, mas as funções deles ainda não querer funcionar, ele esta funciondando no site, mas o modal não quer ffuncionar)
 
 						<div class="ag-section">
 							<div class="ag-section-title">

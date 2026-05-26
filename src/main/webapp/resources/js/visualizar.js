@@ -59,13 +59,31 @@ if (visiveis === 0) {
 
 function cancelarConsulta(id) {
     if (confirm('Deseja realmente cancelar esta consulta?')) {
-        // Em JSF: substituir por chamada ao managed bean via h:commandButton com ajax
-        console.log('Cancelar consulta id=' + id);
+        fetch('http://localhost:8083/api/agendamentos/' + id + '/cancelar', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                // Esconde o card visualmente
+                var cards = document.querySelectorAll('.consulta-card');
+                cards.forEach(function(card) {
+                    if (card.getAttribute('data-id') == id) {
+                        card.style.display = 'none';
+                    }
+                });
+                alert('Consulta cancelada com sucesso!');
+            } else {
+                alert('Erro ao cancelar consulta.');
+            }
+        })
+        .catch(function(err) {
+            alert('Erro de conexão: ' + err);
+        });
     }
 }
 
 function remarcarConsulta(id) {
-    // Em JSF: redirecionar para a tela de reagendamento
-    window.location.href = 'remarcar.xhtml?id=' + id;
+    window.location.href = 'agendarConsulta.xhtml?remarcar=true&id=' + id;
 }
 }

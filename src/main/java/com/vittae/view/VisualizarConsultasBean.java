@@ -24,7 +24,10 @@ public class VisualizarConsultasBean implements Serializable {
 	private String filtroTexto;
 	private String filtroStatus;
 	private boolean exibirModalCancelamento = false;
-
+	private boolean exibirModalRemarcacao = false;
+	private Consulta consultaParaRemarcar;
+	private Long idConsultaSelecionada;
+	
 	private ConsultaService service = new ConsultaService();
 
 	@PostConstruct
@@ -33,14 +36,16 @@ public class VisualizarConsultasBean implements Serializable {
 		carregarConsultas();
 	}
 
-	// ─── CARREGAR ────────────────────────────────────────
 	public void carregarConsultas() {
 		try {
 			consultas = service.listarTodas();
 		} catch (Exception e) {
 			consultas = new ArrayList<>();
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Erro ao carregar consultas: " + e.getMessage(), null));
+
+			e.printStackTrace(); 
+			String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao carregar consultas: " + msg, null));
 		}
 	}
 
@@ -53,9 +58,9 @@ public class VisualizarConsultasBean implements Serializable {
 	}
 
 	private boolean passaFiltroStatus(Consulta c) {
-		if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
-			return true;
-		return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
+	    if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
+	        return true;
+	    return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
 	}
 
 	private boolean passaFiltroTexto(Consulta c) {
@@ -115,11 +120,59 @@ public class VisualizarConsultasBean implements Serializable {
 		}
 	}
 
-	// ─── REMARCAR ────────────────────────────────────────
+	
 	public void prepararRemarcar(Consulta c) {
-		this.consultaSelecionada = c;
-		addInfo("Funcionalidade de remarcação em breve!");
+	    this.consultaParaRemarcar = new Consulta(
+	        c.getMedico(), c.getPaciente(), c.getStatus(),
+	        null, c.getDataConsulta(), c.getValorConsulta(),
+	        c.getHora(), c.getEspecialidade(),
+	        c.getRespNome(), c.getRespCpf(), c.getRespParentesco()
+	    );
+	    this.consultaParaRemarcar.setId(c.getId());
+	    this.exibirModalRemarcacao = true;
 	}
+
+	public void confirmarRemarcacao() {
+		if (consultaParaRemarcar != null) {
+			try {
+				service.remarcar(consultaParaRemarcar.getId(), consultaParaRemarcar);
+				carregarConsultas();
+				consultaSelecionada = null;
+				addInfo("Consulta remarcada com sucesso!");
+			} catch (Exception e) {
+				addErro("Erro ao remarcar: " + e.getMessage());
+			}
+		}
+		fecharModalRemarcacao();
+	}
+
+	public void fecharModalRemarcacao() {
+		this.exibirModalRemarcacao = false;
+		this.consultaParaRemarcar = null;
+	}
+	
+	// CONSULTA SELECIONADA 
+	public String prepararCancelamentoAction() {
+	    for (Consulta c : consultas) {
+	        if (c.getId().equals(idConsultaSelecionada)) {
+	            prepararCancelamento(c);
+	            break;
+	        }
+	    }
+	    return null;
+	}
+
+	public String prepararRemarcarAction() {
+	    for (Consulta c : consultas) {
+	        if (c.getId().equals(idConsultaSelecionada)) {
+	            prepararRemarcar(c);
+	            break;
+	        }
+	    }
+	    return null;
+	}
+
+	
 
 	// ─── HELPERS ─────────────────────────────────────────
 	private void addInfo(String msg) {
@@ -177,5 +230,27 @@ public class VisualizarConsultasBean implements Serializable {
 
 	public void setExibirModalCancelamento(boolean exibirModalCancelamento) {
 		this.exibirModalCancelamento = exibirModalCancelamento;
+	}
+
+	public boolean isExibirModalRemarcacao() {
+		return exibirModalRemarcacao;
+	}
+
+	public void setExibirModalRemarcacao(boolean v) {
+		this.exibirModalRemarcacao = v;
+	}
+
+	public Consulta getConsultaParaRemarcar() {
+		return consultaParaRemarcar;
+	}
+
+	public void setConsultaParaRemarcar(Consulta c) {
+		this.consultaParaRemarcar = c;
+	}
+	
+	public Long getIdConsultaSelecionada() { return idConsultaSelecionada;
+	}
+	
+	public void setIdConsultaSelecionada(Long id) { this.idConsultaSelecionada = id;
 	}
 }

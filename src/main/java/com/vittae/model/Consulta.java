@@ -6,7 +6,6 @@ import java.time.LocalTime;
 
 import com.vittae.model.enums.Status;
 
-// Classes puras, prontas para virar JSON
 public class Consulta {
 
 	private Long id;
