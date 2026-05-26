@@ -14,6 +14,7 @@ import javax.inject.Named;
 import com.vittae.model.Usuario;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import lombok.extern.log4j.Log4j;
 
@@ -24,9 +25,10 @@ public class UsuarioService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private final String API_URL = "http://localhost:8081/api/usuarios";
+    private final String API_URL = "http://localhost:8083/api/usuarios";
     private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper()
+    		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public Usuario autenticar(String cpf, String senha) {
         try {
@@ -34,7 +36,7 @@ public class UsuarioService implements Serializable {
             String jsonBody = String.format("{\"cpf\":\"%s\", \"senha\":\"%s\"}", cpf, senha);
 
             HttpRequest request = HttpRequest.newBuilder()
-            		.uri(URI.create("http://localhost:8081/api/login"))
+            		.uri(URI.create("http://localhost:8083/api/login"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();

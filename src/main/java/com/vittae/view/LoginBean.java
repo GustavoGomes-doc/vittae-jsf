@@ -78,7 +78,7 @@ public class LoginBean implements Serializable {
                 log.info("Usuário logado: " + usuario.toString());
 
                 session.setAttribute("usuario", usuario);
-                return "/views/welcome/Welcome.xhtml?faces-redirect=true";
+                return "/views/pacientes/agendarConsulta.xhtml?faces-redirect=true";
                 
             } else {
                 FacesContext.getCurrentInstance().addMessage(null,
@@ -86,7 +86,7 @@ public class LoginBean implements Serializable {
                 return "/login.xhtml"; 
             }
         }
-        return "/views/welcome/Welcome.xhtml?faces-redirect=true";
+        return "/views/pacientes/agendarConsulta.xhtml?faces-redirect=true";
     }
 
     public String sair() {
@@ -118,7 +118,7 @@ public class LoginBean implements Serializable {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     // ✅ CORREÇÃO 2: A URL agora aponta para /api/usuarios/cadastrar
-                    .uri(URI.create("http://localhost:8081/api/usuarios/cadastrar")) 
+                    .uri(URI.create("http://localhost:8083/api/usuarios/cadastrar")) 
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();

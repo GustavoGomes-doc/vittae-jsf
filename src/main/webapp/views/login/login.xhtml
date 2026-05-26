@@ -23,10 +23,11 @@
 					<p class="subtitle">Bem-vindo de volta ao Vittae!</p>
 
 					<div class="input-field">
-						<i class="fas fa-id-card" />
-						<h:inputText id="cpfLogin" value="#{loginBean.cpf}"
-							pt:placeholder="CPF (000.000.000-00)" required="true"
-							requiredMessage="CPF é obrigatório" styleClass="form-control" maxlength="14" />
+   						 <i class="fas fa-id-card" />
+   						 <h:inputText id="cpfLogin" value="#{loginBean.cpf}"
+        					pt:placeholder="CPF (000.000.000-00)" required="true"
+       						requiredMessage="CPF é obrigatório" styleClass="form-control" maxlength="14"
+        					onkeyup="mascaraCPF(this)" />
 					</div>
 
 					<div class="input-field">
@@ -41,9 +42,7 @@
 						<f:ajax execute="@this" render="messages" />
 					</h:commandLink>
 
-					<h:commandButton value="Entrar" action="#{loginBean.login()}" styleClass="btn-main">
-						<f:ajax execute="@form" render="messages" />
-					</h:commandButton>
+				<h:commandButton value="Entrar" action="#{loginBean.login()}" styleClass="btn-main" />
 
 					<div class="footer-copy">
 						<p>©Copyright 2026 Vittae.</p>
@@ -69,6 +68,17 @@
 		</div>
 
 	</section>
-
+<script type="text/javascript">
+        //<![CDATA[
+        function mascaraCPF(campo) {
+            var v = campo.value;
+            v = v.replace(/\D/g, ""); // Remove tudo que não for número
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca o primeiro ponto
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca o segundo ponto
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca o traço
+            campo.value = v;
+        }
+        //]]>
+    </script>
 </h:body>
 </html>
