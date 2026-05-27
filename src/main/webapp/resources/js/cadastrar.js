@@ -169,10 +169,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    //data de nascimento: mascara DD/MM/AAAA e validacao de idade minima de 24 anos
+    /* ═══════════════════════════════════════════════════════════════
+       DATA DE NASCIMENTO DO MÉDICO
+       — Máscara DD/MM/AAAA
+       — Hint de idade em TEMPO REAL (igual ao do agendamento)
+       — Validação no blur: mínimo 24 anos
+    ═══════════════════════════════════════════════════════════════ */
     var dataNascInput = document.getElementById('formCadastro:dataNascimento');
     if (dataNascInput) {
-        //alica a mascara conforme o usuario digita
+
+        // Cria o hint de idade dinamicamente logo abaixo do campo
+        var idadeHintMedico = document.createElement('span');
+        idadeHintMedico.id = 'medicoIdadeHint';
+        // Reutiliza a mesma classe CSS do agendamento para consistência visual
+        idadeHintMedico.className = 'ag-menor-hint';
+        dataNascInput.parentNode.insertBefore(idadeHintMedico, dataNascInput.nextSibling);
+
+        // Função auxiliar: calcula idade a partir de um objeto Date
+        function calcularIdadeMedico(nascDate) {
+            var hoje = new Date();
+            var idade = hoje.getFullYear() - nascDate.getFullYear();
+            var m = hoje.getMonth() - nascDate.getMonth();
+            if (m < 0 || (m === 0 && hoje.getDate() < nascDate.getDate())) idade--;
+            return idade;
+        }
+
+        // Máscara DD/MM/AAAA conforme o usuário digita
         dataNascInput.addEventListener('input', function () {
             var v = this.value.replace(/\D/g, '').slice(0, 8);
             if (v.length > 4) {
@@ -181,9 +203,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 v = v.slice(0, 2) + '/' + v.slice(2);
             }
             this.value = v;
+
+            // ── Hint em tempo real ──────────────────────────────────────
+            // Só processa quando a data estiver completamente digitada
+            if (v.length < 10) {
+                idadeHintMedico.classList.remove('visible');
+                return;
+            }
+
+            var partes = v.split('/');
+            if (partes.length !== 3 || partes[2].length !== 4) {
+                idadeHintMedico.classList.remove('visible');
+                return;
+            }
+
+            var nascDate = new Date(+partes[2], +partes[1] - 1, +partes[0]);
+            var dataInvalida = isNaN(nascDate.getTime())
+                || nascDate.getDate()  !== +partes[0]
+                || nascDate.getMonth() !== +partes[1] - 1
+                || nascDate > new Date();
+
+            if (dataInvalida) {
+                idadeHintMedico.classList.remove('visible');
+                return;
+            }
+
+            var idade = calcularIdadeMedico(nascDate);
+
+            idadeHintMedico.classList.add('visible');
+
+            if (idade < 24) {
+                // Abaixo do mínimo: hint vermelho + mensagem de aviso
+                idadeHintMedico.textContent = '⚠ ' + idade + ' anos • Mínimo 24 anos para cadastro';
+                idadeHintMedico.style.color = '#f87171';
+            } else {
+                // Idade válida: hint verde tranquilizador
+                idadeHintMedico.textContent = '✓ ' + idade + ' anos • Idade válida';
+                idadeHintMedico.style.color = '#34d399';
+            }
         });
 
-        //valida a idade ao sair do campo
+        // Validação no blur (mantém o comportamento original ao sair do campo)
         dataNascInput.addEventListener('blur', function () {
             var partes = this.value.split('/');
             var erro = true;
