@@ -1,225 +1,345 @@
 * {
-    font-family: 'Montserrat', sans-serif;
+	font-family: 'Montserrat', sans-serif;
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
+	font-family: 'Montserrat', sans-serif;
 }
 
 #agendar .doctor-card {
-    padding: 16px;
-    border: 2px solid #f7fafc;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: #fafafa;
-    text-align: left;
+	padding: 16px;
+	border: 2px solid #f7fafc;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.2s;
+	background: #fafafa;
+	text-align: left;
 }
 
 #agendar .doctor-card:hover {
-    border-color: #cbd5e0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	border-color: #cbd5e0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 #agendar .doctor-card.selected {
-    border-color: var(--primary);
-    background: #f5f3ff;
+	border-color: var(--primary);
+	background: #f5f3ff;
 }
 
 #agendar .doctor-card.selected .doctor-avatar {
-    background: var(--primary);
-    color: white;
+	background: var(--primary);
+	color: white;
 }
 
 .appointment-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: var(--white);
-    border-radius: 16px;
-    padding: 40px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	max-width: 800px;
+	margin: 0 auto;
+	background: var(--white);
+	border-radius: 16px;
+	padding: 40px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .appointment-header h2 {
-    text-align: center;
-    color: var(--text-dark);
-    font-size: 28px;
-    margin-bottom: 30px;
+	text-align: center;
+	color: var(--text-dark);
+	font-size: 28px;
+	margin-bottom: 30px;
 }
 
 .progress-wrapper {
-    margin-bottom: 40px;
+	margin-bottom: 40px;
 }
 
 .progress-steps {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    margin-bottom: 10px;
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	margin-bottom: 10px;
 }
 
 .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index: 2;
 }
 
 .step-circle {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #e2e8f0;
-    color: #718096;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 18px;
-    transition: all 0.3s;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background: #e2e8f0;
+	color: #718096;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: 18px;
+	transition: all 0.3s;
 }
 
 .step-circle.active {
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+	background: var(--primary);
+	color: white;
+	box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
 }
 
 .step-circle.completed {
-    background: #48bb78;
-    color: white;
+	background: #48bb78;
+	color: white;
 }
 
 .step-label {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #718096;
-    font-weight: 500;
+	margin-top: 8px;
+	font-size: 13px;
+	color: #718096;
+	font-weight: 500;
 }
 
 .progress-line {
-    position: relative;
-    height: 5px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    margin: -60px 40px 0;
+	position: relative;
+	height: 5px;
+	background: #e2e8f0;
+	border-radius: 4px;
+	margin: -60px 40px 0;
 }
 
 .progress-fill {
-    position: absolute;
-    height: 100%;
-    background: #48bb78;
-    border-radius: 4px;
-    width: 0%;
-    transition: width 0.4s ease;
+	position: absolute;
+	height: 100%;
+	background: #48bb78;
+	border-radius: 4px;
+	width: 0%;
+	transition: width 0.4s ease;
 }
 
 .form-step {
-    display: none;
-    min-height: 350px;
+	display: none;
+	min-height: 350px;
 }
 
 .form-step.active {
-    display: block;
-    animation: fadeIn 0.3s;
+	display: block;
+	animation: fadeIn 0.3s;
 }
 
 .form-step h3 {
-    font-size: 20px;
-    color: var(--text-dark);
-    margin-bottom: 25px;
+	font-size: 20px;
+	color: var(--text-dark);
+	margin-bottom: 25px;
 }
 
 .step-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #4a5568;
-    margin-bottom: 8px;
+	display: block;
+	font-size: 14px;
+	font-weight: 500;
+	color: #4a5568;
+	margin-bottom: 8px;
 }
 
 .form-control {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 15px;
-    transition: all 0.2s;
-    font-family: inherit;
+	width: 100%;
+	padding: 12px 16px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	font-size: 15px;
+	transition: all 0.2s;
+	font-family: inherit;
 }
 
 .form-control:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
 }
 
 .radio-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
 }
 
 .radio-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 14px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 14px;
+	border: 2px solid #e2e8f0;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s;
 }
 
 .radio-box input {
-    display: none;
+	display: none;
 }
 
 .radio-box:hover {
-    border-color: #cbd5e0;
+	border-color: #cbd5e0;
 }
 
 .radio-box.active {
-    border-color: var(--primary);
-    background: #f5f3ff;
-    color: var(--primary);
-    font-weight: 500;
+	border-color: var(--primary);
+	background: #f5f3ff;
+	color: var(--primary);
+	font-weight: 500;
 }
 
 .search-input {
-    width: 300px;
-    padding: 10px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
+	width: 300px;
+	padding: 10px 16px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	font-size: 14px;
 }
 
 .success-check {
-    width: 70px;
-    height: 70px;
-    background: #c6f6d5;
-    border-radius: 50%;
-    display: flex;
+	width: 70px;
+	height: 70px;
+	background: #c6f6d5;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 40px;
+	color: #48bb78;
+	margin: 0 auto 20px;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
-    color: #48bb78;
-    margin: 0 auto 20px;
+    z-index: 1000;
+}
+
+.modal-overlay.modal-ativo {
+    display: flex;
+}
+
+.modal-box {
+	background: #fff;
+	border-radius: 16px;
+	padding: 2rem;
+	max-width: 420px;
+	width: 90%;
+	text-align: center;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.modal-icon {
+	font-size: 2.5rem;
+	color: #e74c3c;
+	margin-bottom: 1rem;
+}
+
+.modal-title {
+	font-size: 1.3rem;
+	font-weight: 700;
+	margin-bottom: .5rem;
+}
+
+.modal-text {
+	color: #666;
+	margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+}
+
+.btn-secondary {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #eee;
+	color: #333;
+	border: none;
+	padding: 8px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.btn-confirmar-cancel {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #e74c3c;
+	color: #fff;
+	border: none;
+	padding: 8px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+/* Botão remarcar */
+.btn-remarcar {
+	background: #f0ebff;
+	color: var(--vittae-purple);
+	border: 1px solid var(--vittae-purple);
+	padding: .5rem 1.2rem;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.btn-remarcar {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #f0ebff;
+	color: #7c3aed;
+	border: 1px solid #7c3aed;
+	padding: 8px 16px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+.btn-cancel {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #fff0f0;
+	color: #e74c3c;
+	border: 1px solid #e74c3c;
+	padding: 8px 16px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+.btn-remarcar:hover {
+	background: #ede0ff;
+}
+
+.btn-cancel:hover {
+	background: #ffe0e0;
 }

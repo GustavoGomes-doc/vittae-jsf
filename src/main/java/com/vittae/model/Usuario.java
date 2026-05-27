@@ -15,12 +15,11 @@ public class Usuario {
 	public Usuario() {
 	}
 
-	public Usuario(String cpf, String senha, String nome, String email, Perfil perfil) {
+	public Usuario(String cpf, String senha, String nome, String email) {
 		this.cpf = cpf;
-		this.senha = senha;	
+		this.senha = senha;
 		this.nome = nome;
 		this.email = email;
-		this.perfil = perfil;
 	}
 
 	public Long getId() {
@@ -70,4 +69,6 @@ public class Usuario {
 	public void setPerfil(Perfil perfil) {
 		this.perfil = perfil;
 	}
+	
+	
 }

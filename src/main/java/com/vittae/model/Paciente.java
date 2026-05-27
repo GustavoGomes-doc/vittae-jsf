@@ -7,8 +7,7 @@ public class Paciente extends Usuario {
 
 	private LocalDate dataNascimento;
 	private String telefone;
-	private String endereco;
-	private String cidade;
+	private String cep;
 
 	private Paciente responsavel;
 
@@ -19,22 +18,6 @@ public class Paciente extends Usuario {
 
 	public Paciente(LocalDate dataNascimento) {
 		this.dataNascimento = dataNascimento;
-	}
-
-	public String getEndereco() {
-		return endereco;
-	}
-
-	public void setEndereco(String endereco) {
-		this.endereco = endereco;
-	}
-
-	public String getCidade() {
-		return cidade;
-	}
-
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
 	}
 
 	public LocalDate getDataNascimento() {
@@ -59,6 +42,15 @@ public class Paciente extends Usuario {
 
 	public void setResponsavel(Paciente responsavel) {
 		this.responsavel = responsavel;
+	}
+	
+
+	public String getCep() {
+		return cep;
+	}
+
+	public void setCep(String cep) {
+		this.cep = cep;
 	}
 
 	public List<Consulta> getConsultas() {

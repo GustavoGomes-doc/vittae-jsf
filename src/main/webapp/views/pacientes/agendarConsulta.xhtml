@@ -2,159 +2,424 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
 
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
 
-        <ui:define name="corpo">
-            
-            <h:form id="formAgendamento">
-                
-                <section id="agendar" class="content-section active">
-                    <div class="appointment-container">
-                        <div class="appointment-header">
-                            <h2>Agendamento de Consulta</h2>
-                        </div>
+	<ui:define name="css_extra">
+		<h:outputStylesheet library="css" name="agendamento.css" />
+	</ui:define>
 
-                        <div class="progress-wrapper">
-                            <div class="progress-steps">
-                                <div class="step-item">
-                                    <div class="step-circle active" id="circle1"><span>1</span></div>
-                                    <span class="step-label">Consulta</span>
-                                </div>
-                                <div class="step-item">
-                                    <div class="step-circle" id="circle2"><span>2</span></div>
-                                    <span class="step-label">Médico</span>
-                                </div>
-                                <div class="step-item">
-                                    <div class="step-circle" id="circle3"><span>3</span></div>
-                                    <span class="step-label">Dados</span>
-                                </div>
-                            </div>
-                            <div class="progress-line">
-                                <div class="progress-fill" id="progressBar"></div>
-                            </div>
-                        </div> <br/>
+	<ui:define name="corpo">
+		<h:form id="fAg">
 
-                        <div class="form-step active" id="step1">
-                            <h3>Dados da Consulta</h3>
-                            <div class="form-group">
-                                <label>Especialidade da consulta</label>
-                                <h:selectOneMenu id="especialidadeType" value="#{agendamentoBean.especialidade}" styleClass="form-control">
-                                    <f:selectItem itemValue="" itemLabel="Selecione..." />
-                                    <f:selectItem itemValue="cardiologia" itemLabel="Cardiologia" />
-                                    <f:selectItem itemValue="neurologia" itemLabel="Neurologia" />
-                                    <f:selectItem itemValue="alergologia" itemLabel="Alergologia e Imunologia" />
-                                    <f:selectItem itemValue="urologia" itemLabel="Urologia" />
-                                    <f:selectItem itemValue="ginecologia" itemLabel="Ginecologia" />
-                                    <f:selectItem itemValue="radiologia" itemLabel="Radiologia" />
-                                </h:selectOneMenu>
-                            </div>
-                            <div class="form-group">
-                                <label>Tipo de Consulta</label>
-                                <h:selectOneMenu id="consultaType" value="#{agendamentoBean.tipoConsulta}" styleClass="form-control">
-                                    <f:selectItem itemValue="" itemLabel="Selecione..." />
-                                    <f:selectItem itemValue="rotina" itemLabel="Consulta de Rotina" />
-                                    <f:selectItem itemValue="retorno" itemLabel="Retorno" />
-                                    <f:selectItem itemValue="urgencia" itemLabel="Urgência" />
-                                </h:selectOneMenu>
-                            </div>
+			<div class="ag-wrapper">
+				<div class="ag-main">
 
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Data</label>
-                                    <h:inputText id="consultaDate" value="#{agendamentoBean.dataConsulta}" styleClass="form-control" p:type="date" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Horário</label>
-                                    <h:inputText id="consultaTime" value="#{agendamentoBean.horaConsulta}" styleClass="form-control" p:type="time" />
-                                </div>
-                            </div>
-                        </div>
+					<div class="ag-stepper">
+						<div class="ag-step">
+							<div class="ag-step-circle" id="sc1">1</div>
+							<div class="ag-step-info">
+								<span class="ag-step-num">Passo 1</span>
+								<span class="ag-step-name active" id="sn1">Dados</span>
+							</div>
+						</div>
+						<div class="ag-step-line" id="sl1"></div>
+						<div class="ag-step">
+							<div class="ag-step-circle" id="sc2">2</div>
+							<div class="ag-step-info">
+								<span class="ag-step-num">Passo 2</span>
+								<span class="ag-step-name" id="sn2">Especialidade</span>
+							</div>
+						</div>
+						<div class="ag-step-line" id="sl2"></div>
+						<div class="ag-step">
+							<div class="ag-step-circle" id="sc3">3</div>
+							<div class="ag-step-info">
+								<span class="ag-step-num">Passo 3</span>
+								<span class="ag-step-name" id="sn3">Médico</span>
+							</div>
+						</div>
+						<div class="ag-step-line" id="sl3"></div>
+						<div class="ag-step">
+							<div class="ag-step-circle" id="sc4">4</div>
+							<div class="ag-step-info">
+								<span class="ag-step-num">Passo 4</span>
+								<span class="ag-step-name" id="sn4">Data e Horário</span>
+							</div>
+						</div>
+					</div>
 
-                        <div class="form-step" id="step2">
-                            <div class="step-header-row">
-                                <h3>Selecione o Médico</h3>
-                                <input type="text" id="searchInput" placeholder="Buscar..." class="search-input" />
-                            </div>
-                            
-                            <h:inputHidden id="medicoSelecionadoId" value="#{agendamentoBean.medicoId}" />
+					<div class="ag-step-panel active" id="panel1">
+						<div class="ag-step-badge">
+							<i class="fas fa-user"></i> Passo 1 de 4
+						</div>
+						<h2 class="ag-step-title">Dados do Paciente</h2>
+						<p class="ag-step-sub">Preencha as informações para identificar o paciente.</p>
 
-                            <div class="doctors-list" id="doctorsList">
-                                <ui:repeat value="#{agendamentoBean.listaMedicos}" var="medico">
-                                    <div class="doctor-card" onclick="selecionarMedico(this, '#{medico.id}')" data-nome="#{medico.nome}">
-                                        <div class="doctor-header">
-                                            <div class="doctor-avatar">MD</div>
-                                            <div class="doctor-info">
-                                                <h4>#{medico.nome}</h4>
-                                                <p class="doctor-specialty">#{medico.especialidade}</p>
-                                            </div>
-                                        </div>
-                                        <div class="doctor-details">
-                                            <span>📍 #{medico.localizacao}</span>
-                                            <span>⭐ 5.0</span>
-                                        </div>
-                                    </div>
-                                </ui:repeat>
-                            </div>
-                        </div>
+						<div class="ag-section">
+							<div class="ag-section-title">
+								<div class="ag-section-num">1</div>
+								Identificação
+							</div>
 
-                        <div class="form-step" id="step3">
-                            <h3>Seus Dados</h3>
-                            <div class="form-group">
-                                <label>Nome Completo</label>
-                                <h:inputText id="patientName" value="#{agendamentoBean.paciente.nome}" styleClass="form-control" p:placeholder="Digite seu nome" />
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>CPF</label>
-                                    <h:inputText id="patientCPF" value="#{agendamentoBean.paciente.cpf}" styleClass="form-control mask-cpf" p:placeholder="000.000.000-00" p:maxlength="14" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Telefone</label>
-                                    <h:inputText id="patientPhone" value="#{agendamentoBean.paciente.telefone}" styleClass="form-control mask-phone" p:placeholder="(00) 00000-0000" p:maxlength="15" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Data de Nascimento</label>
-                                    <h:inputText id="patientBirthDate" value="#{agendamentoBean.paciente.dataNascimento}" styleClass="form-control mask-date" p:placeholder="00/00/0000" p:maxlength="10" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Sexo Biológico</label>
-                                    <h:selectOneMenu id="patientSex" value="#{agendamentoBean.paciente.sexo}" styleClass="form-control">
-                                        <f:selectItem itemValue="" itemLabel="Selecione..." />
-                                        <f:selectItem itemValue="masculino" itemLabel="Masculino" />
-                                        <f:selectItem itemValue="feminino" itemLabel="Feminino" />
-                                    </h:selectOneMenu>
-                                </div>
-                            </div>
+							<div class="ag-row ag-row-2">
+								<div class="ag-field">
+									<label class="ag-label">Nome completo do paciente <span class="req">*</span></label>
+									<h:inputText id="pacNome" value="#{agendamentoBean.pacienteNome}"
+										styleClass="ag-input" p:placeholder="Maria Silva dos Santos" />
+									<span class="ag-error-msg" id="errNome">
+										<i class="fas fa-exclamation-circle"></i> Informe nome e sobrenome
+									</span>
+								</div>
+								<div class="ag-field">
+									<label class="ag-label">Data de nascimento <span class="req">*</span></label>
+									<h:inputText id="pacNascimento" value="#{agendamentoBean.pacienteNascimento}"
+										styleClass="ag-input mask-nascimento"
+										p:placeholder="DD/MM/AAAA" p:maxlength="10" />
+									<span class="ag-menor-hint" id="menorHint"><i class="fas fa-exclamation-triangle"></i> 17 anos • Menor de idade</span>
+									<span class="ag-error-msg" id="errNasc">
+										<i class="fas fa-exclamation-circle"></i> Data inválida
+									</span>
+								</div>
+							</div>
 
-                            <div class="form-group">
-                                <label>Observações (Opcional)</label>
-                                <h:inputTextarea id="observations" value="#{agendamentoBean.observacoes}" styleClass="form-control" rows="3" p:placeholder="Alguma observação?" />
-                            </div>
-                        </div>
+							<div class="ag-row ag-row-2">
+								<div class="ag-field">
+									<label class="ag-label">CPF do paciente <span class="req">*</span></label>
+									<h:inputText id="pacCpf" value="#{agendamentoBean.pacienteCpf}"
+										styleClass="ag-input mask-cpf"
+										p:placeholder="000.000.000-00" p:maxlength="14" />
+									<span class="ag-error-msg" id="errCpf">
+										<i class="fas fa-exclamation-circle"></i> CPF inválido
+									</span>
+								</div>
+								<div class="ag-field">
+									<label class="ag-label">Gênero <span class="req">*</span></label>
+									<h:selectOneMenu id="pacGenero" value="#{agendamentoBean.pacienteGenero}"
+										styleClass="ag-select">
+										<f:selectItem itemValue="" itemLabel="Selecione..." />
+										<f:selectItem itemValue="masculino" itemLabel="Masculino" />
+										<f:selectItem itemValue="feminino"  itemLabel="Feminino" />
+										<f:selectItem itemValue="trans"     itemLabel="Trans" />
+										<f:selectItem itemValue="outro"     itemLabel="Outro" />
+									</h:selectOneMenu>
+									<span class="ag-error-msg" id="errSexo">
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
+									</span>
+								</div>
+							</div>
+						</div>
 
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="prevBtn" disabled="disabled">← Voltar</button>
-                            <button type="button" class="btn btn-primary" id="nextBtn">Próximo →</button>
-                            
-                            <h:commandButton id="btnSubmeterJSF" value="Prosseguir ✓" action="#{agendamentoBean.salvarAgendamento}" styleClass="btn btn-success" style="display: none;" />
-                            
-                            <button type="button" class="btn btn-success" id="submitBtnVisual" style="display: none;">Prosseguir ✓</button>
-                        </div>
-                    </div>
-                </section>
+						<div class="ag-section">
+							<div class="ag-section-title">
+								<div class="ag-section-num">2</div>
+								Contato
+							</div>
+							<div class="ag-row ag-row-2">
+								<div class="ag-field">
+									<label class="ag-label">Telefone / WhatsApp <span class="req">*</span></label>
+									<h:inputText id="pacTelefone" value="#{agendamentoBean.pacienteTelefone}"
+										styleClass="ag-input mask-phone"
+										p:placeholder="(11) 99999-9999" p:maxlength="15" />
+									<span class="ag-error-msg" id="errTel">
+										<i class="fas fa-exclamation-circle"></i> Telefone inválido
+									</span>
+								</div>
+							</div>
+						</div>
 
-                <section id="historico" class="content-section active"></section>
+						<div class="ag-responsavel" id="blocoResponsavel">
+							<div class="ag-responsavel-header">
+								<i class="fas fa-shield-alt"></i>
+								<h5>Responsável Legal</h5>
+							</div>
+							<p class="ag-responsavel-sub">Obrigatório para menores de 18 anos (Art. 8º do ECA e Resolução CFM 2.217/2018).</p>
+							<div class="ag-row ag-row-3">
+								
+								<div class="ag-field">
+									<label class="ag-label">Nome do responsável <span class="req">*</span></label>
+									<input type="text" class="ag-input" id="respNome" placeholder="Nome completo" />
+									<span class="ag-error-msg" id="errRespNome">
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
+									</span>
+								</div>
+								
+								<div class="ag-field">
+									<label class="ag-label">CPF do responsável <span class="req">*</span></label>
+									<input type="text" class="ag-input mask-cpf" id="respCpf" placeholder="000.000.000-00" maxlength="14" />
+									<span class="ag-error-msg" id="errRespCpf">
+										<i class="fas fa-exclamation-circle"></i> CPF inválido
+									</span>
+								</div>
+								
+								<div class="ag-field">
+									<label class="ag-label">Data de nascimento <span class="req">*</span></label>
+									<input type="text" class="ag-input mask-nascimento" id="respNascimento" placeholder="DD/MM/AAAA" maxlength="10" />
+									<span class="ag-error-msg" id="errRespNasc">
+										<i class="fas fa-exclamation-circle"></i> Data inválida
+									</span>
+								</div>
+								
+								<div class="ag-field">
+									<label class="ag-label">Grau de parentesco <span class="req">*</span></label>
+									<select class="ag-select" id="respParentesco">
+										<option value="">Selecione...</option>
+										<option value="mae">Mãe</option>
+										<option value="pai">Pai</option>
+										<option value="avo">Avó/Avô</option>
+										<option value="tutor">Tutor Legal</option>
+										<option value="outro">Outro</option>
+									</select>
+									<span class="ag-error-msg" id="errRespParent">
+										<i class="fas fa-exclamation-circle"></i> Obrigatório
+									</span>
+								</div>
 
-            </h:form>
+							</div>
+						</div>
 
-            <h:outputScript library="js" name="Paciente.js" />
-            <h:outputScript library="js" name="AgendarConsulta.js" />
+						<div class="ag-section">
+							<div class="ag-section-title">
+								<div class="ag-section-num">3</div>
+								Histórico de Saúde
+							</div>
 
-        </ui:define>
-    </ui:composition>
+							<div class="ag-row ag-row-1">
+							    <div class="ag-field">
+							        <label class="ag-label">Motivo da consulta <span class="req">*</span></label>
+							        <h:inputTextarea id="motivoConsulta"
+							            value="#{agendamentoBean.observacoes}"
+							            styleClass="ag-input ag-textarea"
+							            p:placeholder="Descreva brevemente o motivo ou sintomas, medicamentos em uso, aleargias conhecidas, condicoes cronicas etc... (ajuda o médico a se preparar)"
+							            required="true"
+							            requiredMessage="Descreva o motivo" />
+							        <h:message for="motivoConsulta" styleClass="ag-error-msg" />
+							    </div>
+							</div>
+
+							<div class="ag-termos">
+								<div class="ag-termos-header">
+									<i class="fas fa-shield-alt" style="color: #818cf8"></i>
+									<h4>Termos e privacidade</h4>
+								</div>
+								<p class="ag-termos-sub">Lei nº 13.709/2018 (LGPD) e Código de Ética Médica</p>
+
+								<label class="ag-check-group">
+									<input type="checkbox" id="termoVerdade" />
+									<span class="ag-check-text">
+										Declaro que as <strong>informações são verdadeiras</strong> e assumo responsabilidade por elas.
+										<span class="req" style="color: #f87171">*</span>
+									</span>
+								</label>
+								<span class="ag-error-msg" id="errTermo1" style="color: #f87171; margin-top: -6px">
+									<i class="fas fa-exclamation-circle"></i> Necessário declarar
+								</span>
+
+								<label class="ag-check-group" style="margin-top: 10px">
+									<input type="checkbox" id="termoLgpd" />
+									<span class="ag-check-text">
+										Autorizo o tratamento dos meus <strong>dados pessoais e de saúde</strong>
+										conforme a LGPD, exclusivamente para fins de atendimento médico e administrativo.
+										<span class="req" style="color: #f87171">*</span>
+									</span>
+								</label>
+								<span class="ag-error-msg" id="errTermo2" style="color: #f87171; margin-top: -6px">
+									<i class="fas fa-exclamation-circle"></i> Necessário aceitar
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="ag-step-panel" id="panel2">
+						<div class="ag-step-badge">
+							<i class="fas fa-stethoscope"></i> Passo 2 de 4
+						</div>
+						<h2 class="ag-step-title">Qual especialidade?</h2>
+						<p class="ag-step-sub">Selecione a área médica para ver os profissionais disponíveis.</p>
+
+						<h:inputHidden id="especialidadeHidden" value="#{agendamentoBean.especialidade}" />
+
+						<div class="ag-esp-grid" id="espGrid">
+							</div>
+						<span class="ag-error-msg" id="errEsp">
+							<i class="fas fa-exclamation-circle"></i> Selecione uma especialidade
+						</span>
+					</div>
+					<div class="ag-step-panel" id="panel3">
+						<div class="ag-step-badge">
+							<i class="fas fa-user-md"></i> Passo 3 de 4
+						</div>
+						<h2 class="ag-step-title">Escolha seu médico</h2>
+						<p class="ag-step-sub" id="subMedico">Profissionais disponíveis. Compare e escolha o ideal para você.</p>
+
+						<h:inputHidden id="medicoIdHidden" value="#{agendamentoBean.medicoId}" />
+
+						<div class="ag-medico-search">
+							<i class="fas fa-search"></i>
+							<input type="text" id="buscaMedico"
+								placeholder="Buscar por nome ou CRM..." oninput="filtrarMedicos()" />
+						</div>
+
+						<div class="ag-medicos-grid" id="medicosGrid">
+							</div>
+						<span class="ag-error-msg" id="errMedico">
+							<i class="fas fa-exclamation-circle"></i> Selecione um médico
+						</span>
+					</div>
+					<div class="ag-step-panel" id="panel4">
+						<div class="ag-step-badge">
+							<i class="far fa-calendar-alt"></i> Passo 4 de 4
+						</div>
+						<h2 class="ag-step-title">Data e Horário</h2>
+						<p class="ag-step-sub" id="subDataHora">Escolha o melhor dia e horário para sua consulta.</p>
+
+						<h:inputHidden id="dataConsultaHidden"  value="#{agendamentoBean.dataConsulta}" />
+						<h:inputHidden id="horaConsultaHidden"  value="#{agendamentoBean.horaConsulta}" />
+						<h:inputHidden id="tipoConsultaHidden"  value="#{agendamentoBean.tipoConsulta}" />
+
+						<div class="ag-section" style="margin-bottom: 16px">
+							<div class="ag-section-title">
+								<div class="ag-section-num">1</div>
+								Tipo de Consulta
+							</div>
+							<div class="ag-tipo-grid">
+								<div class="ag-tipo-card" onclick="selecionarTipo(this,'rotina')">
+									<div class="ag-tipo-icon"><i class="fas fa-stethoscope"></i></div>
+									<div class="ag-tipo-name">Rotina</div>
+								</div>
+								<div class="ag-tipo-card" onclick="selecionarTipo(this,'retorno')">
+									<div class="ag-tipo-icon"><i class="fas fa-sync-alt"></i></div>
+									<div class="ag-tipo-name">Retorno</div>
+								</div>
+								<div class="ag-tipo-card" onclick="selecionarTipo(this,'urgencia')">
+									<div class="ag-tipo-icon"><i class="fas fa-star-of-life"></i></div>
+									<div class="ag-tipo-name">Urgência</div>
+								</div>
+							</div>
+							<span class="ag-error-msg" id="errTipo">
+								<i class="fas fa-exclamation-circle"></i> Selecione o tipo de consulta
+							</span>
+						</div>
+
+						<div class="ag-calendar-wrapper">
+							<div class="ag-calendar">
+								<div class="ag-cal-header">
+									<button type="button" class="ag-cal-nav" onclick="navegarMes(-1)">&#8249;</button>
+									<h4 id="calMesAno"></h4>
+									<button type="button" class="ag-cal-nav" onclick="navegarMes(1)">&#8250;</button>
+								</div>
+								<div class="ag-cal-grid" id="calGrid"></div>
+								<div class="ag-cal-legend">
+									<span><span class="ag-cal-legend-dot" style="background: #059669"></span>Disponível</span>
+									<span><span class="ag-cal-legend-dot" style="background: #7c3aed"></span>Selecionado</span>
+								</div>
+							</div>
+
+							<div class="ag-horarios">
+								<h4>Horários</h4>
+								<p class="ag-horarios-sub" id="horariosSub">Selecione uma data no calendário</p>
+								<div class="ag-horarios-grid" id="horariosGrid">
+									<div class="ag-horarios-empty">
+										<div class="ag-empty-icon"><i class="far fa-calendar-alt"></i></div>
+										<div class="ag-empty-text">Selecione uma data</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<span class="ag-error-msg" id="errData" style="margin-top: 8px">
+							<i class="fas fa-exclamation-circle"></i> Selecione data e horário
+						</span>
+					</div>
+					<div class="ag-actions">
+						<button type="button" class="ag-btn ag-btn-secondary"
+							id="btnVoltar" onclick="voltarStep()" style="visibility: hidden">← Voltar</button>
+						<button type="button" class="ag-btn ag-btn-primary"
+							id="btnProximo" onclick="proximoStep()">Próximo →</button>
+						<button type="button" id="btnSubmitJSF"
+							  class="ag-btn ag-btn-success" style="display:none"
+							  onclick="prepararSubmit()">
+							  Confirmar Agendamento <i class="fas fa-check" style="margin-left: 8px"></i>
+						</button>
+					</div>
+
+				</div>
+				<div class="ag-sidebar">
+					<div class="ag-resumo-card">
+						<h4>Resumo</h4>
+
+						<div class="ag-resumo-item">
+							<div class="ag-resumo-icon pending" id="rIconPaciente"><i class="fas fa-user"></i></div>
+							<div>
+								<div class="ag-resumo-label">Paciente</div>
+								<div class="ag-resumo-value pending" id="rPaciente">pendente</div>
+							</div>
+						</div>
+
+						<div class="ag-resumo-item">
+							<div class="ag-resumo-icon pending" id="rIconEsp"><i class="fas fa-stethoscope"></i></div>
+							<div>
+								<div class="ag-resumo-label">Especialidade</div>
+								<div class="ag-resumo-value pending" id="rEspecialidade">pendente</div>
+							</div>
+						</div>
+
+						<div class="ag-resumo-item">
+							<div class="ag-resumo-icon pending" id="rIconMedico"><i class="fas fa-user-md"></i></div>
+							<div>
+								<div class="ag-resumo-label">Médico</div>
+								<div class="ag-resumo-value pending" id="rMedico">pendente</div>
+							</div>
+						</div>
+
+						<div class="ag-resumo-item">
+							<div class="ag-resumo-icon pending" id="rIconData"><i class="far fa-calendar-alt"></i></div>
+							<div>
+								<div class="ag-resumo-label">Data e Horário</div>
+								<div class="ag-resumo-value pending" id="rData">pendente</div>
+							</div>
+						</div>
+
+						<div class="ag-resumo-divider"></div>
+
+						<div class="ag-resumo-footer" id="rValorBlock" style="display: none">
+							<div>
+								<div class="ag-resumo-label" style="color: #a5b4fc">Valor</div>
+								<div class="ag-resumo-valor" id="rValor">—</div>
+							</div>
+						</div>
+
+						<p class="ag-resumo-nota"><i class="fas fa-lock" style="margin-right: 6px"></i> Dados protegidos pela LGPD e sigilo médico (CFM).</p>
+					</div>
+				</div>
+				</div>
+
+			<div id="modalSucesso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+   				background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+				    <div style="background:#1e1b4b; border-radius:16px; padding:40px; max-width:480px; width:90%;
+				        text-align:center; border:1px solid #4f46e5; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+				        <div style="font-size:56px; margin-bottom:16px; color:#10b981;"><i class="fas fa-check-circle"></i></div>
+				        <h2 style="color:#a5b4fc; margin:0 0 8px">Consulta Agendada!</h2>
+				        <p style="color:#c7d2fe; margin:0 0 6px">Seu agendamento foi confirmado com sucesso.</p>
+				        <div id="modalResumoTexto" style="background:#312e81; border-radius:10px; padding:16px;
+				            margin:20px 0; color:#e0e7ff; font-size:14px; line-height:1.8; text-align:left;">
+				        </div>
+				        <button type="button" onclick="fecharModalEIr()"
+				            style="background:#4f46e5; color:white; border:none; padding:12px 32px;
+				            border-radius:8px; font-size:15px; cursor:pointer; width:100%">
+				            Novo Agendamento
+				        </button>
+					</div>
+			</div>
+
+			<h:messages showDetail="true" showSummary="true" tooltip="true"
+				style="color:red;font-weight:bold;padding:10px;margin:0 32px;" />
+		</h:form>
+
+		<h:outputScript library="js" name="agendar.js" />
+
+	</ui:define>
+</ui:composition>
 </html>
