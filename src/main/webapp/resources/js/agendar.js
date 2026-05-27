@@ -37,6 +37,7 @@
         aplicarMascaras();
         aplicarCapitalizacao();
         monitorarNascimento();
+        monitorarNascimentoResponsavel(); // ← NOVO: hint de idade para o responsável
         renderizarCalendario();
 		carregarEspecialidades();
     }
@@ -165,6 +166,76 @@
         });
     }
 
+    /* ═══════════════════════════════════════════════
+       MONITORAR NASCIMENTO (RESPONSÁVEL) — NOVO
+       Mostra hint de idade igual ao do paciente.
+       Se a idade for < 18, exibe aviso de inválido.
+    ═══════════════════════════════════════════════ */
+    function monitorarNascimentoResponsavel() {
+        var campo = document.getElementById('respNascimento');
+        if (!campo) return;
+
+        // Cria o elemento de hint dinamicamente (igual ao menorHint do paciente)
+        var hint = document.getElementById('respIdadeHint');
+        if (!hint) {
+            hint = document.createElement('span');
+            hint.id = 'respIdadeHint';
+            hint.className = 'ag-menor-hint'; // mesma classe do paciente
+            campo.parentNode.insertBefore(hint, campo.nextSibling);
+        }
+
+        campo.addEventListener('input', function() {
+            var v = campo.value;
+            var errEl = document.getElementById('errRespNasc');
+
+            // Esconde hint enquanto digita
+            hint.classList.remove('visible');
+
+            if (v.length < 10) {
+                esconderErro('errRespNasc', campo);
+                return;
+            }
+
+            var partes = v.split('/');
+            if (partes.length !== 3) return;
+
+            var dia  = parseInt(partes[0], 10);
+            var mes  = parseInt(partes[1], 10);
+            var ano  = parseInt(partes[2], 10);
+            var data = new Date(ano, mes - 1, dia);
+
+            var dataInvalida = isNaN(data.getTime())
+                || data.getDate()  !== dia
+                || data.getMonth() !== mes - 1
+                || data.getFullYear() !== ano
+                || data > new Date();
+
+            if (dataInvalida) {
+                mostrarErro('errRespNasc', campo);
+                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
+                return;
+            }
+
+            var idade = calcularIdade(data);
+
+            // Mostra a idade calculada no hint (igual ao do paciente)
+            hint.classList.add('visible');
+
+            if (idade < 18) {
+                // Menor de idade: hint vermelho/laranja de aviso
+                hint.textContent = '⚠ ' + idade + ' anos • Responsável deve ter +18 anos';
+                hint.style.color = '#f87171'; // tom vermelho para diferenciar do aviso do paciente
+                mostrarErro('errRespNasc', campo);
+                if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> O responsável deve ser maior de idade (+18)';
+            } else {
+                // Maior de idade: hint verde tranquilizador
+                hint.textContent = '✓ ' + idade + ' anos • Maior de idade';
+                hint.style.color = '#34d399';
+                esconderErro('errRespNasc', campo);
+            }
+        });
+    }
+
     function esconderMenor() {
         var hint  = document.getElementById('menorHint');
         var bloco = document.getElementById('blocoResponsavel');
@@ -179,6 +250,10 @@
             if (rCpf)  rCpf.value  = '';
             if (rPar)  rPar.value  = '';
             if (rNasc) rNasc.value = '';
+
+            // Limpa também o hint do responsável ao esconder o bloco
+            var respHint = document.getElementById('respIdadeHint');
+            if (respHint) respHint.classList.remove('visible');
         }
     }
 
@@ -247,7 +322,7 @@
 
         var btnV = document.getElementById('btnVoltar');
         var btnP = document.getElementById('btnProximo');
-        var btnS = document.getElementById('btnSubmitJSF'); // Ou seu botão de confirmar
+        var btnS = document.getElementById('btnSubmitJSF');
 
         btnV.style.visibility = state.step === 1 ? 'hidden' : 'visible';
 
@@ -331,8 +406,9 @@
         // RESPONSÁVEL LEGAL
         var bloco = document.getElementById('blocoResponsavel');
         if (bloco && bloco.classList.contains('visible') && idadePaciente !== null && idadePaciente < 18) {
-            
-            // 1. Nome do Responsável (Não pode ser igual ao paciente)
+
+            // ── VALIDAÇÃO 1: Nome do Responsável ─────────────────────────────
+            // Não pode ser vazio. Não pode ser igual ao nome do paciente.
             var rNome = document.getElementById('respNome');
             var nomePaciente = nome ? nome.value.trim().toLowerCase() : '';
             var nomeResp     = rNome ? rNome.value.trim().toLowerCase() : '';
@@ -345,16 +421,17 @@
             } else if (nomeResp === nomePaciente) {
                 mostrarErro('errRespNome', rNome);
                 var errNomeEl = document.getElementById('errRespNome');
-                if (errNomeEl) errNomeEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Deve ser diferente do paciente';
+                if (errNomeEl) errNomeEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Deve ser diferente do nome do paciente';
                 ok = false;
             } else {
                 esconderErro('errRespNome', rNome);
             }
 
-            // 2. CPF do Responsável (Não pode ser igual ao paciente)
+            // ── VALIDAÇÃO 2: CPF do Responsável ──────────────────────────────
+            // Deve ter 11 dígitos. Não pode ser igual ao CPF do paciente.
             var rCpf = document.getElementById('respCpf');
             var cpfPacienteStr = cpf ? cpf.value.replace(/\D/g, '') : '';
-            var cpfRespStr = rCpf ? rCpf.value.replace(/\D/g, '') : '';
+            var cpfRespStr     = rCpf ? rCpf.value.replace(/\D/g, '') : '';
 
             if (!rCpf || cpfRespStr.length !== 11) {
                 mostrarErro('errRespCpf', rCpf);
@@ -364,13 +441,14 @@
             } else if (cpfRespStr === cpfPacienteStr) {
                 mostrarErro('errRespCpf', rCpf);
                 var errCpfEl = document.getElementById('errRespCpf');
-                if (errCpfEl) errCpfEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Não pode ser igual ao do paciente';
+                if (errCpfEl) errCpfEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> O CPF não pode ser igual ao do paciente';
                 ok = false;
             } else {
                 esconderErro('errRespCpf', rCpf);
             }
 
-            // 3. Nascimento do Responsável (+18 anos)
+            // ── VALIDAÇÃO 3: Nascimento do Responsável ────────────────────────
+            // Data deve ser válida E responsável deve ter 18 anos ou mais.
             var rNasc = document.getElementById('respNascimento');
             if (!rNasc || rNasc.value.length < 10) {
                 mostrarErro('errRespNasc', rNasc);
@@ -378,13 +456,17 @@
                 if (errNascEl) errNascEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
                 ok = false;
             } else {
-                var partesR = rNasc.value.split('/');
+                var partesR      = rNasc.value.split('/');
                 var dataNascResp = new Date(partesR[2], partesR[1] - 1, partesR[0]);
-                
                 var dataInvalidaR = isNaN(dataNascResp.getTime()) || dataNascResp > new Date();
-                var idadeResp = calcularIdade(dataNascResp);
+                var idadeResp     = calcularIdade(dataNascResp);
 
-                if (dataInvalidaR || idadeResp < 18) {
+                if (dataInvalidaR) {
+                    mostrarErro('errRespNasc', rNasc);
+                    var errNascEl = document.getElementById('errRespNasc');
+                    if (errNascEl) errNascEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data inválida';
+                    ok = false;
+                } else if (idadeResp < 18) {
                     mostrarErro('errRespNasc', rNasc);
                     var errNascEl = document.getElementById('errRespNasc');
                     if (errNascEl) errNascEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> O responsável deve ser maior de idade (+18)';
