@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" lang="pt-BR">
+<h:head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Vittae - Login</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	<h:outputStylesheet library="css" name="login.css" />
+	<link rel="shortcut icon" href="#{request.contextPath}/resources/imagens/facvicon VITTAE.png" type="image/x-icon" />
+</h:head>
+
+<h:body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+	
+	<section class="container-pai" id="mainContainer" style="max-width: 850px;">
+		<div class="forms-content-container">
+			
+			<div class="form-content sign-in" id="loginBlock">
+				<h:form id="loginForm" prependId="false">
+					<h2>Acesse sua Conta</h2>
+					<p class="subtitle">Bem-vindo de volta ao Vittae!</p>
+
+					<div class="input-field">
+   						 <i class="fas fa-id-card" />
+   						 <h:inputText id="cpfLogin" value="#{loginBean.cpf}"
+        					pt:placeholder="CPF (000.000.000-00)" required="true"
+       						requiredMessage="CPF é obrigatório" styleClass="form-control" maxlength="14"
+        					onkeyup="mascaraCPF(this)" />
+					</div>
+
+					<div class="input-field">
+						<i class="fas fa-lock" />
+						<h:inputSecret id="senhaLogin" value="#{loginBean.senha}"
+							pt:placeholder="Sua Senha" required="true"
+							requiredMessage="Senha é obrigatória" styleClass="form-control" />
+					</div>
+
+					<h:commandLink value="Esqueceu sua senha?" styleClass="forgot-pass"
+						action="#{loginBean.recuperarSenha()}">
+						<f:ajax execute="@this" render="messages" />
+					</h:commandLink>
+
+				<h:commandButton value="Entrar" action="#{loginBean.login()}" styleClass="btn-main" />
+
+					<div class="footer-copy">
+						<p>©Copyright 2026 Vittae.</p>
+					</div>
+					
+					<h:messages id="messages" globalOnly="false" style="color: #e74c3c; list-style: none; padding: 0; font-size: 13px; margin-top: 10px;" />
+				</h:form>
+			</div>
+		</div>
+
+		<div class="overlay-panel-container">
+			<div class="overlay">
+				<div class="overlay-section overlay-right">
+					<h2>Novo por aqui?</h2>
+					<p>Crie sua conta em segundos e agende suas consultas com total praticidade.</p>
+					
+					<h:link value="Criar Conta" 
+						outcome="/views/cadastrar/cadastrar.xhtml" 
+						styleClass="btn-outline" 
+						style="text-decoration: none; display: inline-block; text-align: center; line-height: 45px;" />
+				</div>
+			</div>
+		</div>
+
+	</section>
+<script type="text/javascript">
+        //<![CDATA[
+        function mascaraCPF(campo) {
+            var v = campo.value;
+            v = v.replace(/\D/g, ""); // Remove tudo que não for número
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca o primeiro ponto
+            v = v.replace(/(\d{3})(\d)/, "$1.$2"); // Coloca o segundo ponto
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca o traço
+            campo.value = v;
+        }
+        //]]>
+    </script>
+</h:body>
+</html>
