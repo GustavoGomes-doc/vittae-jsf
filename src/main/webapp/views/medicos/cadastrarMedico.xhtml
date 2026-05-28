@@ -7,6 +7,10 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+<ui:define name="css_extra">
+		<h:outputStylesheet library="css" name="admin.css" />
+	</ui:define>
 	<ui:define name="corpo">
 
 		<div class="header-pagina">
