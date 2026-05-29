@@ -16,11 +16,9 @@ import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 
 public class ConsultaService {
-
-	// mesma porta do seu Spring Boot — ajusta se precisar
-
 	private static final String API_URL = "http://localhost:8083/api/agendamentos";
 	private static final String API_MEDICOS = "http://localhost:8083/api/medicos";
+
 
 	/**
 	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha
@@ -61,58 +59,28 @@ public class ConsultaService {
 		}
 		throw new Exception("Falha ao buscar médicos. Status: " + response.statusCode());
 	}
-	
+
 	// METÓDO LISTAR CONSULTAS PARA O VISUALIZAR CONSULTA
 	public List<Consulta> listarTodas() throws Exception {
-	    HttpClient client = HttpClient.newHttpClient();
-	    HttpRequest request = HttpRequest.newBuilder()
-	            .uri(URI.create(API_URL))
-	            .GET()
-	            .build();
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL)).GET().build();
 
-	    HttpResponse<String> response = client.send(request,
-	            HttpResponse.BodyHandlers.ofString());
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-	    if (response.statusCode() == 200) {
-	        ObjectMapper mapper = new ObjectMapper();
-	        mapper.registerModule(new JavaTimeModule());
-	        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		if (response.statusCode() == 200) {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.registerModule(new JavaTimeModule());
+			mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-	        return mapper.readValue(response.body(),
-	                mapper.getTypeFactory()
-	                      .constructCollectionType(List.class, Consulta.class));
-	    }
-	    throw new Exception("Erro ao buscar consultas. Status: " + response.statusCode());
+			return mapper.readValue(response.body(),
+					mapper.getTypeFactory().constructCollectionType(List.class, Consulta.class));
+		}
+		throw new Exception("Erro ao buscar consultas. Status: " + response.statusCode());
 	}
-	
-	// MÉTODO CANCELAR — remover o .GET() errado
-	public void cancelar(Long id, Consulta consulta) throws Exception {
+
+	public void cancelar(Long id, Consulta consulta) throws Exception { //metodo cancelar
 	    consulta.setStatus(Status.CANCELADA);
 
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.registerModule(new JavaTimeModule());
-	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-	    String json = mapper.writeValueAsString(consulta);
-
-	    HttpClient client = HttpClient.newHttpClient();
-	    HttpRequest request = HttpRequest.newBuilder()
-	            .uri(URI.create(API_URL + "/" + id))
-	            .header("Content-Type", "application/json")
-	            .PUT(HttpRequest.BodyPublishers.ofString(json)) // remova o .GET() que estava aqui
-	            .build();
-
-	    HttpResponse<String> response = client.send(request,
-	            HttpResponse.BodyHandlers.ofString());
-
-	    if (response.statusCode() != 200) {
-	        throw new Exception("Erro ao cancelar. Status: "
-	                + response.statusCode() + " - " + response.body());
-	    }
-	}
-
-	// MÉTODO REMARCAR — adicionar após o cancelar
-	public void remarcar(Long id, Consulta consulta) throws Exception {
 	    ObjectMapper mapper = new ObjectMapper();
 	    mapper.registerModule(new JavaTimeModule());
 	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -130,9 +98,28 @@ public class ConsultaService {
 	            HttpResponse.BodyHandlers.ofString());
 
 	    if (response.statusCode() != 200) {
-	        throw new Exception("Erro ao remarcar. Status: "
+	        throw new Exception("Erro ao cancelar. Status: "
 	                + response.statusCode() + " - " + response.body());
 	    }
+	}
+
+	// MÉTODO REMARCAR — adicionar após o cancelar
+	public void remarcar(Long id, Consulta consulta) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+		String json = mapper.writeValueAsString(consulta);
+
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL + "/" + id))
+				.header("Content-Type", "application/json").PUT(HttpRequest.BodyPublishers.ofString(json)).build();
+
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+		if (response.statusCode() != 200) {
+			throw new Exception("Erro ao remarcar. Status: " + response.statusCode() + " - " + response.body());
+		}
 	}
 
 	// ── DTO interno que espelha o AgendamentoDTO do Spring ──────────────────
@@ -219,8 +206,8 @@ public class ConsultaService {
 		private String nome;
 		private String cpf;
 		private String telefone;
-		private String genero; 
-		private String nascimento; 
+		private String genero;
+		private String nascimento;
 
 		public PacienteDTO() {
 		}
@@ -265,4 +252,5 @@ public class ConsultaService {
 			this.nascimento = nascimento;
 		}
 	}
+
 }

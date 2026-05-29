@@ -34,7 +34,7 @@ public class VisualizarConsultasBean implements Serializable {
 	public void init() {
 		filtroStatus = "todas";
 		carregarConsultas();
-	}
+	}//
 
 	public void carregarConsultas() {
 		try {
@@ -110,14 +110,13 @@ public class VisualizarConsultasBean implements Serializable {
 	}
 
 	public void cancelar(Consulta c) {
-		try {
-			service.cancelar(c.getId(), c);
-			carregarConsultas();
-			consultaSelecionada = null;
-			addInfo("Consulta cancelada com sucesso!");
-		} catch (Exception e) {
-			addErro("Erro ao cancelar: " + e.getMessage());
-		}
+	    try {
+	        service.cancelar(c.getId(), c);
+	        carregarConsultas();
+	        addInfo("Consulta cancelada com sucesso!");
+	    } catch (Exception e) {
+	        addErro("Erro ao cancelar: " + e.getMessage());
+	    }
 	}
 
 	
@@ -152,26 +151,24 @@ public class VisualizarConsultasBean implements Serializable {
 	}
 	
 	// CONSULTA SELECIONADA 
-	public String prepararCancelamentoAction() {
+	public void prepararCancelamentoAction(Long id) {
 	    for (Consulta c : consultas) {
-	        if (c.getId().equals(idConsultaSelecionada)) {
+	        if (c.getId().equals(id)) {
 	            prepararCancelamento(c);
 	            break;
 	        }
 	    }
-	    return null;
 	}
 
-	public String prepararRemarcarAction() {
+	public void prepararRemarcarAction(Long id) {
 	    for (Consulta c : consultas) {
-	        if (c.getId().equals(idConsultaSelecionada)) {
+	        if (c.getId().equals(id)) {
 	            prepararRemarcar(c);
 	            break;
 	        }
 	    }
-	    return null;
 	}
-
+	
 	
 
 	// ─── HELPERS ─────────────────────────────────────────
