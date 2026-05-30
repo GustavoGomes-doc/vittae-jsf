@@ -5,7 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.vittae.model.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vittae.model.enums.Status;
 
+// Classes puras, prontas para virar JSON
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Consulta {
 
 	private Long id;

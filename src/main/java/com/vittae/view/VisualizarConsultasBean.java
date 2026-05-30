@@ -61,6 +61,7 @@ public class VisualizarConsultasBean implements Serializable {
 	    if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
 	        return true;
 	    return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
+
 	}
 
 	private boolean passaFiltroTexto(Consulta c) {

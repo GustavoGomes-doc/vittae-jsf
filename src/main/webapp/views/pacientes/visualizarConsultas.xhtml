@@ -23,9 +23,11 @@
 			<div class="page-header">
 				<h:panelGroup layout="block">
 					<h2 class="page-title">Minhas Consultas</h2>
-					<p class="page-subtitle">Gerencie seus agendamentos no sistema Vittae</p>
+					<p class="page-subtitle">Gerencie seus agendamentos no sistema
+						Vittae</p>
 				</h:panelGroup>
-				<h:link outcome="/views/pacientes/agendarConsulta" styleClass="btn-nova">
+				<h:link outcome="/views/pacientes/agendarConsulta"
+					styleClass="btn-nova">
 					<i class="fas fa-plus"></i> Nova Consulta
 				</h:link>
 			</div>
@@ -54,10 +56,10 @@
 							listener="#{visualizarConsultasBean.filtrar}" />
 					</h:commandButton>
 
-					<h:commandButton value="Agendadas"
-						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'agendada' ? 'active' : ''}">
+					<h:commandButton value="Pendentes"
+						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'pendente' ? 'active' : ''}">
 						<f:setPropertyActionListener
-							target="#{visualizarConsultasBean.filtroStatus}" value="agendada" />
+							target="#{visualizarConsultasBean.filtroStatus}" value="pendente" />
 						<f:ajax execute="@this"
 							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
 							listener="#{visualizarConsultasBean.filtrar}" />
@@ -66,7 +68,8 @@
 					<h:commandButton value="Realizadas"
 						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'realizada' ? 'active' : ''}">
 						<f:setPropertyActionListener
-							target="#{visualizarConsultasBean.filtroStatus}" value="realizada" />
+							target="#{visualizarConsultasBean.filtroStatus}"
+							value="realizada" />
 						<f:ajax execute="@this"
 							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
 							listener="#{visualizarConsultasBean.filtrar}" />
@@ -75,7 +78,8 @@
 					<h:commandButton value="Canceladas"
 						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'cancelada' ? 'active' : ''}">
 						<f:setPropertyActionListener
-							target="#{visualizarConsultasBean.filtroStatus}" value="cancelada" />
+							target="#{visualizarConsultasBean.filtroStatus}"
+							value="cancelada" />
 						<f:ajax execute="@this"
 							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
 							listener="#{visualizarConsultasBean.filtrar}" />
@@ -104,7 +108,10 @@
 					layout="block">
 					<ui:repeat value="#{visualizarConsultasBean.consultasFiltradas}"
 						var="consulta">
-						<h:panelGroup layout="block" styleClass="consulta-card">
+
+						<!-- CLASSE CONDICIONAL: cinza se cancelada -->
+						<h:panelGroup layout="block"
+							styleClass="consulta-card #{consulta.status.toString() == 'CANCELADA' ? 'consulta-cancelada' : ''}">
 
 							<!-- Card Header -->
 							<div class="card-header">
@@ -120,13 +127,19 @@
 											<i class="fas fa-stethoscope"></i>
 											<h:outputText value="#{consulta.medico.especialidade}" />
 										</div>
+										<!-- NOME DO PACIENTE -->
+										<div class="paciente-nome">
+											<i class="fas fa-user"></i>
+											<h:outputText value="#{consulta.paciente.nome}" />
+										</div>
 									</h:panelGroup>
 								</h:panelGroup>
 
+								<!-- BADGE COM COR -->
 								<h:panelGroup layout="block"
 									styleClass="badge badge-#{consulta.status.toString().toLowerCase()}">
 									<div class="badge-dot"></div>
-									<h:outputText value="#{consulta.status.descricao}" />
+									<h:outputText value="#{consulta.status}" />
 								</h:panelGroup>
 							</div>
 
@@ -135,32 +148,33 @@
 							<!-- Detalhes -->
 							<div class="card-details">
 								<div class="detail-item">
-									<span class="detail-label"><i class="fas fa-calendar-day"></i> Data</span>
-									<h:outputText value="#{consulta.dataConsulta}" styleClass="detail-value">
+									<span class="detail-label"><i
+										class="fas fa-calendar-day"></i> Data</span>
+									<h:outputText value="#{consulta.dataConsulta}"
+										styleClass="detail-value">
 										<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
 									</h:outputText>
 								</div>
 								<div class="detail-item">
-									<span class="detail-label"><i class="fas fa-clock"></i> Horário</span>
-									<h:outputText value="#{consulta.hora}" styleClass="detail-value">
+									<span class="detail-label"><i class="fas fa-clock"></i>
+										Horário</span>
+									<h:outputText value="#{consulta.hora}"
+										styleClass="detail-value">
 										<f:convertDateTime type="localTime" pattern="HH:mm" />
 									</h:outputText>
 								</div>
 								<div class="detail-item">
-									<span class="detail-label"><i class="fas fa-money-bill-wave"></i> Valor</span>
-									<h:outputText value="#{consulta.valorConsulta}" styleClass="detail-value price">
-										<f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR" />
+									<span class="detail-label"><i
+										class="fas fa-money-bill-wave"></i> Valor</span>
+									<h:outputText value="#{consulta.valorConsulta}"
+										styleClass="detail-value price">
+										<f:convertNumber type="currency" currencySymbol="R$ "
+											locale="pt_BR" />
 									</h:outputText>
-								</div>
-								<div class="detail-item">
-									<span class="detail-label"><i class="fas fa-map-marker-alt"></i> Local</span>
-									<span class="detail-address">
-										<h:outputText value="#{consulta.local}" />
-									</span>
 								</div>
 							</div>
 
-							<!-- Ações -->
+							<!-- Ações — só aparece se não cancelada/realizada -->
 							<div class="card-actions">
 								<h:commandButton value="Remarcar" styleClass="btn btn-remarcar"
 									rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}">
@@ -181,7 +195,8 @@
 			</h:panelGroup>
 
 			<!-- MODAL CANCELAMENTO -->
-			<h:panelGroup id="modalCancelamento" layout="block" style="display:contents">
+			<h:panelGroup id="modalCancelamento" layout="block"
+				style="display:contents">
 				<div class="modal-overlay"
 					style="#{visualizarConsultasBean.exibirModalCancelamento ? 'display:flex' : 'display:none'}">
 					<div class="modal-box">
@@ -189,13 +204,15 @@
 							<i class="fas fa-exclamation-triangle"></i>
 						</div>
 						<h3 class="modal-title">Cancelar Consulta</h3>
-						<p class="modal-text">Tem certeza que deseja cancelar esta consulta?</p>
+						<p class="modal-text">Tem certeza que deseja cancelar esta
+							consulta?</p>
 						<div class="modal-actions">
 							<h:commandButton value="Voltar" styleClass="btn btn-secondary">
 								<f:ajax execute="@this" render="@form"
 									listener="#{visualizarConsultasBean.fecharModal}" />
 							</h:commandButton>
-							<h:commandButton value="Sim, cancelar" styleClass="btn btn-confirmar-cancel">
+							<h:commandButton value="Sim, cancelar"
+								styleClass="btn btn-confirmar-cancel">
 								<f:ajax execute="@this" render="@form"
 									listener="#{visualizarConsultasBean.confirmarCancelamento}" />
 							</h:commandButton>
@@ -205,7 +222,8 @@
 			</h:panelGroup>
 
 			<!-- MODAL REMARCAÇÃO -->
-			<h:panelGroup id="modalRemarcacao" layout="block" style="display:contents">
+			<h:panelGroup id="modalRemarcacao" layout="block"
+				style="display:contents">
 				<div class="modal-overlay"
 					style="#{visualizarConsultasBean.exibirModalRemarcacao ? 'display:flex' : 'display:none'}">
 					<div class="modal-box modal-remarcar">
@@ -215,7 +233,8 @@
 						<h3 class="modal-title">Remarcar Consulta</h3>
 						<p class="modal-text">Altere os dados e confirme.</p>
 
-						<h:panelGroup rendered="#{visualizarConsultasBean.consultaParaRemarcar != null}">
+						<h:panelGroup
+							rendered="#{visualizarConsultasBean.consultaParaRemarcar != null}">
 							<div class="form-group">
 								<label>Nova Data</label>
 								<h:inputText styleClass="form-control"
@@ -237,7 +256,8 @@
 								<f:ajax execute="@this" render="@form"
 									listener="#{visualizarConsultasBean.fecharModalRemarcacao}" />
 							</h:commandButton>
-							<h:commandButton value="Confirmar" styleClass="btn btn-confirmar-remarcar">
+							<h:commandButton value="Confirmar"
+								styleClass="btn btn-confirmar-remarcar">
 								<f:ajax execute="@form" render="@form"
 									listener="#{visualizarConsultasBean.confirmarRemarcacao}" />
 							</h:commandButton>

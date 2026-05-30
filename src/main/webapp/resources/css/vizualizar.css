@@ -112,25 +112,26 @@
 }
 
 .search-wrap i {
-	position: absolute;
-	left: 14px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: var(--text-label);
-	pointer-events: none;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-label);
+    pointer-events: none;
+    font-size: 12px;
 }
 
 .search-input {
-	width: 100%;
-	padding: 11px 16px 11px 42px;
-	border: 1.5px solid var(--border);
-	border-radius: var(--radius-sm);
-	background: var(--surface);
-	font-family: inherit;
-	font-size: 14px;
-	color: var(--text);
-	outline: none;
-	transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+    padding: 11px 16px 11px 26px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
 }
 
 .search-input::placeholder {
@@ -578,3 +579,44 @@ to {
 	text-decoration: none;
 	color: #fff;
 }
+
+/* ── BADGE PENDENTE ───────────────────────────── */
+.badge-pendente {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #93c5fd;
+}
+.badge-pendente .badge-dot { background: #3b82f6; }
+
+/* ── CARD CANCELADA ───────────────────────────── */
+.consulta-cancelada {
+    opacity: 0.55;
+    filter: grayscale(55%);
+    background: #f3f4f6 !important;
+    border: 1px solid #d1d5db !important;
+    pointer-events: none;
+}	
+.consulta-cancelada .card-actions {
+    display: none;
+}
+
+/* ── NOME DO PACIENTE ─────────────────────────── */
+.paciente-nome {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 3px;
+}
+.paciente-nome i {
+    color: var(--vittae-purple);
+    font-size: 0.72rem;
+}
+
+.badge-pendente {
+    background: #fff8e1 !important;
+    color: #d97706 !important;
+	border: 1px solid #fcd34d !important;}
+.badge-pendente .badge-dot { background: #f59e0b; }
+.badge-pendente .badge-dot { background: #f59e0b; }

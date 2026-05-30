@@ -16,10 +16,11 @@ import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 
 public class ConsultaService {
-	private static final String API_URL = "http://localhost:8083/api/agendamentos";
-	private static final String API_MEDICOS = "http://localhost:8083/api/medicos";
 
-
+	// mesma porta do seu Spring Boot — ajusta se precisar
+	private static final String API_URL = "http://localhost:9090/api/agendamentos";
+	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
+	
 	/**
 	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha
 	 * exatamente o que o ConsultaService do Spring espera.

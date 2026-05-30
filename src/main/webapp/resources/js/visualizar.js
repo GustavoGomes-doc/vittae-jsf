@@ -59,7 +59,7 @@ if (visiveis === 0) {
 
 function cancelarConsulta(id) {
     if (confirm('Deseja realmente cancelar esta consulta?')) {
-        fetch('http://localhost:8083/api/agendamentos/' + id + '/cancelar', {
+        fetch('http://localhost:9090/api/agendamentos/' + id + '/cancelar', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' }
         })
