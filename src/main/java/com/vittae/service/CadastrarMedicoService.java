@@ -14,7 +14,7 @@ import com.vittae.dto.MedicoEnvioDTO;
 
 public class CadastrarMedicoService {
 
-    private static final String API_URL = "http://localhost:8083/api/medicos";
+    private static final String API_URL = "http://localhost:9090/api/medicos";
 
     public void salvarMedico(MedicoEnvioDTO dto) throws Exception {
         try {
