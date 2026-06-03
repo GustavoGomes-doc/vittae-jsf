@@ -1,6 +1,8 @@
 package com.vittae.util.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,35 +19,41 @@ import com.vittae.model.Usuario;
 
 @WebFilter(urlPatterns = "/views/*", servletNames = "{Faces Servlet}")
 public class LoginFilter extends AbstractFilter implements Filter {
-	
-	public void init(FilterConfig arg0) throws ServletException {}
-	
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse res = (HttpServletResponse) response;
-		HttpSession session = req.getSession();
-		
-		// 1. Verifica qual página o usuário está tentando acessar
-		String reqURI = req.getRequestURI();
-		
-		// 2. SE FOR A TELA DE LOGIN (que também tem o cadastro), DEIXA PASSAR!
-		if (reqURI.contains("/login.xhtml") || reqURI.contains("/cadastrar.xhtml")) {
-			chain.doFilter(request, response);
-			return; 
-		}
-		
-		// 3. Se for qualquer outra página (como o painel de médicos), verifica a sessão
-		Usuario user = (Usuario) session.getAttribute("usuario");
-		
-		if (session.isNew() || user == null) {
-			dologin(request, response, req);
-		} else {
-			chain.doFilter(request, response);	
-		} 
-	}
-	
-	public void destroy() {}	
-		
+
+    public void init(FilterConfig arg0) throws ServletException {}
+
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest req  = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        // CORRIGIDO #1 — getServletPath() não inclui path parameters
+        String path = req.getServletPath();
+
+        // CORRIGIDO #2 — lista branca com paths exactos em vez de contains()
+        List<String> publicPaths = Arrays.asList(
+            "/views/login/login.xhtml",
+            "/views/cadastrar/cadastrar.xhtml"
+        );
+
+        if (publicPaths.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // CORRIGIDO #3 — getSession(false) não cria sessão nova (evita Session Fixation)
+        HttpSession session = req.getSession(false);
+        Usuario user = (session != null)
+                ? (Usuario) session.getAttribute("usuario")
+                : null;
+
+        if (user == null) {
+            res.sendRedirect(req.getContextPath() + "/views/login/login.xhtml");
+        } else {
+            chain.doFilter(request, response);
+        }
+    }
+
+    public void destroy() {}
 }
