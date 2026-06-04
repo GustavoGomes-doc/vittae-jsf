@@ -19,8 +19,8 @@ function aplicarFiltros() {
 
     cards.forEach(function(card) {
         var status = card.getAttribute('data-status');
-        var medico = (card.getAttribute('data-medico') + ' ' + card.getAttribute('data-especialidade')).toLowerCase();
-
+		var paciente = (card.getAttribute('data-paciente') + ' ' + card.getAttribute('data-especialidade')).toLowerCase();
+		
 		var okStatus = (filtroAtivo === 'todas') ||
 		    (filtroAtivo === 'pendente'  && status === 'PENDENTE') ||
 		    (filtroAtivo === 'realizada' && status === 'REALIZADA') ||

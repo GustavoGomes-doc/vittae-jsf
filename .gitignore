@@ -13,6 +13,14 @@ target/
 npm-debug.log
 yarn-error.log
 
+# Eclipse
+.classpath
+.factorypath
+.project
+.settings/
+
+*.class
+
 # IDEs and editors
 .idea/
 .project
