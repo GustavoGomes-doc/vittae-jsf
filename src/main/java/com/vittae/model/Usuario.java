@@ -2,6 +2,8 @@ package com.vittae.model;
 
 import com.vittae.model.enums.Perfil;
 
+import lombok.ToString;
+@ToString(exclude = {"senha"})
 public class Usuario {
 
 	private Long id;

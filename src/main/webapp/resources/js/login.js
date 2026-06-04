@@ -58,3 +58,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ═══════════════════════════════════════════════════
+// MÁSCARA CPF E TOGGLE SENHA — Tela de Login
+// ═══════════════════════════════════════════════════
+
+// Máscara CPF: 000.000.000-00
+function mascaraCpfLogin(campo) {
+    var v = campo.value.replace(/\D/g, '');
+    v = v.substring(0, 11);
+    if (v.length > 9)
+        v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+    else if (v.length > 6)
+        v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+    else if (v.length > 3)
+        v = v.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
+    campo.value = v;
+}
+
+// Toggle senha (ícone olho)
+function toggleSenhaLogin(inputId, botao) {
+    var input = document.getElementById(inputId);
+    var icone = botao.querySelector('i');
+    if (!input || !icone) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icone.classList.remove('fa-eye');
+        icone.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icone.classList.remove('fa-eye-slash');
+        icone.classList.add('fa-eye');
+    }
+}
