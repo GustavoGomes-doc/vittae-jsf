@@ -1,0 +1,173 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+	<ui:define name="titulo">Início | Paciente Vittae</ui:define>
+
+	<!-- Aqui usamos "corpo" para encaixar certinho no seu LayoutPadrao.xhtml -->
+	<ui:define name="corpo">
+		<h:form id="formDashboard">
+
+			<!-- CABEÇALHO -->
+			<div class="dashboard-header">
+				<div>
+					<h1>
+						Olá,
+						<h:outputText value="#{inicioPacienteBean.primeiroNome}" />
+						!
+					</h1>
+					<p>
+						Hoje é
+						<h:outputText value="#{inicioPacienteBean.dataAtual}">
+							<f:convertDateTime pattern="EEEE, dd 'de' MMMM" locale="pt_BR"
+								timeZone="America/Sao_Paulo" />
+						</h:outputText>
+						. Como você está se sentindo?
+					</p>
+				</div>
+			</div>
+
+			<div class="dashboard-grid">
+
+				<!-- CARD 1: PRÓXIMA CONSULTA -->
+				<div class="dash-card">
+					<h2 class="dash-card-title">Sua Próxima Consulta</h2>
+
+					<!-- Se TEM consulta agendada -->
+					<h:panelGroup
+						rendered="#{not empty inicioPacienteBean.proximaConsulta}">
+						<div class="appointment-box-dash">
+							<div class="apt-date">
+								<span class="day"> <h:outputText
+										value="#{inicioPacienteBean.proximaConsulta.dataHora}">
+										<f:convertDateTime pattern="dd/MM"
+											timeZone="America/Sao_Paulo" />
+									</h:outputText>
+								</span> <span class="time"> <h:outputText
+										value="#{inicioPacienteBean.proximaConsulta.dataHora}">
+										<f:convertDateTime pattern="HH:mm"
+											timeZone="America/Sao_Paulo" />
+									</h:outputText>
+								</span>
+							</div>
+
+							<div class="apt-details">
+								<h3>
+									Dr(a).
+									<h:outputText
+										value="#{inicioPacienteBean.proximaConsulta.medico.nome}" />
+								</h3>
+								<p>
+									<h:outputText
+										value="#{inicioPacienteBean.proximaConsulta.medico.especialidade}" />
+									- Presencial
+								</p>
+							</div>
+
+							<div class="apt-actions">
+								<h:commandLink value="Remarcar"
+									action="#{inicioPacienteBean.prepararRemarcacao}"
+									styleClass="btn-remarcar" />
+								<h:commandLink value="Cancelar"
+									action="#{inicioPacienteBean.cancelarConsulta}"
+									styleClass="btn-cancel"
+									onclick="return confirm('Tem certeza que deseja cancelar esta consulta?');" />
+							</div>
+						</div>
+					</h:panelGroup>
+
+					<!-- Se NÃO TEM consulta agendada -->
+					<h:panelGroup
+						rendered="#{empty inicioPacienteBean.proximaConsulta}">
+						<div class="empty-state">
+							<!-- Ícone do FontAwesome no lugar do emoji -->
+							<i class="far fa-calendar-times"
+								style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px; display: block;"></i>
+							<p>Você não possui consultas agendadas no momento.</p>
+							<h:commandLink value="Agendar Agora"
+								action="agendarConsulta?faces-redirect=true"
+								styleClass="btn-primary-dash" />
+						</div>
+					</h:panelGroup>
+				</div>
+
+				<!-- CARD 2: AÇÕES RÁPIDAS -->
+				<div class="dash-card">
+					<h2 class="dash-card-title">Ações Rápidas</h2>
+					<div class="quick-actions">
+
+						<h:commandLink action="agendarConsulta?faces-redirect=true"
+							styleClass="action-btn">
+							<span class="icon"><i class="far fa-calendar-plus"></i></span>
+							<span>Agendar Consulta</span>
+						</h:commandLink>
+
+						<h:commandLink action="visualizarConsultas?faces-redirect=true"
+							styleClass="action-btn">
+							<span class="icon"><i class="fas fa-history"></i></span>
+							<span>Meu Histórico</span>
+						</h:commandLink>
+
+					</div>
+				</div>
+
+				<div class="dash-card">
+					<h2 class="dash-card-title">Última Consulta</h2>
+
+					<!-- Se TEM uma consulta anterior -->
+					<h:panelGroup
+						rendered="#{not empty inicioPacienteBean.ultimaConsulta}">
+						<div style="padding: 10px 0;">
+							<p style="color: #2d3748; font-size: 15px; margin-bottom: 5px;">
+								Sua última visita foi com <strong>Dr(a). <h:outputText
+										value="#{inicioPacienteBean.ultimaConsulta.medico.nome}" /></strong>.
+							</p>
+							<p style="color: #718096; font-size: 14px; margin-bottom: 20px;">
+								<i class="fas fa-stethoscope" style="margin-right: 5px;"></i>
+								<h:outputText
+									value="#{inicioPacienteBean.ultimaConsulta.medico.especialidade}" />
+							</p>
+
+							<!-- Botão Mágico do Retorno -->
+							<h:commandLink value="Agendar Retorno"
+								action="#{inicioPacienteBean.agendarRetorno(inicioPacienteBean.ultimaConsulta)}"
+								styleClass="btn-primary-dash"
+								style="width: 100%; display: block; text-align: center;" />
+						</div>
+					</h:panelGroup>
+
+					<!-- Se NÃO TEM consulta anterior -->
+					<h:panelGroup rendered="#{empty inicioPacienteBean.ultimaConsulta}">
+						<div style="text-align: center; color: #a0aec0; padding: 20px 0;">
+							<i class="fas fa-folder-open"
+								style="font-size: 32px; margin-bottom: 10px;"></i>
+							<p>Você ainda não possui histórico de consultas no Vittae.</p>
+						</div>
+					</h:panelGroup>
+				</div>
+
+				<!-- CARD 4: DICA DE SAÚDE -->
+				<!-- Coloquei um fundo roxo bem bonito nele para dar destaque visual na tela -->
+				<div class="dash-card"
+					style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); color: white; border: none;">
+					<h2 class="dash-card-title"
+						style="color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+						<i class="fas fa-lightbulb"
+							style="margin-right: 8px; color: #fde047;"></i> Dica Vittae
+					</h2>
+
+					<div style="text-align: center; padding: 15px 0;">
+						<i class="fas fa-heartbeat"
+							style="font-size: 45px; margin-bottom: 20px; color: #f3f4f6;"></i>
+						<p style="font-size: 16px; font-weight: 500; line-height: 1.6;">
+							<h:outputText value="#{inicioPacienteBean.dicaDoDia}" />
+						</p>
+					</div>
+				</div>
+
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

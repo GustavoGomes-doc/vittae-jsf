@@ -36,17 +36,32 @@
 			<i class="fas fa-stethoscope"></i> <span>Vittae</span>
 		</div>
 
-		<nav class="sidebar-nav"> <h:link
-			outcome="/views/medicos/Inicio" styleClass="nav-item">
-			<i class="fas fa-home"></i> Início
-                    </h:link> <h:panelGroup
+		<nav class="sidebar-nav"> 
+			<h:link outcome="/views/admin/Inicio" styleClass="nav-item" 
+			        rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
+			    <i class="fas fa-home"></i> Início
+			</h:link>
+			
+			<h:link outcome="/views/medicos/Inicio" styleClass="nav-item" 
+			        rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+			    <i class="fas fa-home"></i> Início
+			</h:link>
+			
+			<h:link outcome="/views/pacientes/inicio" styleClass="nav-item" 
+			        rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
+			    <i class="fas fa-home"></i> Início
+			</h:link>
+		
+		<h:panelGroup
 			rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
 			<h:link outcome="/views/medicos/cadastrarMedico"
 				styleClass="nav-item">
 				<i class="fas fa-user-plus"></i> Cadastrar Médico
                         </h:link>
 
-		</h:panelGroup> <h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
+		</h:panelGroup> 
+		
+		<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
 			<h:link outcome="/views/pacientes/agendarConsulta"
 				styleClass="nav-item">
 				<i class="fas fa-calendar-plus"></i> Agendar Consulta
@@ -54,13 +69,19 @@
 			<h:link outcome="/views/paciente/Historico" styleClass="nav-item">
 				<i class="fas fa-history"></i> Meu Histórico
                         </h:link>
-		</h:panelGroup> <h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+		</h:panelGroup> 
+		
+		<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
 			<h:link outcome="/views/medico/MinhaAgenda" styleClass="nav-item">
 				<i class="fas fa-calendar-alt"></i> Minha Agenda
                         </h:link>
-		</h:panelGroup> <h:link outcome="/views/comum/Perfil" styleClass="nav-item">
+		</h:panelGroup> 
+		
+		<h:link outcome="/views/comum/Perfil" styleClass="nav-item">
 			<i class="fas fa-user-circle"></i> Meu Perfil
-                    </h:link> </nav>
+         </h:link> 
+                    
+       </nav>
 
 		</aside>
 		<main class="main-content"> <header class="topbar" id="topbar">
