@@ -74,6 +74,11 @@ body {
     transition: 0.3s;
 }
 
+.nav-item.ativo {
+    background: #f5f3ff;
+    color: var(--primary);
+}
+
 .nav-item:hover,
 .nav-item.active {
     background: #f5f3ff;

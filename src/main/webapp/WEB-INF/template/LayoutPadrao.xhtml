@@ -32,69 +32,88 @@
 	<div class="dashboard-container">
 
 		<aside class="sidebar">
-		<div class="sidebar-logo">
-			<i class="fas fa-stethoscope"></i> <span>Vittae</span>
-		</div>
-
-		<nav class="sidebar-nav"> 
-			<h:link outcome="/views/admin/Inicio" styleClass="nav-item" 
-			        rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
-			    <i class="fas fa-home"></i> Início
-			</h:link>
-			
-			<h:link outcome="/views/medicos/Inicio" styleClass="nav-item" 
-			        rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
-			    <i class="fas fa-home"></i> Início
-			</h:link>
-			
-			<h:link outcome="/views/pacientes/inicio" styleClass="nav-item" 
-			        rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
-			    <i class="fas fa-home"></i> Início
-			</h:link>
-		
-		<h:panelGroup
-			rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
-			<h:link outcome="/views/medicos/cadastrarMedico"
-				styleClass="nav-item">
-				<i class="fas fa-user-plus"></i> Cadastrar Médico
-                        </h:link>
-
-		</h:panelGroup> 
-		
-		<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
-			<h:link outcome="/views/pacientes/agendarConsulta"
-				styleClass="nav-item">
-				<i class="fas fa-calendar-plus"></i> Agendar Consulta
-                        </h:link>
-			<h:link outcome="/views/paciente/Historico" styleClass="nav-item">
-				<i class="fas fa-history"></i> Meu Histórico
-                        </h:link>
-		</h:panelGroup> 
-		
-		<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
-			<h:link outcome="/views/medico/MinhaAgenda" styleClass="nav-item">
-				<i class="fas fa-calendar-alt"></i> Minha Agenda
-                        </h:link>
-		</h:panelGroup> 
-		
-		<h:link outcome="/views/comum/Perfil" styleClass="nav-item">
-			<i class="fas fa-user-circle"></i> Meu Perfil
-         </h:link> 
-                    
-       </nav>
-
-		</aside>
-		<main class="main-content"> <header class="topbar" id="topbar">
-		<div class="user-info">
-			<div class="notifications">
-				<i class="fas fa-bell"></i> <span class="badge"></span>
+			<div class="sidebar-logo">
+				<i class="fas fa-stethoscope"></i> <span>Vittae</span>
 			</div>
-			<img
-				src="https://ui-avatars.com/api/?name=#{usuarioLogadoBean.nome}&amp;background=7c3aed&amp;color=fff"
-				alt="Avatar" />
-		</div>
-		</header> <ui:insert name="corpo">
-		</ui:insert> </main>
+
+			<nav class="sidebar-nav">
+
+				<!-- Início: ADMIN -->
+				<h:link outcome="/views/admin/Inicio"
+					styleClass="nav-item #{request.requestURI.contains('Inicio') ? 'ativo' : ''}"
+					rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
+					<i class="fas fa-home"></i> Início
+				</h:link>
+
+				<!-- Início: MEDICO -->
+				<h:link outcome="/views/medicos/Inicio"
+					styleClass="nav-item #{request.requestURI.contains('Inicio') ? 'ativo' : ''}"
+					rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+					<i class="fas fa-home"></i> Início
+				</h:link>
+
+				<!-- Início: PACIENTE -->
+				<h:link outcome="/views/pacientes/inicio"
+					styleClass="nav-item #{request.requestURI.contains('inicio') ? 'ativo' : ''}"
+					rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
+					<i class="fas fa-home"></i> Início
+				</h:link>
+
+				<!-- ADMIN -->
+				<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
+					<h:link outcome="/views/medicos/cadastrarMedico"
+						styleClass="nav-item #{request.requestURI.contains('cadastrarMedico') ? 'ativo' : ''}">
+						<i class="fas fa-user-plus"></i> Cadastrar Médico
+					</h:link>
+				</h:panelGroup>
+
+				<!-- PACIENTE -->
+				<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'PACIENTE'}">
+					<h:link outcome="/views/pacientes/agendarConsulta"
+						styleClass="nav-item #{request.requestURI.contains('agendarConsulta') ? 'ativo' : ''}">
+						<i class="fas fa-calendar-plus"></i> Agendar Consulta
+					</h:link>
+					<h:link outcome="/views/pacientes/visualizarConsultas"
+						styleClass="nav-item #{request.requestURI.contains('visualizarConsultas') ? 'ativo' : ''}">
+						<i class="fas fa-history"></i> Meu Histórico
+					</h:link>
+				</h:panelGroup>
+
+				<!-- MEDICO -->
+				<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+					<h:link outcome="/views/medicos/MinhaAgenda"
+						styleClass="nav-item #{request.requestURI.contains('MinhaAgenda') ? 'ativo' : ''}">
+						<i class="fas fa-calendar-alt"></i> Minha Agenda
+					</h:link>
+					<h:link outcome="/views/medicos/visualizarConsultas"
+						styleClass="nav-item #{request.requestURI.contains('visualizarConsultas') ? 'ativo' : ''}">
+						<i class="fas fa-list-alt"></i> Consultas
+					</h:link>
+				</h:panelGroup>
+
+				<!-- Comum -->
+				<h:link outcome="/views/comum/Perfil"
+					styleClass="nav-item #{request.requestURI.contains('Perfil') ? 'ativo' : ''}">
+					<i class="fas fa-user-circle"></i> Meu Perfil
+				</h:link>
+
+			</nav>
+		</aside>
+
+		<main class="main-content">
+			<header class="topbar" id="topbar">
+				<div class="user-info">
+					<div class="notifications">
+						<i class="fas fa-bell"></i> <span class="badge"></span>
+					</div>
+					<img
+						src="https://ui-avatars.com/api/?name=#{usuarioLogadoBean.nome}&amp;background=7c3aed&amp;color=fff"
+						alt="Avatar" />
+				</div>
+			</header>
+			<ui:insert name="corpo"></ui:insert>
+		</main>
+
 	</div>
 
 	<ui:insert name="js_extra"></ui:insert>

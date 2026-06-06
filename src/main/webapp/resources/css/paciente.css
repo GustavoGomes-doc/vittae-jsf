@@ -357,7 +357,7 @@ body {
 .dashboard-header p {
     color: #718096;
     font-size: 16px;
-    text-transform: capitalize; /* Para deixar a data bonita: Sexta-feira */
+    text-transform: none;
 }
 
 .dashboard-grid {
