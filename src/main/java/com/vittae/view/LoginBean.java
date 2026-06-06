@@ -64,20 +64,36 @@ public class LoginBean implements Serializable {
         String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
 
         LoginResposta resposta = usuarioService.autenticar(cpfLimpo, senha);
+        
+        System.out.println("RESPOSTA NULA? " + (resposta == null));
+        if (resposta != null) {
+            System.out.println("USUARIO: " + resposta.usuario);
+            System.out.println("PERFIL: " + resposta.perfil);
+            System.out.println("TOKEN: " + (resposta.token != null ? "OK" : "NULO"));
+        }
 
         if (resposta != null) {
             HttpSession session = getSession();
-            session.setAttribute("usuario", resposta.usuario);
+            session.setAttribute("usuario", resposta.usuario.getNome());
             session.setAttribute("token", resposta.token);
             session.setAttribute("perfil", resposta.perfil);
 
-            return switch (resposta.perfil) {
-                case "ADMIN"    -> "/views/admin/inicio.xhtml?faces-redirect=true";
-                case "PACIENTE" -> "/views/pacientes/inicio.xhtml?faces-redirect=true";
-                case "MEDICO"   -> "/views/medico/inicio.xhtml?faces-redirect=true";
-                default         -> "/login.xhtml?faces-redirect=true";
+            String destino = switch (resposta.perfil) {
+                case "ADMIN"    -> "/views/admin/inicio.xhtml";
+                case "PACIENTE" -> "/views/pacientes/inicio.xhtml";
+                case "MEDICO"   -> "/views/medicos/inicio.xhtml";
+                default         -> "/views/login/login.xhtml";
             };
+
+            FacesContext fc = FacesContext.getCurrentInstance();
+            fc.getApplication().getNavigationHandler()
+                .handleNavigation(fc, null, destino + "?faces-redirect=true");
+            fc.renderResponse();
+            return null;
         }
+        
+        System.out.println("USUARIO NA RESPOSTA: " + resposta.usuario);
+        System.out.println("PERFIL NA RESPOSTA: " + resposta.perfil);
 
         FacesContext.getCurrentInstance().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou!", "CPF ou senha incorretos"));

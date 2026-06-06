@@ -316,6 +316,14 @@ body {
 	color: #9ca3af;
 }
 
+#hint-nasc {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
 /* ── Grid campos ── */
 .form-grid-2 {
 	display: grid;

@@ -16,6 +16,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.vittae.dto.MedicoEnvioDTO;
@@ -110,7 +111,19 @@ public class CadastrarMedicoBean implements Serializable {
 		}
 
 		try {
-			// Monta o DTO de envio
+			//pega o token da sessao
+			HttpSession session = (HttpSession) ctx.getExternalContext().getSession(false);
+			String token = (String) session.getAttribute("token");
+			
+			System.out.println("Token na sessão: " + token);
+			
+			if (token == null) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"Sessão expirada", "Faca login novamente."));
+				return;
+			}
+			
+			//monta o DTO de envio
 			MedicoEnvioDTO medicoDTO = new MedicoEnvioDTO();
 			medicoDTO.setNome(dto.getNome());
 			medicoDTO.setCpf(dto.getCpf());
@@ -151,9 +164,11 @@ public class CadastrarMedicoBean implements Serializable {
 						return d;
 					}).collect(Collectors.toList());
 			medicoDTO.setDisponibilidades(disponibilidades);
+			
+			
 
 			// Envia para a API
-			service.salvarMedico(medicoDTO);
+			service.salvarMedico(medicoDTO, token);
 
 			ctx.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));

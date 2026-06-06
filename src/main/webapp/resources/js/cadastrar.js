@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Cria hint dinâmico — insere depois do input, antes do h:message
         var hintNasc = document.createElement('span');
         hintNasc.id = 'hint-nasc';
-        hintNasc.style.cssText = 'font-size:12px;position: absolute;font-weight:600;display:block;margin-top:3px;min-height:16px;';
+        hintNasc.style.cssText = 'font-size:12px;font-weight:600;display:block;margin-top:3px;min-height:16px;';
         // Insere logo após o input de nascimento
         nascInput.parentNode.insertBefore(hintNasc, nascInput.nextSibling);
 
@@ -183,15 +183,22 @@ document.addEventListener('DOMContentLoaded', function () {
             var raw = this.value.replace(/\D/g, '').slice(0, 4);
             if (raw.length === 0) { this.value = ''; return; }
 
-            // Se o primeiro dígito for >= 3 (ex: 3,4,5,6,7,8,9),
-            // hora máxima é 23, então só pode ser dígito único → adiciona 0 na frente
+            // Se o primeiro dígito for >= 3, hora só pode ser de 1 dígito → adiciona 0 na frente
+            // Ex: digita "8" → raw vira "08" → insere "08:" automaticamente
             if (raw.length === 1 && parseInt(raw, 10) >= 3) {
                 raw = '0' + raw;
+                // Com 2 dígitos já formados, insere o ':' e posiciona cursor após ele
+                this.value = raw + ':';
+                return;
             }
 
             // Insere ':' automaticamente após os 2 primeiros dígitos
             if (raw.length <= 2) {
                 this.value = raw;
+                // Se completou 2 dígitos e primeiro dígito indica hora válida, insere ':'
+                if (raw.length === 2) {
+                    this.value = raw + ':';
+                }
             } else {
                 this.value = raw.slice(0, 2) + ':' + raw.slice(2);
             }
