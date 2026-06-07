@@ -46,13 +46,17 @@ public class CadastrarMedicoService {
             if (response.statusCode() == 200 || response.statusCode() == 201) {
                 System.out.println("Médico enviado com sucesso para a API!");
             } else {
-                throw new Exception("Falha ao salvar médico na API. Status: " + response.statusCode() 
-                                    + " - Erro: " + response.body());
+                String mensagemErro = response.body();
+
+                if (mensagemErro == null || mensagemErro.trim().isEmpty()) {
+                    mensagemErro = "Não foi possível salvar o médico.";
+                }
+
+                throw new Exception(mensagemErro);
             }
             
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Erro de comunicação com a API: " + e.getMessage());
+        	throw new Exception(e.getMessage());
         }
     }
 }

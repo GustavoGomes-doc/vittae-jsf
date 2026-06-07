@@ -6,7 +6,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vittae.dto.LoginResposta;
 import com.vittae.model.Usuario;
+import com.vittae.model.enums.Perfil;
 
 import lombok.extern.log4j.Log4j;
 
@@ -116,5 +119,24 @@ public class UsuarioService implements Serializable {
         } catch (Exception e) {
             log.error("Erro ao excluir usuário: " + e.getMessage());
         }
+    }
+    
+    public List<Usuario> buscarPorPerfil(Perfil perfil) {
+        return buscarTodos().stream()
+                .filter(usuario -> perfil.equals(usuario.getPerfil()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Usuario> buscarUltimosMedicos(int limite) {
+        return buscarPorPerfil(Perfil.MEDICO).stream()
+                .sorted(Comparator.comparing(Usuario::getId, Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(limite)
+                .collect(Collectors.toList());
+    }
+
+    public long contarPorPerfil(Perfil perfil) {
+        return buscarTodos().stream()
+                .filter(usuario -> perfil.equals(usuario.getPerfil()))
+                .count();
     }
 }

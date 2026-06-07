@@ -16,18 +16,18 @@ public class UsuarioLogadoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Usuario getUsuarioDaSessao() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-		HttpSession session = request.getSession(false);
-		if (session == null) return null;
-		
-		return (Usuario) session.getAttribute("usuario");
+	private String getUsuarioDaSessao() {
+	    FacesContext context = FacesContext.getCurrentInstance();
+	    HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+	    HttpSession session = request.getSession(false);
+	    if (session == null) return null;
+
+	    return (String) session.getAttribute("usuario"); // era (Usuario), agora é (String)
 	}
-	
+
 	public String getNome() {
-		Usuario u = getUsuarioDaSessao();
-		return u != null ? u.getNome() : "";
+	    String nome = getUsuarioDaSessao();
+	    return nome != null ? nome : "";
 	}
 	
 	public String getPerfil () {

@@ -39,14 +39,14 @@
 			<nav class="sidebar-nav">
 
 				<!-- Início: ADMIN -->
-				<h:link outcome="/views/admin/Inicio"
+				<h:link outcome="/views/admin/inicio"
 					styleClass="nav-item #{request.requestURI.contains('Inicio') ? 'ativo' : ''}"
 					rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
 					<i class="fas fa-home"></i> Início
 				</h:link>
 
 				<!-- Início: MEDICO -->
-				<h:link outcome="/views/medicos/Inicio"
+				<h:link outcome="/views/medicos/inicio"
 					styleClass="nav-item #{request.requestURI.contains('Inicio') ? 'ativo' : ''}"
 					rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
 					<i class="fas fa-home"></i> Início
@@ -61,7 +61,7 @@
 
 				<!-- ADMIN -->
 				<h:panelGroup rendered="#{usuarioLogadoBean.perfil eq 'ADMIN'}">
-					<h:link outcome="/views/medicos/cadastrarMedico"
+					<h:link outcome="/views/admin/cadastrarMedico"
 						styleClass="nav-item #{request.requestURI.contains('cadastrarMedico') ? 'ativo' : ''}">
 						<i class="fas fa-user-plus"></i> Cadastrar Médico
 					</h:link>

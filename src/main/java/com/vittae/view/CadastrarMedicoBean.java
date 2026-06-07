@@ -38,6 +38,12 @@ public class CadastrarMedicoBean implements Serializable {
 	private Part foto;
 	private String especialidadesSelecionadas;
 	private String dataNascimentoStr;
+	
+	private boolean modalVisivel;
+	private boolean modalSucesso;
+	private String modalTitulo;
+	private String modalMensagem;
+	private String modalResumo;	
 
 	@PostConstruct
 	public void init() {
@@ -170,14 +176,24 @@ public class CadastrarMedicoBean implements Serializable {
 			// Envia para a API
 			service.salvarMedico(medicoDTO, token);
 
-			ctx.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Médico cadastrado com sucesso."));
+			this.modalVisivel = true;
+			this.modalSucesso = true;
+			this.modalTitulo = "Médico cadastrado!";
+			this.modalMensagem = "O profissional foi adicionado ao sistema com sucesso.";
+			this.modalResumo =
+			        "<strong>Nome:</strong> " + medicoDTO.getNome() + "<br/>" +
+			        "<strong>CPF:</strong> " + medicoDTO.getCpf() + "<br/>" +
+			        "<strong>CRM:</strong> " + medicoDTO.getCrm() + "/" + medicoDTO.getUfCrm() + "<br/>" +
+			        "<strong>E-mail:</strong> " + medicoDTO.getEmail();
 
-			init(); // limpa o formulário
-
+			init();
+			
 		} catch (Exception e) {
-			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro",
-					"Erro ao processar dados: " + e.getMessage()));
+		    this.modalVisivel = true;
+		    this.modalSucesso = false;
+		    this.modalTitulo = "Erro ao cadastrar médico";
+		    this.modalMensagem = "Não foi possível salvar o cadastro.";
+		    this.modalResumo = e.getMessage();
 		}
 	}
 
@@ -229,6 +245,51 @@ public class CadastrarMedicoBean implements Serializable {
 
 	public void setDataNascimentoStr(String dataNascimentoStr) {
 		this.dataNascimentoStr = dataNascimentoStr;
+	}
+	
+	public boolean isModalVisivel() {
+	    return modalVisivel;
+	}
+
+	public void setModalVisivel(boolean modalVisivel) {
+	    this.modalVisivel = modalVisivel;
+	}
+
+	public boolean isModalSucesso() {
+	    return modalSucesso;
+	}
+
+	public void setModalSucesso(boolean modalSucesso) {
+	    this.modalSucesso = modalSucesso;
+	}
+
+	public String getModalTitulo() {
+	    return modalTitulo;
+	}
+
+	public void setModalTitulo(String modalTitulo) {
+	    this.modalTitulo = modalTitulo;
+	}
+
+	public String getModalMensagem() {
+	    return modalMensagem;
+	}
+
+	public void setModalMensagem(String modalMensagem) {
+	    this.modalMensagem = modalMensagem;
+	}
+
+	public String getModalResumo() {
+	    return modalResumo;
+	}
+
+	public void setModalResumo(String modalResumo) {
+	    this.modalResumo = modalResumo;
+	}
+
+	public String fecharModal() {
+	    this.modalVisivel = false;
+	    return null;
 	}
 
 	// ── Classe interna DiaUI ─────────────────────────────────────────────────
