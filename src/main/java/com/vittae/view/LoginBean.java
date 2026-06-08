@@ -77,6 +77,7 @@ public class LoginBean implements Serializable {
         session.setAttribute("usuarioLogado", resposta.usuario);
         session.setAttribute("token", resposta.token);
         session.setAttribute("perfil", resposta.perfil);
+        session.setAttribute("usuarioId", resposta.usuario.getId());
 
         return switch (resposta.perfil) {
             case "ADMIN"    -> "/views/admin/inicio.xhtml?faces-redirect=true";

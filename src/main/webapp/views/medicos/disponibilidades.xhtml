@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+    <ui:define name="titulo">Vittae - Minha Disponibilidade</ui:define>
+
+    <ui:define name="corpo">
+
+        <div class="perfil-container">
+        
+        <h:inputHidden id="tokenHidden"   value="#{disponibilidadeBean.token}" />
+		<h:inputHidden id="medicoIdHidden" value="#{disponibilidadeBean.medicoId}" />
+
+            <div class="perfil-header">
+                <div class="perfil-header-info">
+                    <h1>Minha Disponibilidade</h1>
+                    <span class="perfil-badge">Gerencie seus horários de atendimento</span>
+                </div>
+            </div>
+
+            <h:messages globalOnly="true" styleClass="perfil-messages" />
+
+            <!-- Adicionar disponibilidade -->
+            <div class="perfil-card">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-plus-circle"></i> Adicionar Horário
+                </div>
+                <h:form id="formDisp">
+                    <div class="perfil-grid">
+                        <div class="perfil-campo">
+                            <label>Dia da semana</label>
+                            <h:selectOneMenu id="diaSemana" value="#{disponibilidadeBean.diaSemana}"
+                                styleClass="perfil-input">
+                                <f:selectItem itemValue="" itemLabel="Selecione..." />
+                                <f:selectItem itemValue="SEGUNDA" itemLabel="Segunda-feira" />
+                                <f:selectItem itemValue="TERCA"   itemLabel="Terça-feira" />
+                                <f:selectItem itemValue="QUARTA"  itemLabel="Quarta-feira" />
+                                <f:selectItem itemValue="QUINTA"  itemLabel="Quinta-feira" />
+                                <f:selectItem itemValue="SEXTA"   itemLabel="Sexta-feira" />
+                                <f:selectItem itemValue="SABADO"  itemLabel="Sábado" />
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Horário de início</label>
+                            <h:inputText id="horaInicio" value="#{disponibilidadeBean.horaInicio}"
+                                styleClass="perfil-input"
+                                pt:type="time" />
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Horário de fim</label>
+                            <h:inputText id="horaFim" value="#{disponibilidadeBean.horaFim}"
+                                styleClass="perfil-input"
+                                pt:type="time" />
+                        </div>
+                    </div>
+                    <h:commandButton value="Adicionar horário"
+                        action="#{disponibilidadeBean.salvar()}"
+                        styleClass="btn-perfil-salvar"
+                        style="margin-top:1rem;">
+                        <f:ajax execute="@form" render="@form tabelaDisp" />
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <!-- Tabela de disponibilidades -->
+            <div class="perfil-card" id="tabelaDisp">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-calendar-alt"></i> Horários Cadastrados
+                </div>
+
+                <h:panelGroup layout="block"
+                              rendered="#{empty disponibilidadeBean.disponibilidades}">
+                    <div style="text-align:center; padding:2rem; color:#6b7280;">
+                        <i class="fas fa-calendar-times" style="font-size:2rem; margin-bottom:0.5rem; display:block;"></i>
+                        Nenhum horário cadastrado ainda.
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup layout="block"
+                              rendered="#{not empty disponibilidadeBean.disponibilidades}">
+                    <div class="disp-semana-grid">
+                        <ui:repeat value="#{disponibilidadeBean.disponibilidades}" var="disp">
+                            <div class="disp-card">
+                                <div class="disp-dia">#{disp['diaSemana']}</div>
+                                <div class="disp-horario">
+                                    <i class="fas fa-clock"></i>
+                                    #{disp['horaInicio']} — #{disp['horaFim']}
+                                </div>
+                                <h:form>
+                                    <h:commandButton value="Remover"
+                                        action="#{disponibilidadeBean.remover(disp['id'])}"
+                                        styleClass="disp-btn-remover">
+                                        <f:ajax execute="@form" render=":tabelaDisp" />
+                                    </h:commandButton>
+                                </h:form>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                </h:panelGroup>
+            </div>
+
+            <!-- Visão semanal visual -->
+            <div class="perfil-card">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-eye"></i> Visão Semanal
+                </div>
+                <div class="disp-semana-visual" id="semanaVisual">
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Seg</div>
+                        <div class="disp-col-slots" id="slotSEGUNDA"></div>
+                    </div>
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Ter</div>
+                        <div class="disp-col-slots" id="slotTERCA"></div>
+                    </div>
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Qua</div>
+                        <div class="disp-col-slots" id="slotQUARTA"></div>
+                    </div>
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Qui</div>
+                        <div class="disp-col-slots" id="slotQUINTA"></div>
+                    </div>
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Sex</div>
+                        <div class="disp-col-slots" id="slotSEXTA"></div>
+                    </div>
+                    <div class="disp-col-dia">
+                        <div class="disp-col-header">Sáb</div>
+                        <div class="disp-col-slots" id="slotSABADO"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <h:outputScript library="js" name="disponibilidade.js" target="body" />
+
+    </ui:define>
+
+</ui:composition>
+</html>
