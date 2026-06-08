@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+    <ui:define name="titulo">Vittae - Meu Perfil</ui:define>
+
+    <ui:define name="corpo">
+
+        <f:event type="preRenderView" listener="#{perfilBean.init}" />
+
+        <div class="perfil-container">
+
+            <!-- Cabeçalho -->
+            <div class="perfil-header">
+                <img src="https://ui-avatars.com/api/?name=#{usuarioLogadoBean.nome}&amp;background=7c3aed&amp;color=fff&amp;size=96"
+                     alt="Avatar" class="perfil-avatar" />
+                <div class="perfil-header-info">
+                    <h1>#{perfilBean.usuario.nome}</h1>
+                    <span class="perfil-badge">#{perfilBean.usuario.perfil}</span>
+                </div>
+            </div>
+
+            <h:messages globalOnly="true" styleClass="perfil-messages" />
+
+            <!-- Dados pessoais (somente leitura) -->
+            <div class="perfil-card">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-id-card"></i> Dados Pessoais
+                </div>
+                <div class="perfil-grid">
+                    <div class="perfil-campo">
+                        <label>Nome completo</label>
+                        <span>#{perfilBean.usuario.nome}</span>
+                    </div>
+                    <div class="perfil-campo">
+                        <label>CPF</label>
+                        <span>#{perfilBean.usuario.cpf}</span>
+                    </div>
+                    <div class="perfil-campo">
+                        <label>Email</label>
+                        <span>#{perfilBean.usuario.email}</span>
+                    </div>
+                    <div class="perfil-campo">
+                        <label>Telefone</label>
+                        <span>#{perfilBean.usuario.telefone != null ? perfilBean.usuario.telefone : '—'}</span>
+                    </div>
+                    <div class="perfil-campo">
+                        <label>Data de nascimento</label>
+                        <span>
+                            <h:outputText value="#{perfilBean.usuario.dataNascimento}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" type="localDate" />
+                            </h:outputText>
+                        </span>
+                    </div>
+                    <div class="perfil-campo">
+                        <label>Perfil</label>
+                        <span>#{perfilBean.usuario.perfil}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados profissionais do médico (somente leitura) -->
+            <h:panelGroup layout="block"
+                          rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+                <div class="perfil-card">
+                    <div class="perfil-card-titulo">
+                        <i class="fas fa-stethoscope"></i> Dados Profissionais
+                    </div>
+                    <div class="perfil-grid">
+                        <div class="perfil-campo">
+                            <label>CRM</label>
+                            <span>#{perfilBean.usuario.crm}</span>
+                        </div>
+                        <div class="perfil-campo">
+                            <label>UF do CRM</label>
+                            <span>#{perfilBean.usuario.ufCrm}</span>
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Valor da consulta</label>
+                            <span>
+                                R$ <h:outputText value="#{perfilBean.usuario.valorConsulta}">
+                                    <f:convertNumber pattern="#,##0.00" />
+                                </h:outputText>
+                            </span>
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Duração da consulta</label>
+                            <span>#{perfilBean.usuario.tempoConsultaMinutos} minutos</span>
+                        </div>
+                        <div class="perfil-campo perfil-campo-full">
+                            <label>Especialidades</label>
+                            <span>
+                                <ui:repeat value="#{perfilBean.usuario.especialidades}" var="esp">
+                                    <span class="perfil-badge" style="margin-right:6px;">#{esp.nome}</span>
+                                </ui:repeat>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <!-- Editar dados -->
+            <div class="perfil-card">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-pen"></i> Editar Dados
+                </div>
+                <h:form id="formDados">
+                    <div class="perfil-grid">
+                        <div class="perfil-campo">
+                            <label>Novo email</label>
+                            <h:inputText id="novoEmail" value="#{perfilBean.novoEmail}"
+                                styleClass="perfil-input"
+                                pt:type="email" />
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Novo telefone</label>
+                            <h:inputText id="novoTelefone" value="#{perfilBean.novoTelefone}"
+                                styleClass="perfil-input"
+                                pt:placeholder="(00) 00000-0000" />
+                        </div>
+                    </div>
+
+                    <!-- Campos extras para médico -->
+                    <h:panelGroup layout="block"
+                                  rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}"
+                                  styleClass="perfil-grid"
+                                  style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
+                        <div class="perfil-campo">
+                            <label>Valor da consulta (R$)</label>
+                            <h:inputText id="novoValorConsulta" value="#{perfilBean.novoValorConsulta}"
+                                styleClass="perfil-input"
+                                pt:type="number"
+                                pt:step="0.01"
+                                pt:min="0" />
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Duração da consulta (minutos)</label>
+                            <h:inputText id="novoTempoConsulta" value="#{perfilBean.novoTempoConsulta}"
+                                styleClass="perfil-input"
+                                pt:type="number"
+                                pt:min="15"
+                                pt:step="15" />
+                        </div>
+                    </h:panelGroup>
+
+                    <h:commandButton value="Salvar alterações"
+                        action="#{perfilBean.salvarDados()}"
+                        styleClass="btn-perfil-salvar" />
+                </h:form>
+            </div>
+
+            <!-- Trocar senha -->
+            <div class="perfil-card">
+                <div class="perfil-card-titulo">
+                    <i class="fas fa-lock"></i> Trocar Senha
+                </div>
+                <h:form id="formSenha">
+                    <div class="perfil-grid">
+                        <div class="perfil-campo">
+                            <label>Senha atual</label>
+                            <h:inputSecret id="senhaAtual" value="#{perfilBean.senhaAtual}"
+                                styleClass="perfil-input"
+                                redisplay="false" />
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Nova senha</label>
+                            <h:inputSecret id="novaSenha" value="#{perfilBean.novaSenha}"
+                                styleClass="perfil-input"
+                                redisplay="false" />
+                        </div>
+                        <div class="perfil-campo">
+                            <label>Confirmar nova senha</label>
+                            <h:inputSecret id="confirmarSenha" value="#{perfilBean.confirmarSenha}"
+                                styleClass="perfil-input"
+                                redisplay="false" />
+                        </div>
+                    </div>
+                    <h:commandButton value="Alterar senha"
+                        action="#{perfilBean.trocarSenha()}"
+                        styleClass="btn-perfil-salvar" />
+                </h:form>
+            </div>
+
+        </div>
+
+        <h:outputScript library="js" name="perfil.js" target="body" />
+
+    </ui:define>
+
+</ui:composition>
+</html>

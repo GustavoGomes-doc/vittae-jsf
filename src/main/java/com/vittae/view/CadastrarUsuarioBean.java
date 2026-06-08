@@ -45,15 +45,19 @@ public class CadastrarUsuarioBean implements Serializable {
 
         Usuario logado = loginBean.getUsuarioLogado();
 
-        // CORRIGIDO — só admin lista todos os utilizadores
+        if (logado == null) {
+            this.usuarios = new ArrayList<>();
+            this.perfis = Arrays.asList(Perfil.PACIENTE);
+            return;
+        }
+
         if (Perfil.ADMIN.equals(logado.getPerfil())) {
             this.usuarios = usuarioService.buscarTodos();
         } else {
             this.usuarios = new ArrayList<>();
         }
 
-        // CORRIGIDO — comparar Enum com Enum (era String vs Enum → sempre false)
-        if (logado != null && Perfil.PACIENTE.equals(logado.getPerfil())) {
+        if (Perfil.PACIENTE.equals(logado.getPerfil())) {
             this.perfis = Arrays.asList(Perfil.PACIENTE);
         } else {
             this.perfis = Arrays.asList(Perfil.values());

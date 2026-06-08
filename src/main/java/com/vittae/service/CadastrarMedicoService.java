@@ -16,7 +16,7 @@ public class CadastrarMedicoService {
 
     private static final String API_URL = "http://localhost:9090/api/medicos";
 
-    public void salvarMedico(MedicoEnvioDTO dto) throws Exception {
+    public void salvarMedico(MedicoEnvioDTO dto, String token) throws Exception {
         try {
             // Configurar o Jackson para entender datas (LocalDate e LocalTime)
             ObjectMapper mapper = new ObjectMapper();
@@ -25,8 +25,7 @@ public class CadastrarMedicoService {
 
             // Converter o objeto Medico para String JSON
             String json = mapper.writeValueAsString(dto);
-            
-            // Dica de Ouro: Deixe esse print para você ver no console do Eclipse como o JSON ficou!
+       
             System.out.println("Enviando JSON: " + json);
 
             // Criar o Cliente HTTP
@@ -36,6 +35,7 @@ public class CadastrarMedicoService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL))
                     .header("Content-Type", "application/json") // avisa o spring que esta mandando um JSON
+                    .header("Authorization", "Bearer " + token)
                     .POST(BodyPublishers.ofString(json)) // pega o JSON gerado e coloca no corpo da mensagem HTTP 
                     .build();
 
@@ -46,13 +46,17 @@ public class CadastrarMedicoService {
             if (response.statusCode() == 200 || response.statusCode() == 201) {
                 System.out.println("Médico enviado com sucesso para a API!");
             } else {
-                throw new Exception("Falha ao salvar médico na API. Status: " + response.statusCode() 
-                                    + " - Erro: " + response.body());
+                String mensagemErro = response.body();
+
+                if (mensagemErro == null || mensagemErro.trim().isEmpty()) {
+                    mensagemErro = "Não foi possível salvar o médico.";
+                }
+
+                throw new Exception(mensagemErro);
             }
             
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Erro de comunicação com a API: " + e.getMessage());
+        	throw new Exception(e.getMessage());
         }
     }
 }

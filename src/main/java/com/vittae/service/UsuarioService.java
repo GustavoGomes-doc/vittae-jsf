@@ -6,15 +6,19 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
-import com.vittae.model.Usuario;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vittae.dto.LoginResposta;
+import com.vittae.model.Usuario;
+import com.vittae.model.enums.Perfil;
 
 import lombok.extern.log4j.Log4j;
 
@@ -25,29 +29,33 @@ public class UsuarioService implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private final String API_URL = "http://localhost:8083/api/usuarios";
+    private final String API_URL = "http://localhost:9090/api/usuarios";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper()
-    		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    	    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    	    .configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
 
-    public Usuario autenticar(String cpf, String senha) {
+    public LoginResposta autenticar(String cpf, String senha) {
         try {
-            log.info("Iniciando autenticação para o CPF: " + cpf);
             String jsonBody = String.format("{\"cpf\":\"%s\", \"senha\":\"%s\"}", cpf, senha);
 
             HttpRequest request = HttpRequest.newBuilder()
-            		.uri(URI.create("http://localhost:8083/api/login"))
+            		.uri(URI.create("http://localhost:9090/api/login"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
             if (response.statusCode() == 200) {
-            	com.fasterxml.jackson.databind.JsonNode jsonNode = mapper.readTree(response.body());
-            	Usuario usuario_db = mapper.treeToValue(jsonNode.get("usuario"), Usuario.class);
-                log.info("Usuário " + usuario_db.getNome() + " logado com sucesso.");
-                return usuario_db;
+                com.fasterxml.jackson.databind.JsonNode json = mapper.readTree(response.body());
+
+                LoginResposta resposta = new LoginResposta();
+                resposta.usuario = mapper.treeToValue(json.get("usuario"), Usuario.class);
+                resposta.token   = json.get("token").asText();
+                resposta.perfil  = json.get("perfil").asText();
+
+                log.info("Usuário " + resposta.usuario.getNome() + " logado. Perfil: " + resposta.perfil);
+                return resposta;
             }
         } catch (Exception e) {
             log.error("Erro na comunicação com a API (Login): " + e.getMessage());
@@ -111,5 +119,24 @@ public class UsuarioService implements Serializable {
         } catch (Exception e) {
             log.error("Erro ao excluir usuário: " + e.getMessage());
         }
+    }
+    
+    public List<Usuario> buscarPorPerfil(Perfil perfil) {
+        return buscarTodos().stream()
+                .filter(usuario -> perfil.equals(usuario.getPerfil()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Usuario> buscarUltimosMedicos(int limite) {
+        return buscarPorPerfil(Perfil.MEDICO).stream()
+                .sorted(Comparator.comparing(Usuario::getId, Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(limite)
+                .collect(Collectors.toList());
+    }
+
+    public long contarPorPerfil(Perfil perfil) {
+        return buscarTodos().stream()
+                .filter(usuario -> perfil.equals(usuario.getPerfil()))
+                .count();
     }
 }

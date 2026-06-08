@@ -573,7 +573,7 @@
 
         grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">⏳ Carregando médicos...</div>';
 
-        fetch('http://localhost:8082/api/medicos?especialidade=' + encodeURIComponent(especialidade))
+        fetch('http://localhost:9090/api/medicos?especialidade=' + encodeURIComponent(especialidade))
             .then(function(r) { return r.json(); })
             .then(function(medicos) {
                 renderizarCardsMedicos(medicos);
@@ -681,7 +681,7 @@
        CALENDÁRIO & HORÁRIOS
     ═══════════════════════════════════════════════ */
     function carregarDisponibilidade(medicoId) {
-        fetch('http://localhost:8082/api/medicos/' + medicoId + '/horarios-livres')
+        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres')
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 state.diasDisponiveis = data.diasDisponiveis || [];
@@ -698,7 +698,7 @@
         var grid = document.getElementById('horariosGrid');
         if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
 
-        fetch('http://localhost:8082/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
+        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 renderizarHorarios(data.horariosLivres || []);
@@ -778,8 +778,8 @@
 	
 	function carregarEspecialidades() {
 	    Promise.all([
-	        fetch('http://localhost:8082/api/especialidades').then(function(r) { return r.json(); }),
-	        fetch('http://localhost:8082/api/medicos').then(function(r) { return r.json(); })
+	        fetch('http://localhost:9090/api/especialidades').then(function(r) { return r.json(); }),
+	        fetch('http://localhost:9090/api/medicos').then(function(r) { return r.json(); })
 	    ]).then(function(results) {
 	        var especialidades = results[0];
 	        var medicos = results[1];
@@ -946,7 +946,7 @@
         var btn = document.getElementById('btnSubmitJSF');
         if (btn) btn.disabled = true;
 
-        fetch('http://localhost:8082/api/agendamentos', {
+        fetch('http://localhost:9090/api/agendamentos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

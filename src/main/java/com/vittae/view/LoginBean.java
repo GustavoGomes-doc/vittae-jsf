@@ -14,8 +14,10 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.vittae.dto.LoginResposta;
 import com.vittae.model.Usuario;
 import com.vittae.service.UsuarioService;
 
@@ -60,34 +62,30 @@ public class LoginBean implements Serializable {
     // ==========================================
 
     public String login() {
-        log.info("Tentando logar.......");
+        String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
 
-        HttpSession session = getSession(); 
-        usuario = (Usuario) session.getAttribute("usuario");
+        LoginResposta resposta = usuarioService.autenticar(cpfLimpo, senha);
 
-        if (usuario == null) {
-            String cpfLimpo = this.cpf != null ? this.cpf.replaceAll("\\D", "") : "";
-            
-            // Chama a API do Spring
-            usuario = usuarioService.autenticar(cpfLimpo, senha);
-            
-            if (usuario != null) {
-            	session.setAttribute("usuario", usuario);
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Login realizado com sucesso!", usuario.getNome()));
-                log.info("Usuário logado: " + usuario.toString());
-
-                session.setAttribute("usuario", usuario);
-                return "/views/pacientes/agendarConsulta.xhtml?faces-redirect=true";
-                
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou!", "CPF ou senha incorretos"));
-                return "/login.xhtml"; 
-            }
+        if (resposta == null || resposta.usuario == null || resposta.perfil == null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login falhou!", "CPF ou senha incorretos"));
+            return null;
         }
-        return "/views/pacientes/agendarConsulta.xhtml?faces-redirect=true";
-    }
+
+        HttpSession session = getSession();
+        session.setAttribute("usuario", resposta.usuario.getNome());
+        session.setAttribute("usuarioLogado", resposta.usuario);
+        session.setAttribute("token", resposta.token);
+        session.setAttribute("perfil", resposta.perfil);
+        session.setAttribute("usuarioId", resposta.usuario.getId());
+
+        return switch (resposta.perfil) {
+            case "ADMIN"    -> "/views/admin/inicio.xhtml?faces-redirect=true";
+            case "PACIENTE" -> "/views/pacientes/inicio.xhtml?faces-redirect=true";
+            case "MEDICO"   -> "/views/medicos/inicio.xhtml?faces-redirect=true";
+            default         -> "/views/login/login.xhtml?faces-redirect=true";
+        };
+    }        
 
     public String sair() {
         log.info("Session invalidate");
@@ -118,7 +116,7 @@ public class LoginBean implements Serializable {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     // ✅ CORREÇÃO 2: A URL agora aponta para /api/usuarios/cadastrar
-                    .uri(URI.create("http://localhost:8083/api/usuarios/cadastrar")) 
+                    .uri(URI.create("http://localhost:9090/api/usuarios/cadastrar")) 
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
@@ -154,7 +152,7 @@ public class LoginBean implements Serializable {
 
     public Usuario getUsuarioLogado() {
         HttpSession session = getSession();
-        return (Usuario) session.getAttribute("usuario");
+        return (Usuario) session.getAttribute("usuarioLogado");
     }
     
 

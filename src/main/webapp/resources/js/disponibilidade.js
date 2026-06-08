@@ -1,0 +1,93 @@
+(function () {
+    "use strict";
+
+    var DIAS_LABEL = {
+        'SEGUNDA': 'Segunda',
+        'TERCA':   'Terça',
+        'QUARTA':  'Quarta',
+        'QUINTA':  'Quinta',
+        'SEXTA':   'Sexta',
+        'SABADO':  'Sábado'
+    };
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function gerarSlots(horaInicio, horaFim, intervaloMin) {
+        var slots = [];
+        var partsI = horaInicio.split(':');
+        var partsF = horaFim.split(':');
+        var minI = parseInt(partsI[0]) * 60 + parseInt(partsI[1]);
+        var minF = parseInt(partsF[0]) * 60 + parseInt(partsF[1]);
+
+        for (var m = minI; m < minF; m += intervaloMin) {
+            slots.push(pad(Math.floor(m / 60)) + ':' + pad(m % 60));
+        }
+        return slots;
+    }
+
+    function renderizarSemana() {
+
+        ['SEGUNDA','TERCA','QUARTA','QUINTA','SEXTA','SABADO'].forEach(function(dia) {
+            var col = document.getElementById('slot' + dia);
+            if (col) col.innerHTML = '';
+        });
+
+        var token = document.querySelector('meta[name="token"]');
+        var medicoId = document.querySelector('meta[name="medicoId"]');
+        if (!token || !medicoId) return;
+
+        fetch('http://localhost:9090/api/disponibilidade/' + medicoId.content, {
+            headers: { 'Authorization': 'Bearer ' + token.content }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(disps) {
+            fetch('http://localhost:9090/api/usuarios/' + medicoId.content, {
+                headers: { 'Authorization': 'Bearer ' + token.content }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(medico) {
+                var intervalo = medico.tempoConsultaMinutos || 30;
+
+                disps.forEach(function(disp) {
+                    var col = document.getElementById('slot' + disp.diaSemana);
+                    if (!col) return;
+
+                    var slots = gerarSlots(disp.horaInicio, disp.horaFim, intervalo);
+                    slots.forEach(function(slot) {
+                        var el = document.createElement('div');
+                        el.className = 'disp-slot';
+                        el.textContent = slot;
+                        col.appendChild(el);
+                    });
+                });
+            });
+        })
+        .catch(function(err) {
+            console.error('Erro ao renderizar semana:', err);
+        });
+    }
+
+ 
+    function injetarMetas() {
+
+        var tokenInput   = document.querySelector('input[id$="tokenHidden"]');
+        var medicoInput  = document.querySelector('input[id$="medicoIdHidden"]');
+
+        if (tokenInput && medicoInput) {
+            var metaToken = document.createElement('meta');
+            metaToken.name = 'token';
+            metaToken.content = tokenInput.value;
+            document.head.appendChild(metaToken);
+
+            var metaMedico = document.createElement('meta');
+            metaMedico.name = 'medicoId';
+            metaMedico.content = medicoInput.value;
+            document.head.appendChild(metaMedico);
+        }
+
+        renderizarSemana();
+    }
+
+    document.addEventListener('DOMContentLoaded', injetarMetas);
+
+})();

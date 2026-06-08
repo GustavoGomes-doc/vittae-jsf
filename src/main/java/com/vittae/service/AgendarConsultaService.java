@@ -15,8 +15,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 public class AgendarConsultaService {
 
 	// mesma porta do seu Spring Boot — ajusta se precisar
-	private static final String API_URL = "http://localhost:8082/api/agendamentos";
-	private static final String API_MEDICOS = "http://localhost:8082/api/medicos";
+	private static final String API_URL = "http://localhost:9090/api/agendamentos";
+	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
 
 	/**
 	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha

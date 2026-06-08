@@ -10,6 +10,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,36 +24,49 @@ import com.vittae.service.ConsultaService;
 @ViewScoped
 public class VisualizarConsultasMedicoBean implements Serializable {
 
-	private static final Long MEDICO_ID = 1L;
-
 	private List<MedicoConsultaDTO> consultas;
 	private String filtroTexto;
 	private String filtroStatus;
 	private boolean exibirModalCancelamento = false;
 	private Long idParaCancelar;
+	private Long medicoId;
+	private String token;
 
 	private ConsultaService service = new ConsultaService();
 
 	@PostConstruct
 	public void init() {
-		filtroStatus = "todas";
-		carregarConsultas();
+	    filtroStatus = "todas";
+
+	    FacesContext fc = FacesContext.getCurrentInstance();
+	    HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
+	    HttpSession session = req.getSession(false);
+
+	    if (session != null) {
+	        medicoId = (Long) session.getAttribute("usuarioId");
+	        token = (String) session.getAttribute("token");
+	    }
+
+	    carregarConsultas();
 	}
 
 	public void carregarConsultas() {
-		try {
-			consultas = buscarConsultasDoMedico(MEDICO_ID);
-		} catch (Exception e) {
-			consultas = new ArrayList<>();
-			addErro("Erro ao carregar consultas: " + e.getMessage());
-			e.printStackTrace();
-		}
+	    try {
+	        consultas = buscarConsultasDoMedico(medicoId); 
+	    } catch (Exception e) {
+	        consultas = new ArrayList<>();
+	        addErro("Erro ao carregar consultas: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
 
 	private List<MedicoConsultaDTO> buscarConsultasDoMedico(Long medicoId) throws Exception {
-		java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-				.uri(java.net.URI.create("http://localhost:9090/api/agendamentos/medico/" + medicoId)).GET().build();
+	    java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+	    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+	        .uri(java.net.URI.create("http://localhost:9090/api/agendamentos/medico/" + medicoId))
+	        .header("Authorization", "Bearer " + token) // <- token aqui
+	        .GET()
+	        .build();
 
 		java.net.http.HttpResponse<String> response = client.send(request,
 				java.net.http.HttpResponse.BodyHandlers.ofString());
@@ -66,7 +81,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		throw new Exception("Status: " + response.statusCode());
 	}
 
-	// ─── FILTROS ──────────────────────────────────────────────
+	//filtros
 	public List<MedicoConsultaDTO> getConsultasFiltradas() {
 		if (consultas == null)
 			return new ArrayList<>();
@@ -92,7 +107,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	public void filtrar() {
 	}
 
-	// ─── CANCELAR ─────────────────────────────────────────────
+	//cancelamento
 	public void prepararCancelamentoAction(Long id) {
 		this.idParaCancelar = id;
 		this.exibirModalCancelamento = true;
@@ -119,7 +134,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		this.idParaCancelar = null;
 	}
 
-	// ─── HELPERS ──────────────────────────────────────────────
+	//helpers
 	private void addInfo(String msg) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
 	}
@@ -127,8 +142,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	private void addErro(String msg) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
 	}
-
-	// ─── DTO INTERNO ──────────────────────────────────────────
+	
 	public static class MedicoConsultaDTO {
 		private Long id;
 		private String nomePaciente;
@@ -186,7 +200,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		}
 	}
 
-	// ─── GETTERS E SETTERS ────────────────────────────────────
+
 	public String getFiltroTexto() {
 		return filtroTexto;
 	}

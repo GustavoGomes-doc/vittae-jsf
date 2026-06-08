@@ -3,11 +3,14 @@ package com.vittae.service;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -15,6 +18,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 
+@Named
+@ApplicationScoped
 public class ConsultaService {
 
 	// mesma porta do seu Spring Boot — ajusta se precisar

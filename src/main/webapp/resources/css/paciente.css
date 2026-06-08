@@ -343,3 +343,141 @@ body {
 .btn-cancel:hover {
 	background: #ffe0e0;
 }
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    color: var(--text-dark, #2d3748);
+    margin-bottom: 5px;
+}
+
+.dashboard-header p {
+    color: #718096;
+    font-size: 16px;
+    text-transform: none;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+.dash-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Mesma sombra do seu appointment-container */
+    border: 1px solid #f7fafc;
+}
+
+.dash-card-title {
+    font-size: 18px;
+    color: var(--text-dark, #2d3748);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Estilo da caixa de consulta */
+.appointment-box-dash {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.apt-date {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding-right: 20px;
+    border-right: 2px solid #e2e8f0;
+}
+
+.apt-date .day {
+    font-size: 22px;
+    font-weight: 700;
+    color: #7c3aed; /* Sua var(--vittae-purple) */
+}
+
+.apt-date .time {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.apt-details {
+    flex: 1;
+    padding: 0 20px;
+}
+
+.apt-details h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: var(--text-dark, #2d3748);
+}
+
+.apt-details p {
+    font-size: 14px;
+    color: #718096;
+}
+
+.apt-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estado vazio (Sem consultas) */
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #718096;
+}
+
+.btn-primary-dash {
+    display: inline-block;
+    margin-top: 15px;
+    background: #7c3aed; /* Sua cor principal */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Ações Rápidas */
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-dark, #2d3748);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #f5f3ff;
+    border-color: #7c3aed;
+    color: #7c3aed;
+}
+
+.action-btn .icon {
+    font-size: 20px;
+}
