@@ -514,21 +514,48 @@
         return true;
     }
 
-    function validarDataHora() {
-        var dataH = document.getElementById('fAg:dataConsultaHidden');
-        var horaH = document.getElementById('fAg:horaConsultaHidden');
-        var tipoH = document.getElementById('fAg:tipoConsultaHidden');
+	function validarDataHora() {
+	    // 1. Pega os elementos ocultos do JSF que estão no seu XHTML
+	    var dataH = document.getElementById('fAg:dataConsultaHidden');
+	    var horaH = document.getElementById('fAg:horaConsultaHidden');
+	    var tipoH = document.getElementById('fAg:tipoConsultaHidden');
 
-        if (!state.dataSelecionada || !state.horaSelecionada || !state.tipoConsulta) {
-            mostrarErro('errData', null); return false;
-        }
-        esconderErro('errData', null);
+	    // 2. Se o "state" sumiu, mas o input do JSF tem valor, recupera para o state
+	    if (!state.dataSelecionada && dataH && dataH.value) {
+	        state.dataSelecionada = dataH.value;
+	    }
+	    if (!state.horaSelecionada && horaH && horaH.value) {
+	        state.horaSelecionada = horaH.value;
+	    }
 
-        if (dataH) dataH.value = state.dataSelecionada;
-        if (horaH) horaH.value = state.horaSelecionada;
-        if (tipoH) tipoH.value = state.tipoConsulta;
-        return true;
-    }
+	    // 3. LOG DE DEPURAÇÃO (Abra o Console do navegador [F12] para ver o que está vazio)
+	    console.log("=== VERIFICAÇÃO DE DADOS ===");
+	    console.log("State Data:", state.dataSelecionada, " | InputHidden Data:", dataH ? dataH.value : "não achou input");
+	    console.log("State Hora:", state.horaSelecionada, " | InputHidden Hora:", horaH ? horaH.value : "não achou input");
+
+	    // 4. VALIDAÇÃO REAL: Verifica tanto no state quanto no input oculto
+	    var temData = state.dataSelecionada || (dataH && dataH.value);
+	    var temHora = state.horaSelecionada || (horaH && horaH.value);
+
+	    if (!temData || !temHora) {
+	        mostrarErro('errData', null); 
+	        return false; // Trava aqui e mostra o erro na tela
+	    }
+	    
+	    // Se chegou aqui, os dados existem! Esconde o erro da tela
+	    esconderErro('errData', null);
+
+	    // 5. Força o preenchimento dos inputs para o envio do formulário/fetch
+	    if (dataH) dataH.value = state.dataSelecionada || dataH.value;
+	    if (horaH) horaH.value = state.horaSelecionada || horaH.value;
+	    
+	    // Força um valor padrão para o tipo, já que é enfeite
+	    if (tipoH) {
+	        tipoH.value = state.tipoConsulta || 'rotina';
+	    }
+	    
+	    return true;
+	}
 
     function mostrarErro(id, campo) {
         var el = document.getElementById(id);
@@ -634,348 +661,429 @@
         });
     }
 
-    window.selecionarMedico = function(card) {
-        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
-            c.classList.remove('selected');
-        });
-        card.classList.add('selected');
-
-        var id    = card.getAttribute('data-id');
-        var nome  = card.getAttribute('data-nome');
-        var valor = card.getAttribute('data-valor');
-
-        var hidden = document.getElementById('fAg:medicoIdHidden');
-        if (hidden) hidden.value = id;
-
-        state.medicoId    = id;
-        state.medicoNome  = nome;
-        state.medicoValor = valor;
-
-        atualizarResumo('medico', nome);
-        atualizarResumo('valor', valor);
-        esconderErro('errMedico', null);
-
-        var sub = document.getElementById('subDataHora');
-        if (sub) sub.textContent = 'Com ' + nome + '.';
-    };
-
-    window.filtrarMedicos = function() {
-        var q = (document.getElementById('buscaMedico').value || '').toLowerCase();
-        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
-            var nome = (c.getAttribute('data-nome') || '').toLowerCase();
-            var crm  = (c.getAttribute('data-crm')  || '').toLowerCase();
-            c.style.display = (nome.includes(q) || crm.includes(q)) ? '' : 'none';
-        });
-    };
-
-    window.selecionarTipo = function(card, tipo) {
-        document.querySelectorAll('.ag-tipo-card').forEach(function(c) {
-            c.classList.remove('selected');
-        });
-        card.classList.add('selected');
-        state.tipoConsulta = tipo;
-        esconderErro('errTipo', null);
-    };
-
-    /* ═══════════════════════════════════════════════
-       CALENDÁRIO & HORÁRIOS
-    ═══════════════════════════════════════════════ */
-    function carregarDisponibilidade(medicoId) {
-        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres')
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                state.diasDisponiveis = data.diasDisponiveis || [];
-                renderizarCalendario();
-            })
-            .catch(function(err) {
-                console.error('Erro ao carregar disponibilidade:', err);
-                state.diasDisponiveis = [];
-                renderizarCalendario();
-            });
-    }
-
-    function buscarHorariosLivres(medicoId, dataISO) {
-        var grid = document.getElementById('horariosGrid');
-        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
-
-        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                renderizarHorarios(data.horariosLivres || []);
-            })
-            .catch(function(err) {
-                console.error('Erro ao buscar horários:', err);
-                renderizarHorarios([]);
-            });
-    }
-
-    function diasDisponiveisMes(ano, mes) {
-        var diasComSlots = [];
-        var totalDias = new Date(ano, mes + 1, 0).getDate();
-        for (var d = 1; d <= totalDias; d++) {
-            var data = new Date(ano, mes, d);
-            var diaSemanaEnum = DIAS_SEMANA_MAP[data.getDay()];
-            if (state.diasDisponiveis.indexOf(diaSemanaEnum) !== -1) {
-                diasComSlots.push(d);
-            }
-        }
-        return diasComSlots;
-    }
-
-    function pad(n) { return n < 10 ? '0'+n : n; }
-
-    function renderizarCalendario() {
-        var grid = document.getElementById('calGrid');
-        var titulo = document.getElementById('calMesAno');
-        if (!grid || !titulo) return;
-
-        titulo.textContent = MESES_PT[state.calMes] + ' De ' + state.calAno;
-
-        var diasDisponiveis = diasDisponiveisMes(state.calAno, state.calMes);
-        var primeiroDia = new Date(state.calAno, state.calMes, 1).getDay();
-        var totalDias   = new Date(state.calAno, state.calMes + 1, 0).getDate();
-        var hojeData    = new Date();
-
-        grid.innerHTML = '';
-
-        ['D','S','T','Q','Q','S','S'].forEach(function(d) {
-            var div = document.createElement('div');
-            div.className = 'ag-cal-dow';
-            div.textContent = d;
-            grid.appendChild(div);
-        });
-
-        for (var e = 0; e < primeiroDia; e++) {
-            var vazio = document.createElement('div');
-            vazio.className = 'ag-cal-day empty';
-            grid.appendChild(vazio);
-        }
-
-        for (var d = 1; d <= totalDias; d++) {
-            var dataAtual = new Date(state.calAno, state.calMes, d);
-            var div = document.createElement('div');
-            div.className = 'ag-cal-day';
-            div.textContent = d;
-
-            var passado  = dataAtual < new Date(hojeData.getFullYear(), hojeData.getMonth(), hojeData.getDate());
-            var temSlot  = diasDisponiveis.indexOf(d) !== -1;
-            var isoData  = state.calAno + '-' + pad(state.calMes+1) + '-' + pad(d);
-            var selected = state.dataSelecionada === isoData;
-
-            if (passado || !temSlot) {
-                div.classList.add('disabled');
-            } else {
-                div.classList.add('has-slots');
-                if (selected) div.classList.add('selected');
-                (function(iso, dNum) {
-                    div.onclick = function() { selecionarDia(iso, dNum); };
-                })(isoData, d);
-            }
-
-            grid.appendChild(div);
-        }
-    }
-	
-	function carregarEspecialidades() {
-	    Promise.all([
-	        fetch('http://localhost:9090/api/especialidades').then(function(r) { return r.json(); }),
-	        fetch('http://localhost:9090/api/medicos').then(function(r) { return r.json(); })
-	    ]).then(function(results) {
-	        var especialidades = results[0];
-	        var medicos = results[1];
-
-	        var comMedico = new Set();
-	        medicos.forEach(function(med) {
-	            (med.especialidades || []).forEach(function(e) { comMedico.add(e); });
+	window.selecionarMedico = function(card) {
+	        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
+	            c.classList.remove('selected');
 	        });
+	        card.classList.add('selected');
 
-	        var grid = document.getElementById('espGrid');
-	        if (!grid) return;
+	        var id    = card.getAttribute('data-id');
+	        var nome  = card.getAttribute('data-nome');
+	        var valor = card.getAttribute('data-valor');
+
+	        var hidden = document.getElementById('fAg:medicoIdHidden');
+	        if (hidden) hidden.value = id;
+
+	        state.medicoId    = id;
+	        state.medicoNome  = nome;
+	        state.medicoValor = valor;
+
+	        atualizarResumo('medico', nome);
+	        atualizarResumo('valor', valor);
+	        esconderErro('errMedico', null);
+
+	        var sub = document.getElementById('subDataHora');
+	        if (sub) sub.textContent = 'Com ' + nome + '.';
+	    };
+
+	    window.filtrarMedicos = function() {
+	        var q = (document.getElementById('buscaMedico').value || '').toLowerCase();
+	        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
+	            var nome = (c.getAttribute('data-nome') || '').toLowerCase();
+	            var crm  = (c.getAttribute('data-crm')  || '').toLowerCase();
+	            c.style.display = (nome.includes(q) || crm.includes(q)) ? '' : 'none';
+	        });
+	    };
+
+	    window.selecionarTipo = function(card, tipo) {
+	        document.querySelectorAll('.ag-tipo-card').forEach(function(c) {
+	            c.classList.remove('selected');
+	        });
+	        card.classList.add('selected');
+	        state.tipoConsulta = tipo;
+	        esconderErro('errTipo', null);
+	    };
+
+	    /* ═══════════════════════════════════════════════
+	       CALENDÁRIO & HORÁRIOS
+	    ═══════════════════════════════════════════════ */
+	    function carregarDisponibilidade(medicoId) {
+	        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres')
+	            .then(function(r) { return r.json(); })
+	            .then(function(data) {
+	                state.diasDisponiveis = data.diasDisponiveis || [];
+	                renderizarCalendario();
+	            })
+	            .catch(function(err) {
+	                console.error('Erro ao carregar disponibilidade:', err);
+	                state.diasDisponiveis = [];
+	                renderizarCalendario();
+	            });
+	    }
+
+	    function buscarHorariosLivres(medicoId, dataISO) {
+	        var grid = document.getElementById('horariosGrid');
+	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
+
+	        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
+	            .then(function(r) { return r.json(); })
+	            .then(function(data) {
+	                renderizarHorarios(data.horariosLivres || []);
+	            })
+	            .catch(function(err) {
+	                console.error('Erro ao buscar horários:', err);
+	                renderizarHorarios([]);
+	            });
+	    }
+
+	    function diasDisponiveisMes(ano, mes) {
+	        var diasComSlots = [];
+	        var totalDias = new Date(ano, mes + 1, 0).getDate();
+	        for (var d = 1; d <= totalDias; d++) {
+	            var data = new Date(ano, mes, d);
+	            var diaSemanaEnum = DIAS_SEMANA_MAP[data.getDay()];
+	            if (state.diasDisponiveis.indexOf(diaSemanaEnum) !== -1) {
+	                diasComSlots.push(d);
+	            }
+	        }
+	        return diasComSlots;
+	    }
+
+	    function pad(n) { return n < 10 ? '0'+n : n; }
+
+	    function renderizarCalendario() {
+	        var grid = document.getElementById('calGrid');
+	        var titulo = document.getElementById('calMesAno');
+	        if (!grid || !titulo) return;
+
+	        titulo.textContent = MESES_PT[state.calMes] + ' De ' + state.calAno;
+
+	        var diasDisponiveis = diasDisponiveisMes(state.calAno, state.calMes);
+	        var primeiroDia = new Date(state.calAno, state.calMes, 1).getDay();
+	        var totalDias   = new Date(state.calAno, state.calMes + 1, 0).getDate();
+	        var hojeData    = new Date();
+
 	        grid.innerHTML = '';
 
-	        especialidades
-	            .filter(function(esp) { return comMedico.has(esp.nome); })
-	            .forEach(function(esp) {
-	                var card = document.createElement('div');
-	                card.className = 'ag-esp-card';
-	                card.onclick = function() { window.selecionarEsp(card, esp.nome); };
-	                card.innerHTML =
-	                    '<div class="ag-esp-name">' + esp.nome + '</div>' +
-	                    '<div class="ag-esp-desc">' + (esp.descricao || '') + '</div>';
-	                grid.appendChild(card);
+	        ['D','S','T','Q','Q','S','S'].forEach(function(d) {
+	            var div = document.createElement('div');
+	            div.className = 'ag-cal-dow';
+	            div.textContent = d;
+	            grid.appendChild(div);
+	        });
+
+	        for (var e = 0; e < primeiroDia; e++) {
+	            var vazio = document.createElement('div');
+	            vazio.className = 'ag-cal-day empty';
+	            grid.appendChild(vazio);
+	        }
+
+	        for (var d = 1; d <= totalDias; d++) {
+	            var dataAtual = new Date(state.calAno, state.calMes, d);
+	            var div = document.createElement('div');
+	            div.className = 'ag-cal-day';
+	            div.textContent = d;
+
+	            var passado  = dataAtual < new Date(hojeData.getFullYear(), hojeData.getMonth(), hojeData.getDate());
+	            var temSlot  = diasDisponiveis.indexOf(d) !== -1;
+	            var isoData  = state.calAno + '-' + pad(state.calMes+1) + '-' + pad(d);
+	            var selected = state.dataSelecionada === isoData;
+
+	            if (passado || !temSlot) {
+	                div.classList.add('disabled');
+	            } else {
+	                div.classList.add('has-slots');
+	                if (selected) div.classList.add('selected');
+	                (function(iso, dNum) {
+	                    div.onclick = function() { selecionarDia(iso, dNum); };
+	                })(isoData, d);
+	            }
+
+	            grid.appendChild(div);
+	        }
+	    }
+		
+	    function carregarEspecialidades() {
+	        Promise.all([
+	            fetch('http://localhost:9090/api/especialidades').then(function(r) { return r.json(); }),
+	            fetch('http://localhost:9090/api/medicos').then(function(r) { return r.json(); })
+	        ]).then(function(results) {
+	            var especialidades = results[0];
+	            var medicos = results[1];
+
+	            var comMedico = new Set();
+	            medicos.forEach(function(med) {
+	                (med.especialidades || []).forEach(function(e) { comMedico.add(e); });
 	            });
-	    }).catch(function(err) {
-	        console.error('Erro ao carregar especialidades:', err);
-	    });
-	}
 
-    function selecionarDia(iso, dNum) {
-        state.dataSelecionada = iso;
-        state.horaSelecionada = null;
-        renderizarCalendario();
+	            var grid = document.getElementById('espGrid');
+	            if (!grid) return;
+	            grid.innerHTML = '';
 
-        var data = new Date(state.calAno, state.calMes, dNum);
-        var nomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-        var sub = document.getElementById('horariosSub');
-        if (sub) sub.textContent = nomes[data.getDay()] + ', ' + dNum + '/' + (state.calMes+1);
+	            especialidades
+	                .filter(function(esp) { return comMedico.has(esp.nome); })
+	                .forEach(function(esp) {
+	                    var card = document.createElement('div');
+	                    card.className = 'ag-esp-card';
+	                    card.onclick = function() { window.selecionarEsp(card, esp.nome); };
+	                    card.innerHTML =
+	                        '<div class="ag-esp-name">' + esp.nome + '</div>' +
+	                        '<div class="ag-esp-desc">' + (esp.descricao || '') + '</div>';
+	                    grid.appendChild(card);
+	                });
+	        }).catch(function(err) {
+	            console.error('Erro ao carregar especialidades:', err);
+	        });
+	    }
 
-        buscarHorariosLivres(state.medicoId, iso);
-    }
+	    function selecionarDia(iso, dNum) {
+	        state.dataSelecionada = iso;
+	        state.horaSelecionada = null; // Reseta a hora ao mudar de dia
+	        
+	        var dataH = document.getElementById('fAg:dataConsultaHidden');
+	        if (dataH) dataH.value = iso;
+	        
+	        var horaH = document.getElementById('fAg:horaConsultaHidden');
+	        if (horaH) horaH.value = ''; 
+	        renderizarCalendario();
 
-    function renderizarHorarios(horarios) {
-        var grid = document.getElementById('horariosGrid');
-        if (!grid) return;
+	        var data = new Date(state.calAno, state.calMes, dNum);
+	        var nomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+	        var sub = document.getElementById('horariosSub');
+	        if (sub) sub.textContent = nomes[data.getDay()] + ', ' + dNum + '/' + (state.calMes+1);
 
-        grid.innerHTML = '';
+	        buscarHorariosLivres(state.medicoId, iso);
+	    }
 
-        if (!horarios || horarios.length === 0) {
-            grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">😔</div><div class="ag-empty-text">Sem horários disponíveis</div></div>';
-            return;
-        }
+	    function renderizarHorarios(horarios) {
+	        var grid = document.getElementById('horariosGrid');
+	        if (!grid) return;
 
-        horarios.forEach(function(slot) {
-            var btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'ag-horario-btn';
-            if (state.horaSelecionada === slot) btn.classList.add('selected');
-            btn.textContent = slot;
-            btn.onclick = function() {
-                document.querySelectorAll('.ag-horario-btn').forEach(function(b) { b.classList.remove('selected'); });
-                btn.classList.add('selected');
-                state.horaSelecionada = slot;
-                atualizarResumo('data', state.dataSelecionada + ' às ' + slot);
-                esconderErro('errData', null);
-            };
-            grid.appendChild(btn);
-        });
-    }
+	        grid.innerHTML = '';
 
-    window.navegarMes = function(dir) {
-        state.calMes += dir;
-        if (state.calMes < 0)  { state.calMes = 11; state.calAno--; }
-        if (state.calMes > 11) { state.calMes = 0;  state.calAno++; }
-        state.dataSelecionada = null;
-        state.horaSelecionada = null;
-        renderizarCalendario();
-        var grid = document.getElementById('horariosGrid');
-        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">📅</div><div class="ag-empty-text">Selecione uma data</div></div>';
-    };
+	        if (!horarios || horarios.length === 0) {
+	            grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">😔</div><div class="ag-empty-text">Sem horários disponíveis</div></div>';
+	            return;
+	        }
 
-    /* ═══════════════════════════════════════════════
-       RESUMO SIDEBAR
-    ═══════════════════════════════════════════════ */
-    function atualizarResumo(campo, valor) {
-        if (campo === 'paciente') {
-            var el = document.getElementById('rPaciente');
-            var ic = document.getElementById('rIconPaciente');
-            if (el) { el.textContent = valor || 'pendente'; el.classList.toggle('pending', !valor); }
-            if (ic) { ic.className = 'ag-resumo-icon ' + (valor ? 'done' : 'pending'); ic.textContent = valor ? '✓' : '👤'; }
-        }
-        if (campo === 'especialidade') {
-            var el = document.getElementById('rEspecialidade');
-            var ic = document.getElementById('rIconEsp');
-            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
-        }
-        if (campo === 'medico') {
-            var el = document.getElementById('rMedico');
-            var ic = document.getElementById('rIconMedico');
-            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
-        }
-        if (campo === 'data') {
-            var el = document.getElementById('rData');
-            var ic = document.getElementById('rIconData');
-            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
-        }
-    }
+	        horarios.forEach(function(slot) {
+	            var btn = document.createElement('button');
+	            btn.type = 'button';
+	            btn.className = 'ag-horario-btn';
+	            if (state.horaSelecionada === slot) btn.classList.add('selected');
+	            btn.textContent = slot;
+	            
+	            btn.onclick = function() {
+	                document.querySelectorAll('.ag-horario-btn').forEach(function(b) { b.classList.remove('selected'); });
+	                btn.classList.add('selected');
+	                state.horaSelecionada = slot;
+	                
+	                var horaH = document.getElementById('fAg:horaConsultaHidden');
+	                if (horaH) horaH.value = slot;
+	                var dataH = document.getElementById('fAg:dataConsultaHidden');
+	                if (dataH) dataH.value = state.dataSelecionada;
 
-    /* ═══════════════════════════════════════════════
-       ENVIO FINAL PARA O BACKEND (SPRING BOOT)
-    ═══════════════════════════════════════════════ */
-    window.salvarAgendamento = function() {
-        if (!validarStep(4)) return; // Garante que a data/hora foi preenchida
+	                atualizarResumo('data', state.dataSelecionada + ' às ' + slot);
+	                
+	                var erroDataEl = document.getElementById('errData');
+	                if (erroDataEl) {
+	                    erroDataEl.style.setProperty('display', 'none', 'important'); 
+	                    erroDataEl.classList.remove('visible');                      
+	                    erroDataEl.classList.remove('active');                       
+	                }
+	                
+	                if (typeof esconderErro === 'function') {
+	                    esconderErro('errData', null);
+	                }
+	            };
+	            grid.appendChild(btn);
+	        });
+	    }
 
-        // Captura dados do Responsável
-        var respNomeEl = document.getElementById('respNome');
-        var respCpfEl = document.getElementById('respCpf');
-        var respNascEl = document.getElementById('respNascimento');
-        var respParentescoEl = document.getElementById('respParentesco');
+	    window.navegarMes = function(dir) {
+	        state.calMes += dir;
+	        if (state.calMes < 0)  { state.calMes = 11; state.calAno--; }
+	        if (state.calMes > 11) { state.calMes = 0;  state.calAno++; }
+	        state.dataSelecionada = null;
+	        state.horaSelecionada = null;
+	        renderizarCalendario();
+	        var grid = document.getElementById('horariosGrid');
+	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">📅</div><div class="ag-empty-text">Selecione uma data</div></div>';
+	    };
 
-        // Para facilitar no Spring Boot, vamos converter a data do responsável de DD/MM/YYYY para YYYY-MM-DD
-        var respDataIso = null;
-        if (respNascEl && respNascEl.value.trim() !== '') {
-            var p = respNascEl.value.split('/');
-            respDataIso = p[2] + '-' + p[1] + '-' + p[0];
-        }
+	    /* ═══════════════════════════════════════════════
+	       RESUMO SIDEBAR
+	    ═══════════════════════════════════════════════ */
+	    function atualizarResumo(campo, valor) {
+	        if (campo === 'paciente') {
+	            var el = document.getElementById('rPaciente');
+	            var ic = document.getElementById('rIconPaciente');
+	            if (el) { el.textContent = valor || 'pendente'; el.classList.toggle('pending', !valor); }
+	            if (ic) { ic.className = 'ag-resumo-icon ' + (valor ? 'done' : 'pending'); ic.textContent = valor ? '✓' : '👤'; }
+	        }
+	        if (campo === 'especialidade') {
+	            var el = document.getElementById('rEspecialidade');
+	            var ic = document.getElementById('rIconEsp');
+	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
+	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	        }
+	        if (campo === 'medico') {
+	            var el = document.getElementById('rMedico');
+	            var ic = document.getElementById('rIconMedico');
+	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
+	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	        }
+	        if (campo === 'data') {
+	            var el = document.getElementById('rData');
+	            var ic = document.getElementById('rIconData');
+	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
+	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	        }
+	    }
 
-        // Para converter a data do paciente de DD/MM/YYYY para YYYY-MM-DD
-        var pacNascEl = document.getElementById('fAg:pacNascimento');
-        var pacDataIso = null;
-        if (pacNascEl && pacNascEl.value.trim() !== '') {
-            var p2 = pacNascEl.value.split('/');
-            pacDataIso = p2[2] + '-' + p2[1] + '-' + p2[0];
-        }
+	    /* ═══════════════════════════════════════════════
+	       SUBMIT/SALVAR AGENDAMENTO
+	    ═══════════════════════════════════════════════ */
+		window.salvarAgendamento = function() {
+		        if (!validarStep(4)) return;
 
-        var payload = {
-            especialidade: state.especialidade,
-            medicoId: state.medicoId,
-            dataConsulta: state.dataSelecionada, // Já está em ISO (YYYY-MM-DD)
-            hora: state.horaSelecionada,
-            observacoes: document.getElementById('fAg:motivoConsulta') ? document.getElementById('fAg:motivoConsulta').value : null,
-            tipoConsulta: state.tipoConsulta,
-            
-            // Dados do paciente
-            paciente: {
-                nome: document.getElementById('fAg:pacNome').value,
-                cpf: document.getElementById('fAg:pacCpf').value.replace(/\D/g, ''),
-                dataNascimento: pacDataIso, 
-                genero: document.getElementById('fAg:pacGenero').value,
-                telefone: document.getElementById('fAg:pacTelefone').value.replace(/\D/g, '')
-            },
+		        var respNomeEl = document.getElementById('respNome');
+		        var respCpfEl = document.getElementById('respCpf');
+		        var respNascEl = document.getElementById('respNascimento');
+		        var respParentescoEl = document.getElementById('respParentesco');
 
-            // Dados do Responsável (serão null se o bloco não foi ativado/preenchido)
-            respNome: (respNomeEl && respNomeEl.value.trim() !== '') ? respNomeEl.value : null,
-            respCpf: (respCpfEl && respCpfEl.value.trim() !== '') ? respCpfEl.value.replace(/\D/g, '') : null,
-            respDataNascimento: respDataIso,
-            respParentesco: (respParentescoEl && respParentescoEl.value !== '') ? respParentescoEl.value : null
-        };
+		        var respDataIso = null;
+		        if (respNascEl && respNascEl.value.trim() !== '') {
+		            var p = respNascEl.value.split('/');
+		            respDataIso = p[2] + '-' + p[1] + '-' + p[0];
+		        }
 
-        // Desabilita o botão para evitar cliques duplos
-        var btn = document.getElementById('btnSubmitJSF');
-        if (btn) btn.disabled = true;
+		        var pacNascEl = document.getElementById('fAg:pacNascimento');
+		        var pacDataIso = null;
+		        if (pacNascEl && pacNascEl.value.trim() !== '') {
+		            var p2 = pacNascEl.value.split('/');
+		            pacDataIso = p2[2] + '-' + p2[1] + '-' + p2[0];
+		        }
 
-        fetch('http://localhost:9090/api/agendamentos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Erro ao salvar agendamento na API');
-            }
-            return response.json();
-        })
-        .then(function(data) {
-            console.log('Agendamento salvo com sucesso no banco!', data);
-            
-            // Aqui você pode disparar a exibição do seu Modal de Sucesso HTML
-            // Exemplo fictício: document.getElementById('modalSucesso').style.display = 'block';
-            
-        })
-        .catch(function(error) {
-            console.error('Falha no POST:', error);
-            alert('Não foi possível concluir o agendamento. Tente novamente.');
-        })
-        .finally(function() {
-            if (btn) btn.disabled = false;
-        });
-    };
+		        var payload = {
+		            especialidade: state.especialidade,
+		            medicoId: state.medicoId,
+		            dataConsulta: state.dataSelecionada,
+		            hora: state.horaSelecionada,
+		            observacoes: document.getElementById('fAg:motivoConsulta') ? document.getElementById('fAg:motivoConsulta').value : null,
+		            tipoConsulta: state.tipoConsulta,
+		            
+		            paciente: {
+		                nome: document.getElementById('fAg:pacNome').value,
+		                cpf: document.getElementById('fAg:pacCpf').value.replace(/\D/g, ''),
+		                dataNascimento: pacDataIso, 
+		                genero: document.getElementById('fAg:pacGenero').value,
+		                telefone: document.getElementById('fAg:pacTelefone').value.replace(/\D/g, '')
+		            },
 
-    // Inicializa a tela
-    init();
+		            respNome: (respNomeEl && respNomeEl.value.trim() !== '') ? respNomeEl.value : null,
+		            respCpf: (respCpfEl && respCpfEl.value.trim() !== '') ? respCpfEl.value.replace(/\D/g, '') : null,
+		            respDataNascimento: respDataIso,
+		            respParentesco: (respParentescoEl && respParentescoEl.value !== '') ? respParentescoEl.value : null
+		        };
+		        
+		        var btn = document.getElementById('btnSubmitJSF');
+		        if (btn) btn.disabled = true;
 
-})();
+		        // === CAPTURA INTELIGENTE E VALIDAÇÃO DO TOKEN (ATUALIZADO COM INJEÇÃO JSF) ===
+		        // 1. Tenta pegar primeiro o token injetado diretamente da sessão do JSF
+		        var token = window.TOKEN_SESSAO_VITTAE || null;
+
+		        // 2. Se não achar, faz a varredura automática nos storages por segurança
+		        if (!token || token === "" || token.indexOf('#{') === 0) {
+		            token = localStorage.getItem('token_vittae') || 
+		                    sessionStorage.getItem('token_vittae') || 
+		                    localStorage.getItem('token') || 
+		                    sessionStorage.getItem('token') || 
+		                    localStorage.getItem('jwt') || 
+		                    sessionStorage.getItem('jwt');
+		        }
+
+		        // 3. Se ainda assim não achar, tenta ler dos Cookies
+		        if (!token) {
+		            var match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
+		            if (match) token = match[2];
+		        }
+
+		        // Limpa espaços ou aspas residuais que o JSF possa injetar
+		        if (token) {
+		            token = token.trim().replace(/^"|"$/g, '');
+		        }
+
+		        // Diagnóstico de credenciais no console do desenvolvedor
+		        console.log("=== VERIFICAÇÃO DE CREDENCIAIS ===");
+		        console.log("Token JWT recuperado:", token ? token.substring(0, 15) + "..." : "NULO/VAZIO");
+
+		        if (!token || token === "" || token === "null") {
+		            console.error("ERRO: Requisição bloqueada localmente. Nenhum token encontrado no Storage ou Sessão JSF.");
+		            alert("Sessão inválida ou expirada. Por favor, realize o login novamente antes de prosseguir.");
+		            if (btn) btn.disabled = false;
+		            return; // Interrompe o envio
+		        }
+
+		        // === DISPARO DO AGENDAMENTO PARA O SPRING BOOT ===
+		        fetch('http://localhost:9090/api/agendamentos', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json',
+		                'Authorization': 'Bearer ' + token 
+		            },
+		            body: JSON.stringify(payload)
+		        })
+		        .then(function(response) {
+		            if (!response.ok) {
+		                throw new Error('Erro ao salvar agendamento na API. Status: ' + response.status);
+		            }
+		            return response.json();
+		        })
+				.then(function(data) {
+				            console.log('Agendamento salvo com sucesso no banco!', data);
+				            
+				            // 1. Abre o modal de sucesso na tela
+				            var modal = document.getElementById('modalSucesso');
+				            if (modal) {
+				                modal.style.display = 'flex';
+				            }
+
+				            // 2. CORREÇÃO DO BOTÃO "NOVO AGENDAMENTO" (Para conseguir sair da tela)
+				            // Procura o botão azul dentro do seu modal para dar uma função a ele
+				            var btnNovoAgendamento = modal ? modal.querySelector('.ag-modal-btn, button') : null;
+				            if (!btnNovoAgendamento) {
+				                // Caso não ache por classe, tenta pegar pelo texto do botão
+				                var botoes = document.querySelectorAll('button');
+				                botoes.forEach(function(b) {
+				                    if (b.textContent.trim() === 'Novo Agendamento') {
+				                        btnNovoAgendamento = b;
+				                    }
+				                });
+				            }
+
+				            // Se encontrar o botão, programa ele para recarregar a página e limpar tudo
+				            if (btnNovoAgendamento) {
+				                btnNovoAgendamento.onclick = function() {
+				                    // Opção A: Recarrega a página do zero para fazer um novo agendamento limpo
+				                    window.location.reload();
+				                    
+				                    // Opção B (Caso queira mandar ele para a tela inicial do Paciente):
+				                    // window.location.href = 'inicio.xhtml';
+				                };
+				            }
+				        })
+		        .catch(function(error) {
+		            console.error('Falha no POST:', error);
+		            alert('Não foi possível concluir o agendamento. Verifique suas credenciais.');
+		        })
+		        .finally(function() {
+		            if (btn) btn.disabled = false;
+		        });
+		    }; // <-- Fecha a função salvarAgendamento corretamente
+
+		    // Inicializa a tela
+		    init();
+
+		})();

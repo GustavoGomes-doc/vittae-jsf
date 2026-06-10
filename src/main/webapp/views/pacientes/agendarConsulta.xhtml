@@ -345,9 +345,9 @@
 						<button type="button" class="ag-btn ag-btn-primary"
 							id="btnProximo" onclick="proximoStep()">Próximo →</button>
 						<button type="button" id="btnSubmitJSF"
-							  class="ag-btn ag-btn-success" style="display:none"
-							  onclick="prepararSubmit()">
-							  Confirmar Agendamento <i class="fas fa-check" style="margin-left: 8px"></i>
+						        class="ag-btn ag-btn-success" style="display:none"
+						        onclick="salvarAgendamento()">
+						    Confirmar Agendamento <i class="fas fa-check" style="margin-left: 8px"></i>
 						</button>
 					</div>
 
@@ -424,7 +424,11 @@
 				style="color:red;font-weight:bold;padding:10px;margin:0 32px;" />
 		</h:form>
 
-		<h:outputScript library="js" name="agendar.js" />
+		<script type="text/javascript">
+    // Acessa o novo método getCc() através do Bean request-scoped
+    window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
+</script>
+<h:outputScript library="js" name="agendar.js" />
 
 	</ui:define>
 </ui:composition>

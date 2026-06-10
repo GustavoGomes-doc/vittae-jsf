@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+    <ui:define name="titulo">Todas as Consultas</ui:define>
+
+    <ui:define name="conteudo">
+        <section class="admin-consultas-page">
+            <div class="admin-consultas-header">
+                <div>
+                    <h1>Todas as Consultas</h1>
+                    <p>Acompanhe e gerencie os agendamentos do sistema.</p>
+                </div>
+
+                <h:form>
+                    <h:commandButton value="Atualizar"
+                                     styleClass="btn btn-secondary"
+                                     action="#{adminConsultasBean.carregarConsultas}">
+                        <f:ajax render="@form :tabelaConsultas :mensagens :resumoConsultas" />
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <h:messages id="mensagens"
+                        globalOnly="true"
+                        layout="table"
+                        infoClass="mensagem-sucesso"
+                        errorClass="mensagem-erro" />
+
+            <h:panelGroup id="resumoConsultas" layout="block" styleClass="admin-consultas-resumo">
+                <div class="admin-consultas-card">
+                    <span>Total</span>
+                    <strong>#{adminConsultasBean.totalConsultas}</strong>
+                </div>
+                <div class="admin-consultas-card">
+                    <span>Pendentes</span>
+                    <strong>#{adminConsultasBean.totalPendentes}</strong>
+                </div>
+                <div class="admin-consultas-card">
+                    <span>Realizadas</span>
+                    <strong>#{adminConsultasBean.totalRealizadas}</strong>
+                </div>
+                <div class="admin-consultas-card">
+                    <span>Canceladas</span>
+                    <strong>#{adminConsultasBean.totalCanceladas}</strong>
+                </div>
+            </h:panelGroup>
+
+            <h:form id="filtrosConsultas" styleClass="filtros-consultas">
+                <div class="admin-consultas-filtro">
+                    <h:outputLabel for="filtroTexto" value="Buscar" />
+                    <h:inputText id="filtroTexto"
+                                 value="#{adminConsultasBean.filtroTexto}"
+                                 styleClass="admin-consultas-input"
+                                 pt:placeholder="Paciente, medico ou especialidade">
+                        <f:ajax event="keyup" render=":tabelaConsultas" />
+                    </h:inputText>
+                </div>
+
+                <div class="admin-consultas-filtro">
+                    <h:outputLabel for="filtroStatus" value="Status" />
+                    <h:selectOneMenu id="filtroStatus"
+                                     value="#{adminConsultasBean.filtroStatus}"
+                                     styleClass="admin-consultas-input">
+                        <f:selectItem itemLabel="Todos" itemValue="" />
+                        <f:selectItem itemLabel="Pendente" itemValue="PENDENTE" />
+                        <f:selectItem itemLabel="Confirmada" itemValue="CONFIRMADA" />
+                        <f:selectItem itemLabel="Realizada" itemValue="REALIZADA" />
+                        <f:selectItem itemLabel="Cancelada" itemValue="CANCELADA" />
+                        <f:ajax render=":tabelaConsultas" />
+                    </h:selectOneMenu>
+                </div>
+            </h:form>
+
+            <h:panelGroup id="tabelaConsultas" layout="block" styleClass="admin-consultas-tabela-wrap">
+                <h:form id="formTabelaConsultas">
+                    <h:dataTable value="#{adminConsultasBean.consultasFiltradas}"
+                                 var="consulta"
+                                 styleClass="admin-table admin-consultas-tabela"
+                                 headerClass="tabela-header"
+                                 rowClasses="linha-par,linha-impar"
+                                 rendered="#{not empty adminConsultasBean.consultasFiltradas}">
+
+                        <h:column>
+                            <f:facet name="header">Paciente</f:facet>
+                            <h:outputText value="#{consulta.nomePaciente}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Medico</f:facet>
+                            <h:outputText value="#{consulta.nomeMedico}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Especialidade</f:facet>
+                            <h:outputText value="#{consulta.especialidade}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Data</f:facet>
+                            <h:outputText value="#{adminConsultasBean.formatarData(consulta.dataConsulta)}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Hora</f:facet>
+                            <h:outputText value="#{adminConsultasBean.formatarHora(consulta.hora)}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Valor</f:facet>
+                            <h:outputText value="#{adminConsultasBean.formatarValor(consulta.valorConsulta)}" />
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Status</f:facet>
+                            <span class="admin-consultas-status #{adminConsultasBean.getClasseStatus(consulta)}">
+                                <h:outputText value="#{consulta.status}" />
+                            </span>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Acoes</f:facet>
+                            <h:commandButton value="Cancelar"
+                                             styleClass="btn btn-danger"
+                                             action="#{adminConsultasBean.cancelarConsulta(consulta.id)}"
+                                             rendered="#{adminConsultasBean.podeCancelar(consulta)}"
+                                             onclick="return confirm('Cancelar esta consulta?');">
+                                <f:ajax execute="@this" render=":mensagens :resumoConsultas :tabelaConsultas" />
+                            </h:commandButton>
+
+                            <h:outputText value="-"
+                                          rendered="#{not adminConsultasBean.podeCancelar(consulta)}" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup layout="block"
+                                  styleClass="empty-state"
+                                  rendered="#{empty adminConsultasBean.consultasFiltradas}">
+                        <h:outputText value="Nenhuma consulta encontrada." />
+                    </h:panelGroup>
+                </h:form>
+            </h:panelGroup>
+        </section>
+    </ui:define>
+</ui:composition>

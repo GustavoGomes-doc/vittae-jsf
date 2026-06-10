@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +28,21 @@ public class ConsultaService {
 	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
 	
 	/**
+	 * Método utilitário para recuperar o token JWT armazenado na sessão do JSF
+	 */
+	private String obterTokenSessao() {
+		try {
+			FacesContext ctx = FacesContext.getCurrentInstance();
+			if (ctx != null && ctx.getExternalContext() != null && ctx.getExternalContext().getSessionMap() != null) {
+				return (String) ctx.getExternalContext().getSessionMap().get("token");
+			}
+		} catch (Exception e) {
+			System.err.println("Erro ao recuperar token da sessão: " + e.getMessage());
+		}
+		return null;
+	}
+
+	/**
 	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha
 	 * exatamente o que o ConsultaService do Spring espera.
 	 */
@@ -38,10 +54,18 @@ public class ConsultaService {
 		String json = mapper.writeValueAsString(dto);
 		System.out.println("Enviando agendamento JSON: " + json);
 
+		String token = obterTokenSessao();
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL))
-				.header("Content-Type", "application/json").POST(BodyPublishers.ofString(json)).build();
+		
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.uri(URI.create(API_URL))
+				.header("Content-Type", "application/json");
 
+		if (token != null && !token.isEmpty()) {
+			requestBuilder.header("Authorization", "Bearer " + token);
+		}
+
+		HttpRequest request = requestBuilder.POST(BodyPublishers.ofString(json)).build();
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 		if (response.statusCode() != 200 && response.statusCode() != 201) {
@@ -55,9 +79,18 @@ public class ConsultaService {
 	 * Busca a lista de médicos do Spring Boot pra exibir no step 2.
 	 */
 	public String buscarMedicosJson() throws Exception {
+		String token = obterTokenSessao();
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_MEDICOS)).GET().build();
+		
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.uri(URI.create(API_MEDICOS))
+				.GET();
 
+		if (token != null && !token.isEmpty()) {
+			requestBuilder.header("Authorization", "Bearer " + token);
+		}
+
+		HttpRequest request = requestBuilder.build();
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 		if (response.statusCode() == 200) {
@@ -68,9 +101,18 @@ public class ConsultaService {
 
 	// METÓDO LISTAR CONSULTAS PARA O VISUALIZAR CONSULTA
 	public List<Consulta> listarTodas() throws Exception {
+		String token = obterTokenSessao();
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL)).GET().build();
+		
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.uri(URI.create(API_URL))
+				.GET();
 
+		if (token != null && !token.isEmpty()) {
+			requestBuilder.header("Authorization", "Bearer " + token);
+		}
+
+		HttpRequest request = requestBuilder.build();
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 		if (response.statusCode() == 200) {
@@ -85,28 +127,32 @@ public class ConsultaService {
 	}
 
 	public void cancelar(Long id, Consulta consulta) throws Exception { //metodo cancelar
-	    consulta.setStatus(Status.CANCELADA);
+		consulta.setStatus(Status.CANCELADA);
 
-	    ObjectMapper mapper = new ObjectMapper();
-	    mapper.registerModule(new JavaTimeModule());
-	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new JavaTimeModule());
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-	    String json = mapper.writeValueAsString(consulta);
+		String json = mapper.writeValueAsString(consulta);
 
-	    HttpClient client = HttpClient.newHttpClient();
-	    HttpRequest request = HttpRequest.newBuilder()
-	            .uri(URI.create(API_URL + "/" + id))
-	            .header("Content-Type", "application/json")
-	            .PUT(HttpRequest.BodyPublishers.ofString(json))
-	            .build();
+		String token = obterTokenSessao();
+		HttpClient client = HttpClient.newHttpClient();
+		
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.uri(URI.create(API_URL + "/" + id))
+				.header("Content-Type", "application/json");
 
-	    HttpResponse<String> response = client.send(request,
-	            HttpResponse.BodyHandlers.ofString());
+		if (token != null && !token.isEmpty()) {
+			requestBuilder.header("Authorization", "Bearer " + token);
+		}
 
-	    if (response.statusCode() != 200) {
-	        throw new Exception("Erro ao cancelar. Status: "
-	                + response.statusCode() + " - " + response.body());
-	    }
+		HttpRequest request = requestBuilder.PUT(HttpRequest.BodyPublishers.ofString(json)).build();
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+		if (response.statusCode() != 200) {
+			throw new Exception("Erro ao cancelar. Status: "
+					+ response.statusCode() + " - " + response.body());
+		}
 	}
 
 	// MÉTODO REMARCAR — adicionar após o cancelar
@@ -117,10 +163,18 @@ public class ConsultaService {
 
 		String json = mapper.writeValueAsString(consulta);
 
+		String token = obterTokenSessao();
 		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL + "/" + id))
-				.header("Content-Type", "application/json").PUT(HttpRequest.BodyPublishers.ofString(json)).build();
+		
+		HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+				.uri(URI.create(API_URL + "/" + id))
+				.header("Content-Type", "application/json");
 
+		if (token != null && !token.isEmpty()) {
+			requestBuilder.header("Authorization", "Bearer " + token);
+		}
+
+		HttpRequest request = requestBuilder.PUT(HttpRequest.BodyPublishers.ofString(json)).build();
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 		if (response.statusCode() != 200) {
@@ -258,5 +312,4 @@ public class ConsultaService {
 			this.nascimento = nascimento;
 		}
 	}
-
 }
