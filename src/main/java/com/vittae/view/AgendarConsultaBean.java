@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.service.AgendarConsultaService;
 import com.vittae.service.AgendarConsultaService.AgendamentoDTO;
@@ -64,7 +65,7 @@ public class AgendarConsultaBean implements Serializable {
 
 	public String salvarAgendamento() {
 		try {
-			
+
 			AgendamentoDTO dto = new AgendamentoDTO();
 			dto.setEspecialidade(especialidade);
 			dto.setMedicoId(medicoId);
@@ -99,6 +100,26 @@ public class AgendarConsultaBean implements Serializable {
 		}
 	}
 
+	public static class EspecialidadeStringDeserializer
+			extends com.fasterxml.jackson.databind.JsonDeserializer<List<String>> {
+		@Override
+		public List<String> deserialize(com.fasterxml.jackson.core.JsonParser p,
+				com.fasterxml.jackson.databind.DeserializationContext ctxt) throws java.io.IOException {
+			List<String> nomes = new ArrayList<>();
+			com.fasterxml.jackson.databind.JsonNode node = p.getCodec().readTree(p);
+			if (node.isArray()) {
+				for (com.fasterxml.jackson.databind.JsonNode item : node) {
+					if (item.isTextual()) {
+						nomes.add(item.asText());
+					} else if (item.has("nome")) {
+						nomes.add(item.get("nome").asText());
+					}
+				}
+			}
+			return nomes;
+		}
+	}
+
 	// ── MedicoUI ──
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MedicoUI {
@@ -106,6 +127,7 @@ public class AgendarConsultaBean implements Serializable {
 		private String nome;
 		private String crm;
 		private String telefone;
+		@JsonDeserialize(using = EspecialidadeStringDeserializer.class)
 		private List<String> especialidades;
 		private Integer tempoConsultaMinutos;
 		private Double valorConsulta;
@@ -127,7 +149,6 @@ public class AgendarConsultaBean implements Serializable {
 		public Integer getTempoConsultaMinutos() {
 			return tempoConsultaMinutos;
 		}
-		
 
 		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
 			this.tempoConsultaMinutos = tempoConsultaMinutos;
@@ -286,4 +307,5 @@ public class AgendarConsultaBean implements Serializable {
 	public void setObservacoes(String observacoes) {
 		this.observacoes = observacoes;
 	}
+
 }
