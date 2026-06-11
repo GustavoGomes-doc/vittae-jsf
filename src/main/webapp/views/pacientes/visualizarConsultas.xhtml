@@ -28,10 +28,7 @@
 					<p class="page-subtitle">Gerencie seus agendamentos no sistema
 						Vittae</p>
 				</h:panelGroup>
-				<h:link outcome="/views/pacientes/agendarConsulta"
-					styleClass="btn-nova">
-					<i class="fas fa-plus"></i> Nova Consulta
-				</h:link>
+				
 			</div>
 
 			<!-- TOOLBAR -->
@@ -86,6 +83,10 @@
 							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
 							listener="#{visualizarConsultasBean.filtrar}" />
 					</h:commandButton>
+					<h:link outcome="/views/pacientes/agendarConsulta"
+						styleClass="btn-nova">
+						<i class="fas fa-plus"></i> Nova Consulta
+					</h:link>
 				</div>
 			</div>
 

@@ -35,7 +35,13 @@
 	align-items: flex-start;
 	justify-content: space-between;
 	margin-bottom: 28px;
+	color: #7c3aed;
 }
+
+.h2 {
+	color: #7c3aed;
+}
+
 
 .page-title {
 	font-size: 26px;
@@ -112,26 +118,26 @@
 }
 
 .search-wrap i {
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-label);
-    pointer-events: none;
-    font-size: 12px;
+	position: absolute;
+	left: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--text-label);
+	pointer-events: none;
+	font-size: 12px;
 }
 
 .search-input {
-    width: 100%;
-    padding: 11px 16px 11px 26px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--text);
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
+	width: 100%;
+	padding: 11px 16px 11px 26px;
+	border: 1.5px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	font-family: inherit;
+	font-size: 14px;
+	color: var(--text);
+	outline: none;
+	transition: border-color .2s, box-shadow .2s;
 }
 
 .search-input::placeholder {
@@ -436,66 +442,65 @@ to {
 
 /* ===== MODAL ===== */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
 }
 
 .modal-box {
-    background: #fff;
-    border-radius: 14px;
-    padding: 32px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-    text-align: center;
+	background: #fff;
+	border-radius: 14px;
+	padding: 32px;
+	width: 100%;
+	max-width: 420px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+	text-align: center;
 }
 
 .modal-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1E1B4B;
-    margin-bottom: 10px;
+	font-size: 20px;
+	font-weight: 700;
+	color: #1E1B4B;
+	margin-bottom: 10px;
 }
 
 .modal-text {
-    color: #6B7280;
-    margin-bottom: 24px;
+	color: #6B7280;
+	margin-bottom: 24px;
 }
 
 .modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
+	display: flex;
+	gap: 12px;
+	justify-content: center;
 }
 
 .btn-confirmar-cancel {
-    background: #E11D48;
-    color: #fff;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+	background: #E11D48;
+	color: #fff;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
 }
 
 .btn-secondary {
-    background: #F3F4F6;
-    color: #374151;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+	background: #F3F4F6;
+	color: #374151;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
 }
-
 
 .modal-overlay.modal-ativo {
 	display: flex !important;
@@ -582,41 +587,75 @@ to {
 
 /* ── BADGE PENDENTE ───────────────────────────── */
 .badge-pendente {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #93c5fd;
+	background: #eff6ff;
+	color: #2563eb;
+	border: 1px solid #93c5fd;
 }
-.badge-pendente .badge-dot { background: #3b82f6; }
+
+.badge-pendente .badge-dot {
+	background: #3b82f6;
+}
 
 /* ── CARD CANCELADA ───────────────────────────── */
 .consulta-cancelada {
-    opacity: 0.55;
-    filter: grayscale(55%);
-    background: #f3f4f6 !important;
-    border: 1px solid #d1d5db !important;
-    pointer-events: none;
-}	
+	opacity: 0.55;
+	filter: grayscale(55%);
+	background: #f3f4f6 !important;
+	border: 1px solid #d1d5db !important;
+	pointer-events: none;
+}
+
 .consulta-cancelada .card-actions {
-    display: none;
+	display: none;
 }
 
 /* ── NOME DO PACIENTE ─────────────────────────── */
 .paciente-nome {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-top: 3px;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.8rem;
+	color: #6b7280;
+	margin-top: 3px;
 }
+
 .paciente-nome i {
-    color: var(--vittae-purple);
-    font-size: 0.72rem;
+	color: var(--vittae-purple);
+	font-size: 0.72rem;
+}
+
+/* 1 — Botão Nova Consulta à direita dos filtros (inline com os tabs) */
+.page-header {
+	align-items: center;
+}
+
+/* 1 — Botão Nova Consulta à direita dos filtros */
+.toolbar {
+    justify-content: flex-start;
+}
+
+.toolbar .btn-nova {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* 2 — Subtítulo mais suave */
+.page-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-label);
 }
 
 .badge-pendente {
-    background: #fff8e1 !important;
-    color: #d97706 !important;
-	border: 1px solid #fcd34d !important;}
-.badge-pendente .badge-dot { background: #f59e0b; }
-.badge-pendente .badge-dot { background: #f59e0b; }
+	background: #fff8e1 !important;
+	color: #d97706 !important;
+	border: 1px solid #fcd34d !important;
+}
+
+.badge-pendente .badge-dot {
+	background: #f59e0b;
+}
+
+.badge-pendente .badge-dot {
+	background: #f59e0b;
+}
