@@ -40,4 +40,14 @@ public class UsuarioLogadoBean implements Serializable {
 		
 	}
 	
+	public String getToken() {
+	    FacesContext context = FacesContext.getCurrentInstance();
+	    HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+	    HttpSession session = request.getSession(false);
+	    if (session == null) return "";
+
+	    Object token = session.getAttribute("token");
+	    return token != null ? token.toString() : "";
+	}
+	
 }

@@ -7,21 +7,18 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class AgendarConsultaService {
 
-	// mesma porta do seu Spring Boot — ajusta se precisar
 	private static final String API_URL = "http://localhost:9090/api/agendamentos";
 	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
 
-	/**
-	 * Envia o agendamento pro Spring Boot via POST JSON. O AgendamentoDTO espelha
-	 * exatamente o que o ConsultaService do Spring espera.
-	 */
 	public void salvarAgendamento(AgendamentoDTO dto) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new JavaTimeModule());
@@ -43,9 +40,6 @@ public class AgendarConsultaService {
 		System.out.println("Agendamento salvo com sucesso!");
 	}
 
-	/**
-	 * Busca a lista de médicos do Spring Boot pra exibir no step 2.
-	 */
 	public String buscarMedicosJson() throws Exception {
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_MEDICOS)).GET().build();
@@ -58,7 +52,20 @@ public class AgendarConsultaService {
 		throw new Exception("Falha ao buscar médicos. Status: " + response.statusCode());
 	}
 
-	// ── DTO interno que espelha o AgendamentoDTO do Spring ──────────────────
+	//buscahorariosocupadosdiretodaspringbootparanoofazerdoubledbooking
+	public List<String> buscarHorariosOcupados(Long medicoId, String data) throws Exception {
+		HttpClient client = HttpClient.newHttpClient();
+		//requisicaogetcomparametrosofazendofiltronaapi
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create(API_URL + "/horarios-ocupados?medicoId=" + medicoId + "&data=" + data))
+				.GET().build();
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		if (response.statusCode() == 200) {
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.readValue(response.body(), new TypeReference<List<String>>() {});
+		}
+		throw new Exception("Falha ao buscar horários ocupados.");
+	}
 
 	public static class AgendamentoDTO {
 		private String especialidade;
@@ -67,15 +74,12 @@ public class AgendarConsultaService {
 		private Long medicoId;
 		private String observacoes;
 		private PacienteDTO paciente;
-		
-		// Novos campos do responsável legal
 		private String respNome;
 		private String respCpf;
 		private String respParentesco;;
 
 		public AgendamentoDTO() {
 		}
-
 
 		public String getEspecialidade() {
 			return especialidade;
@@ -84,7 +88,6 @@ public class AgendarConsultaService {
 		public void setEspecialidade(String especialidade) {
 			this.especialidade = especialidade;
 		}
-
 
 		public LocalDate getDataConsulta() {
 			return dataConsulta;
@@ -126,45 +129,37 @@ public class AgendarConsultaService {
 			this.paciente = paciente;
 		}
 
-
 		public String getRespNome() {
 			return respNome;
 		}
-
 
 		public void setRespNome(String respNome) {
 			this.respNome = respNome;
 		}
 
-
 		public String getRespCpf() {
 			return respCpf;
 		}
-
 
 		public void setRespCpf(String respCpf) {
 			this.respCpf = respCpf;
 		}
 
-
 		public String getRespParentesco() {
 			return respParentesco;
 		}
 
-
 		public void setRespParentesco(String respParentesco) {
 			this.respParentesco = respParentesco;
 		}
-		
-		
 	}
 
 	public static class PacienteDTO {
 		private String nome;
 		private String cpf;
 		private String telefone;
-		private String genero; 
-		private String nascimento; 
+		private String genero;
+		private String nacimiento;
 
 		public PacienteDTO() {
 		}
@@ -202,11 +197,11 @@ public class AgendarConsultaService {
 		}
 
 		public String getNascimento() {
-			return nascimento;
+			return nacimiento;
 		}
 
 		public void setNascimento(String nascimento) {
-			this.nascimento = nascimento;
+			this.nacimiento = nascimento;
 		}
 	}
 }
