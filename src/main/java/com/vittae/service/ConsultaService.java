@@ -16,6 +16,7 @@ import javax.inject.Named;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vittae.dto.AdminConsultaDTO;
 import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 
@@ -124,6 +125,24 @@ public class ConsultaService {
 					mapper.getTypeFactory().constructCollectionType(List.class, Consulta.class));
 		}
 		throw new Exception("Erro ao buscar consultas. Status: " + response.statusCode());
+	}
+	
+	public List<AdminConsultaDTO> listarTodasAdmin(String token) throws Exception {
+	    HttpClient client = HttpClient.newHttpClient();
+	    HttpRequest request = HttpRequest.newBuilder()
+	            .uri(URI.create("http://localhost:9090/api/agendamentos/todos"))
+	            .header("Authorization", "Bearer " + token)
+	            .GET()
+	            .build();
+	    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	    if (response.statusCode() == 200) {
+	        ObjectMapper mapper = new ObjectMapper();
+	        mapper.registerModule(new JavaTimeModule());
+	        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	        return mapper.readValue(response.body(),
+	                mapper.getTypeFactory().constructCollectionType(List.class, AdminConsultaDTO.class));
+	    }
+	    throw new Exception("Erro ao buscar consultas admin. Status: " + response.statusCode());
 	}
 
 	public void cancelar(Long id, Consulta consulta) throws Exception { //metodo cancelar

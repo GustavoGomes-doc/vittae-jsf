@@ -105,7 +105,39 @@ public class UsuarioService implements Serializable {
         }
         return new ArrayList<>(); // Retorna vazio se der erro, para não quebrar a tela
     }
-
+    
+    public List<Usuario> buscarTodosComToken(String token) {
+    	try {
+    		HttpRequest request = HttpRequest.newBuilder()
+    				.uri(URI.create(API_URL))
+    				.header("Accept", "application/json")
+    				.header("Authorization", "Bearer " + token)
+    				.GET()
+    				.build();   
+    		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    		if (response.statusCode() == 200) {
+    			return mapper.readValue(response.body(), new TypeReference<List<Usuario>>() {});
+    		}
+    	} catch (Exception e) {
+    		log.error("Error ao buscar usuários: " + e.getMessage());
+    	}
+    	return new ArrayList<>();
+    } 
+    
+    public long contarPorPerfilComToken(Perfil perfil, String token) {
+    	return buscarTodosComToken(token).stream()
+		    .filter(u -> perfil.equals(u.getPerfil()))
+		    .count();
+    }
+    
+    public List<Usuario> buscarUltimosMedicosComToken(int limite, String token) {
+    	return buscarTodosComToken(token).stream()
+    			.filter(u -> Perfil.MEDICO.equals(u.getPerfil()))
+    			.sorted(Comparator.comparing(Usuario::getId, Comparator.nullsLast(Comparator.reverseOrder())))
+    			.limit(limite)
+    			.collect(Collectors.toList());
+    }
+    
     public void excluir(Usuario usuario) {
         try {
             // Assumindo que a sua classe Usuario tem um getId()

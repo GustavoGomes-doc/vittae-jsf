@@ -12,13 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var valorInput   = document.getElementById('formCadastro:valorConsulta');
     var nomeInput    = document.getElementById('formCadastro:nomeMedico');
 
-    var ESPECIALIDADES = [
-        'Cardiologia','Dermatologia','Pediatria','Ortopedia',
-        'Ginecologia','Oftalmologia','Neurologia','Psiquiatria',
-        'Endocrinologia','Urologia','Otorrinolaringologia',
-        'Gastroenterologia','Clínico Geral','Oncologia',
-        'Reumatologia','Infectologia'
-    ];
+    
 
     var especialidadesSelecionadas = [];
 
@@ -302,37 +296,46 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ── Chips de especialidade ───────────────────────────────────────────────
-    function inicializarChips() {
-        var container = document.getElementById('chipsContainer');
-        if (!container) return;
-        ESPECIALIDADES.forEach(function (nome) {
-            var chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.textContent = nome;
-            chip.dataset.nome = nome;
-            chip.addEventListener('click', function () { toggleChip(chip, nome); });
-            container.appendChild(chip);
-        });
-    }
+	function inicializarChips() {
+	    var container = document.getElementById('chipsContainer');
+	    if (!container) return;
 
-    function toggleChip(chip, nome) {
-        if (chip.classList.contains('bloqueado')) return;
-        if (chip.classList.contains('ativo')) {
-            chip.classList.remove('ativo');
-            especialidadesSelecionadas = especialidadesSelecionadas.filter(function (e) { return e !== nome; });
-        } else {
-            if (especialidadesSelecionadas.length >= 3) {
-                mostrarToast('Máximo de 3 especialidades.', 'erro');
-                return;
-            }
-            chip.classList.add('ativo');
-            especialidadesSelecionadas.push(nome);
-        }
-        var hidden = document.getElementById('formCadastro:especialidadesHidden');
-        if (hidden) hidden.value = especialidadesSelecionadas.join(',');
-        atualizarChips();
-        if (especialidadesSelecionadas.length > 0) ocultarErro('especialidade');
-    }
+	    fetch('http://localhost:9090/api/especialidades')
+	        .then(function(res) { return res.json(); })
+	        .then(function(lista) {
+	            lista.forEach(function(esp) {
+	                var chip = document.createElement('div');
+	                chip.className = 'chip';
+	                chip.textContent = esp.nome;
+	                chip.dataset.nome = esp.nome;
+	                chip.dataset.id = esp.id;
+	                chip.addEventListener('click', function () { toggleChip(chip, esp); });
+	                container.appendChild(chip);
+	            });
+	        })
+	        .catch(function() {
+	            mostrarToast('Erro ao carregar especialidades.', 'erro');
+	        });
+	}
+
+	function toggleChip(chip, esp) {
+	    if (chip.classList.contains('bloqueado')) return;
+	    if (chip.classList.contains('ativo')) {
+	        chip.classList.remove('ativo');
+	        especialidadesSelecionadas = especialidadesSelecionadas.filter(function (e) { return e.id !== esp.id; });
+	    } else {
+	        if (especialidadesSelecionadas.length >= 3) {
+	            mostrarToast('Máximo de 3 especialidades.', 'erro');
+	            return;
+	        }
+	        chip.classList.add('ativo');
+	        especialidadesSelecionadas.push(esp);
+	    }
+	    var hidden = document.getElementById('formCadastro:especialidadesHidden');
+	    if (hidden) hidden.value = especialidadesSelecionadas.map(function(e){ return e.id; }).join(',');
+	    atualizarChips();
+	    if (especialidadesSelecionadas.length > 0) ocultarErro('especialidade');
+	}
 
     function atualizarChips() {
         var max = especialidadesSelecionadas.length >= 3;

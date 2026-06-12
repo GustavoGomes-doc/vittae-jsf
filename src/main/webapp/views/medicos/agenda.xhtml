@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+    <ui:define name="css_extra">
+        <h:outputStylesheet library="css" name="agenda.css" />
+    </ui:define>
+
+    <ui:define name="corpo">
+
+        <h:form id="formAgenda">
+
+            <!-- HEADER -->
+            <div class="agenda-header">
+                <div class="agenda-titulo-wrap">
+                    <i class="fas fa-calendar-alt agenda-titulo-icon"></i>
+                    <h2 class="agenda-titulo">Minha Agenda</h2>
+                </div>
+
+                <!-- Navegação de mês -->
+                <div class="agenda-nav">
+                    <h:commandButton styleClass="agenda-nav-btn" title="Mês anterior"
+					    action="#{agendaMedicoBean.mesAnterior}"
+					    value="&#8249;">
+					    <f:ajax execute="@this" render="formAgenda" />
+					</h:commandButton>
+
+                    <span class="agenda-mes-label">#{agendaMedicoBean.tituloMes}</span>
+
+                    <h:commandButton styleClass="agenda-nav-btn" title="Próximo mês"
+					    action="#{agendaMedicoBean.proximoMes}"
+					    value="&#8250;">
+					    <f:ajax execute="@this" render="formAgenda" />
+					</h:commandButton>
+                </div>
+
+                <!-- Legenda -->
+                <div class="agenda-legenda">
+                    <span class="legenda-item">
+                        <span class="legenda-dot dot-pendente"></span> Pendente
+                    </span>
+                    <span class="legenda-item">
+                        <span class="legenda-dot dot-realizada"></span> Realizada
+                    </span>
+                    <span class="legenda-item">
+                        <span class="legenda-dot dot-cancelada"></span> Cancelada
+                    </span>
+                </div>
+            </div>
+
+            <!-- CALENDÁRIO -->
+            <div class="agenda-calendario">
+
+                <!-- Cabeçalho dias da semana -->
+                <div class="agenda-grid-header">
+                    <div class="agenda-dow">Dom</div>
+                    <div class="agenda-dow">Seg</div>
+                    <div class="agenda-dow">Ter</div>
+                    <div class="agenda-dow">Qua</div>
+                    <div class="agenda-dow">Qui</div>
+                    <div class="agenda-dow">Sex</div>
+                    <div class="agenda-dow">Sáb</div>
+                </div>
+
+                <!-- Grid de células -->
+                <div class="agenda-grid-body">
+                    <ui:repeat value="#{agendaMedicoBean.celulas}" var="dia">
+
+                        <div class="agenda-celula
+                            #{agendaMedicoBean.pertenceAoMes(dia) ? '' : 'celula-fora'}
+                            #{agendaMedicoBean.eHoje(dia) ? 'celula-hoje' : ''}">
+
+                            <!-- Número do dia -->
+                            <div class="agenda-dia-num
+                                #{agendaMedicoBean.eHoje(dia) ? 'dia-num-hoje' : ''}">
+                                <h:outputText value="#{dia.dayOfMonth}" />
+                            </div>
+
+                            <!-- Consultas do dia -->
+                            <div class="agenda-slots">
+                                <ui:repeat value="#{agendaMedicoBean.consultasDoDia(dia)}" var="c">
+                                    <div class="agenda-slot #{agendaMedicoBean.cssDoStatus(c)}"
+                                         title="#{c.nomePaciente} — #{c.especialidade}">
+                                        <span class="slot-hora">
+                                            <h:outputText value="#{c.hora}">
+                                                <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                            </h:outputText>
+                                        </span>
+                                        <span class="slot-nome">#{c.nomePaciente}</span>
+                                        <span class="slot-esp">#{c.especialidade}</span>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+
+                        </div>
+
+                    </ui:repeat>
+                </div>
+
+            </div>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
+</html>

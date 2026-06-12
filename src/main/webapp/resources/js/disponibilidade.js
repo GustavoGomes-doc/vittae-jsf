@@ -18,7 +18,6 @@
         var partsF = horaFim.split(':');
         var minI = parseInt(partsI[0]) * 60 + parseInt(partsI[1]);
         var minF = parseInt(partsF[0]) * 60 + parseInt(partsF[1]);
-
         for (var m = minI; m < minF; m += intervaloMin) {
             slots.push(pad(Math.floor(m / 60)) + ':' + pad(m % 60));
         }
@@ -26,13 +25,12 @@
     }
 
     function renderizarSemana() {
-
         ['SEGUNDA','TERCA','QUARTA','QUINTA','SEXTA','SABADO'].forEach(function(dia) {
             var col = document.getElementById('slot' + dia);
             if (col) col.innerHTML = '';
         });
 
-        var token = document.querySelector('meta[name="token"]');
+        var token    = document.querySelector('meta[name="token"]');
         var medicoId = document.querySelector('meta[name="medicoId"]');
         if (!token || !medicoId) return;
 
@@ -47,11 +45,9 @@
             .then(function(r) { return r.json(); })
             .then(function(medico) {
                 var intervalo = medico.tempoConsultaMinutos || 30;
-
                 disps.forEach(function(disp) {
                     var col = document.getElementById('slot' + disp.diaSemana);
                     if (!col) return;
-
                     var slots = gerarSlots(disp.horaInicio, disp.horaFim, intervalo);
                     slots.forEach(function(slot) {
                         var el = document.createElement('div');
@@ -67,11 +63,9 @@
         });
     }
 
- 
     function injetarMetas() {
-
-        var tokenInput   = document.querySelector('input[id$="tokenHidden"]');
-        var medicoInput  = document.querySelector('input[id$="medicoIdHidden"]');
+        var tokenInput  = document.querySelector('input[id$="tokenHidden"]');
+        var medicoInput = document.querySelector('input[id$="medicoIdHidden"]');
 
         if (tokenInput && medicoInput) {
             var metaToken = document.createElement('meta');
@@ -88,6 +82,25 @@
         renderizarSemana();
     }
 
-    document.addEventListener('DOMContentLoaded', injetarMetas);
+    document.addEventListener('DOMContentLoaded', function () {
+        injetarMetas();
+
+        document.querySelectorAll('.input-hora-disp').forEach(function (input) {
+            input.addEventListener('input', function () {
+                var raw = this.value.replace(/\D/g, '').slice(0, 4);
+                if (raw.length === 0) { this.value = ''; return; }
+                if (raw.length === 1 && parseInt(raw, 10) >= 3) {
+                    raw = '0' + raw;
+                    this.value = raw + ':';
+                    return;
+                }
+                if (raw.length <= 2) {
+                    this.value = raw.length === 2 ? raw + ':' : raw;
+                } else {
+                    this.value = raw.slice(0, 2) + ':' + raw.slice(2);
+                }
+            });
+        });
+    });
 
 })();
