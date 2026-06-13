@@ -30,8 +30,8 @@
             <!-- Adicionar disponibilidade -->
             <div class="perfil-card">
                 <div class="perfil-card-titulo">
-                    <i class="fas fa-plus-circle"></i> Adicionar Horário
-                </div>
+				    <i class="fas fa-plus-circle"></i> Adicionar Horário
+				</div>
                 <h:form id="formDisp">
                     <div class="perfil-grid">
                         <div class="perfil-campo">
@@ -49,31 +49,29 @@
                         </div>
                         <div class="perfil-campo">
                             <label>Horário de início</label>
-                            <h:inputText id="horaInicio" value="#{disponibilidadeBean.horaInicio}"
-                                styleClass="perfil-input"
-                                pt:type="time" />
+                           <h:inputText id="horaInicio" value="#{disponibilidadeBean.horaInicio}"
+							    styleClass="perfil-input input-hora-disp"
+							    placeholder="08:00" maxlength="5" />
                         </div>
                         <div class="perfil-campo">
                             <label>Horário de fim</label>
                             <h:inputText id="horaFim" value="#{disponibilidadeBean.horaFim}"
-                                styleClass="perfil-input"
-                                pt:type="time" />
+                                styleClass="perfil-input input-hora-disp"
+                                placeholder="08:00" maxlength="5" />
                         </div>
                     </div>
                     <h:commandButton value="Adicionar horário"
-                        action="#{disponibilidadeBean.salvar()}"
-                        styleClass="btn-perfil-salvar"
-                        style="margin-top:1rem;">
-                        <f:ajax execute="@form" render="@form tabelaDisp" />
-                    </h:commandButton>
+					    action="#{disponibilidadeBean.salvar()}"
+					    styleClass="btn-perfil-salvar"
+					    style="margin-top:1rem;" />
                 </h:form>
             </div>
 
             <!-- Tabela de disponibilidades -->
             <div class="perfil-card" id="tabelaDisp">
                 <div class="perfil-card-titulo">
-                    <i class="fas fa-calendar-alt"></i> Horários Cadastrados
-                </div>
+				    <i class="fas fa-calendar-alt"></i> Horários Cadastrados
+				</div>
 
                 <h:panelGroup layout="block"
                               rendered="#{empty disponibilidadeBean.disponibilidades}">
@@ -94,12 +92,10 @@
                                     #{disp['horaInicio']} — #{disp['horaFim']}
                                 </div>
                                 <h:form>
-                                    <h:commandButton value="Remover"
-                                        action="#{disponibilidadeBean.remover(disp['id'])}"
-                                        styleClass="disp-btn-remover">
-                                        <f:ajax execute="@form" render=":tabelaDisp" />
-                                    </h:commandButton>
-                                </h:form>
+								    <h:commandButton value="Remover"
+								        action="#{disponibilidadeBean.remover(disp['id'])}"
+								        styleClass="disp-btn-remover" />
+								</h:form>
                             </div>
                         </ui:repeat>
                     </div>

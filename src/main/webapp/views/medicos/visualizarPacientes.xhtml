@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+    <ui:define name="css_extra">
+        <h:outputStylesheet library="css" name="medico.css" />
+        <h:outputStylesheet library="css" name="vizualizar.css" />
+    </ui:define>
+
+    <ui:define name="corpo">
+
+        <h:form id="formPacientes">
+
+            <!-- HEADER -->
+            <div class="page-header">
+                <h2 class="page-title" style="color:#7c3aed;font-size:1.5rem;font-weight:700;">
+                    <i class="fas fa-users" style="margin-right:8px"></i>Meus Pacientes
+                </h2>
+                <p class="page-subtitle">Histórico de todos os pacientes que já consultaram com você</p>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="toolbar">
+                <h:panelGroup layout="block" styleClass="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <h:inputText id="filtroTexto"
+                        value="#{meusPacientesBean.filtroTexto}"
+                        styleClass="search-input"
+                        p:placeholder="Buscar paciente ou especialidade...">
+                        <f:ajax event="keyup" execute="@this"
+                            render="listaPacientesGroup contadorGroup"
+                            listener="#{meusPacientesBean.filtrar}" />
+                    </h:inputText>
+                </h:panelGroup>
+
+                <div class="filter-tabs">
+                    <h:commandButton value="Todas"
+                        styleClass="filter-tab #{meusPacientesBean.filtroStatus == 'todas' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{meusPacientesBean.filtroStatus}" value="todas" />
+                        <f:ajax execute="@this" render="listaPacientesGroup contadorGroup"
+                            listener="#{meusPacientesBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Pendentes"
+                        styleClass="filter-tab #{meusPacientesBean.filtroStatus == 'pendente' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{meusPacientesBean.filtroStatus}" value="pendente" />
+                        <f:ajax execute="@this" render="listaPacientesGroup contadorGroup"
+                            listener="#{meusPacientesBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Realizadas"
+                        styleClass="filter-tab #{meusPacientesBean.filtroStatus == 'realizada' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{meusPacientesBean.filtroStatus}" value="realizada" />
+                        <f:ajax execute="@this" render="listaPacientesGroup contadorGroup"
+                            listener="#{meusPacientesBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Canceladas"
+                        styleClass="filter-tab #{meusPacientesBean.filtroStatus == 'cancelada' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{meusPacientesBean.filtroStatus}" value="cancelada" />
+                        <f:ajax execute="@this" render="listaPacientesGroup contadorGroup"
+                            listener="#{meusPacientesBean.filtrar}" />
+                    </h:commandButton>
+                </div>
+            </div>
+
+            <!-- CONTADOR -->
+            <h:panelGroup id="contadorGroup" layout="block" styleClass="contador-resultados">
+                <h:outputText value="#{meusPacientesBean.totalFiltradas} consulta(s) encontrada(s)" />
+            </h:panelGroup>
+
+            <!-- TABELA -->
+            <h:panelGroup id="listaPacientesGroup" layout="block">
+
+                <!-- Empty state -->
+                <h:panelGroup
+                    rendered="#{empty meusPacientesBean.consultasFiltradas}"
+                    layout="block" styleClass="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-user-times" style="font-size:32px;color:#ede9fe"></i>
+                    </div>
+                    <h3 class="empty-title">Nenhuma consulta encontrada</h3>
+                    <p class="empty-text">Não há registros para os critérios selecionados.</p>
+                </h:panelGroup>
+
+                <!-- Tabela com resultados -->
+                <h:panelGroup
+                    rendered="#{not empty meusPacientesBean.consultasFiltradas}"
+                    layout="block" styleClass="card">
+
+                    <table class="tabela-dados">
+                        <thead class="tabela-header">
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Especialidade</th>
+                                <th>Data da Consulta</th>
+                                <th>Horário</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ui:repeat value="#{meusPacientesBean.consultasFiltradas}"
+                                var="c" varStatus="loop">
+                                <tr class="#{loop.index % 2 == 0 ? 'tabela-linha-par' : 'tabela-linha-impar'}">
+
+                                    <!-- Paciente -->
+                                    <td>
+                                        <div style="display:flex;align-items:center;gap:10px">
+                                            <div style="width:34px;height:34px;border-radius:50%;
+                                                        background:#ede9fe;display:flex;
+                                                        align-items:center;justify-content:center;
+                                                        color:#7c3aed;font-size:14px;flex-shrink:0">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <span style="font-weight:600;color:#1e293b">
+                                                #{c.nomePaciente}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <!-- Especialidade -->
+                                    <td>
+                                        <h:outputText value="#{c.especialidade}" />
+                                    </td>
+
+                                    <!-- Data -->
+                                    <td>
+                                        <h:outputText value="#{c.dataConsulta}">
+                                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                        </h:outputText>
+                                    </td>
+
+                                    <!-- Hora -->
+                                    <td>
+                                        <h:outputText value="#{c.hora}">
+                                            <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                        </h:outputText>
+                                    </td>
+
+                                    <!-- Status badge -->
+                                    <td>
+                                        <h:panelGroup layout="block"
+                                            styleClass="badge #{c.status.toString().equalsIgnoreCase('PENDENTE') ? 'badge-warning'
+                                                : c.status.toString().equalsIgnoreCase('REALIZADA') ? 'badge-success'
+                                                : c.status.toString().equalsIgnoreCase('CANCELADA') ? 'badge-danger'
+                                                : 'badge-default'}">
+                                            <h:outputText value="#{c.status}" />
+                                        </h:panelGroup>
+                                    </td>
+
+                                </tr>
+                            </ui:repeat>
+                        </tbody>
+                    </table>
+
+                </h:panelGroup>
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
+</html>

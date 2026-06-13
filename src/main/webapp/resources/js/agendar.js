@@ -639,9 +639,11 @@
                 ? '<img src="data:image/jpeg;base64,' + med.foto + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%" />'
                 : iniciais;
 
-            var tagsHtml = (med.especialidades || []).map(function(e) {
-                return '<span class="ag-medico-tag">' + e + '</span>';
-            }).join('');
+				var tagsHtml = (med.especialidades || []).map(function(e) {
+				    var nome = typeof e === 'string' ? e : e.nome;
+				    var desc = (e && e.descricao) ? e.descricao : '';
+				    return '<span class="ag-medico-tag"><i class="fas fa-stethoscope"></i> ' + nome + '</span>';
+				}).join('');
 
             var valor = med.valorConsulta ? parseFloat(med.valorConsulta).toFixed(2).replace('.',',') : '—';
 
@@ -812,9 +814,11 @@
 	            var medicos = results[1];
 
 	            var comMedico = new Set();
-	            medicos.forEach(function(med) {
-	                (med.especialidades || []).forEach(function(e) { comMedico.add(e); });
-	            });
+				medicos.forEach(function(med) {
+				    (med.especialidades || []).forEach(function(e) {
+				        comMedico.add(typeof e === 'string' ? e : e.nome);
+				    });
+				});
 
 	            var grid = document.getElementById('espGrid');
 	            if (!grid) return;

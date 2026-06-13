@@ -28,7 +28,6 @@
                     <p>Médicos cadastrados</p>
                 </div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-icon blue">
                     <i class="fas fa-users"></i>
@@ -38,7 +37,6 @@
                     <p>Pacientes registrados</p>
                 </div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-icon green">
                     <i class="fas fa-calendar-check"></i>
@@ -48,7 +46,6 @@
                     <p>Consultas hoje</p>
                 </div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-icon orange">
                     <i class="fas fa-clock"></i>
@@ -65,16 +62,14 @@
                 <i class="fas fa-user-plus"></i>
                 <span>Cadastrar Médico</span>
             </h:link>
-
-            <a href="#" class="quick-btn">
+            <h:link outcome="/views/admin/visualizarConsultas" styleClass="quick-btn">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Consultas</span>
-            </a>
-
-            <a href="#" class="quick-btn">
-                <i class="fas fa-file-medical"></i>
-                <span>Relatórios</span>
-            </a>
+            </h:link>
+            <h:link outcome="/views/admin/visualizarMedicos" styleClass="quick-btn">
+                <i class="fas fa-stethoscope"></i>
+                <span>Médicos</span>
+            </h:link>
         </div>
 
         <div class="bottom-grid">
@@ -85,16 +80,14 @@
                         <i class="fas fa-user-md" style="color:#7c3aed;margin-right:8px"></i>
                         Últimos Médicos Cadastrados
                     </h3>
-                    <h:link outcome="/views/admin/cadastrarMedico" value="Cadastrar novo" />
+                    <h:link outcome="/views/admin/cadastrarMedico" value="Cadastrar novo"/>
                 </div>
-
                 <ui:fragment rendered="#{empty inicioAdminBean.ultimosMedicos}">
                     <div class="empty-state">
                         <i class="fas fa-user-md"></i>
                         <p>Nenhum médico cadastrado ainda.</p>
                     </div>
                 </ui:fragment>
-
                 <ui:fragment rendered="#{not empty inicioAdminBean.ultimosMedicos}">
                     <ul class="activity-list">
                         <ui:repeat value="#{inicioAdminBean.ultimosMedicos}" var="medico">
@@ -116,16 +109,14 @@
                         <i class="fas fa-calendar-alt" style="color:#3b82f6;margin-right:8px"></i>
                         Consultas Recentes
                     </h3>
-                    <a href="#">Ver todas</a>
+                    <h:link outcome="/views/admin/visualizarConsultas" value="Ver todas"/>
                 </div>
-
                 <ui:fragment rendered="#{empty inicioAdminBean.consultasRecentes}">
                     <div class="empty-state">
                         <i class="fas fa-calendar-alt"></i>
                         <p>Nenhuma consulta registrada ainda.</p>
                     </div>
                 </ui:fragment>
-
                 <ui:fragment rendered="#{not empty inicioAdminBean.consultasRecentes}">
                     <ul class="activity-list">
                         <ui:repeat value="#{inicioAdminBean.consultasRecentes}" var="consulta">
@@ -133,7 +124,7 @@
                                 <div class="activity-dot blue"></div>
                                 <div>
                                     <div class="activity-text">
-                                        #{consulta.paciente.nome} com #{consulta.medico.nome}
+                                        #{consulta.nomePaciente} com #{consulta.nomeMedico}
                                     </div>
                                     <div class="activity-time">
                                         #{consulta.dataConsulta} às #{consulta.hora} · #{consulta.status}
@@ -143,78 +134,6 @@
                         </ui:repeat>
                     </ul>
                 </ui:fragment>
-            </div>
-
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>
-                        <i class="fas fa-bell" style="color:#f97316;margin-right:8px"></i>
-                        Pendências da Clínica
-                    </h3>
-                </div>
-
-                <ul class="activity-list">
-                    <li class="activity-item">
-                        <div class="activity-dot orange"></div>
-                        <div>
-                            <div class="activity-text">
-                                #{inicioAdminBean.consultasPendentes} consultas aguardando confirmação
-                            </div>
-                            <div class="activity-time">Acompanhe a agenda da clínica</div>
-                        </div>
-                    </li>
-
-                    <li class="activity-item">
-                        <div class="activity-dot green"></div>
-                        <div>
-                            <div class="activity-text">
-                                #{inicioAdminBean.consultasConfirmadas} consultas confirmadas
-                            </div>
-                            <div class="activity-time">Operação em andamento</div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>
-                        <i class="fas fa-chart-pie" style="color:#22c55e;margin-right:8px"></i>
-                        Resumo do Sistema
-                    </h3>
-                </div>
-
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Indicador</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Médicos cadastrados</td>
-                            <td>#{inicioAdminBean.totalMedicos}</td>
-                            <td><span class="badge-confirmado">Ativo</span></td>
-                        </tr>
-                        <tr>
-                            <td>Pacientes registrados</td>
-                            <td>#{inicioAdminBean.totalPacientes}</td>
-                            <td><span class="badge-confirmado">Ativo</span></td>
-                        </tr>
-                        <tr>
-                            <td>Consultas hoje</td>
-                            <td>#{inicioAdminBean.consultasHoje}</td>
-                            <td><span class="badge-confirmado">Agenda</span></td>
-                        </tr>
-                        <tr>
-                            <td>Consultas pendentes</td>
-                            <td>#{inicioAdminBean.consultasPendentes}</td>
-                            <td><span class="badge-pendente">Aguardando</span></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
 
         </div>

@@ -65,58 +65,92 @@ public class DisponibilidadeBean implements Serializable {
 	}
 
 	public void salvar() {
-		if (diaSemana == null || horaInicio == null || horaFim == null || diaSemana.isBlank() || horaInicio.isBlank()
-				|| horaFim.isBlank()) {
-			addErro("Preencha todos os campos.");
-			return;
-		}
+	    if (diaSemana == null || horaInicio == null || horaFim == null 
+	            || diaSemana.isBlank() || horaInicio.isBlank() || horaFim.isBlank()) {
+	        addErro("Preencha todos os campos.");
+	        return;
+	    }
+	    if (!horaInicio.matches("\\d{2}:\\d{2}") || !horaFim.matches("\\d{2}:\\d{2}")) {
+	        addErro("Formato de horário inválido. Use HH:MM.");
+	        return;
+	    }
+	    int minInicio = Integer.parseInt(horaInicio.split(":")[1]);
+	    int minFim    = Integer.parseInt(horaFim.split(":")[1]);
+	    if (minInicio % 30 != 0 || minFim % 30 != 0) {
+	        addErro("Horários devem ser em intervalos de 30 minutos (ex: 08:00 ou 08:30).");
+	        return;
+	    }
 
-		if (horaFim.compareTo(horaInicio) <= 0) {
-			addErro("Horário de fim deve ser maior que o de início.");
-			return;
-		}
+	    if (horaInicio.compareTo("07:00") < 0 || horaFim.compareTo("19:00") > 0) {
+	        addErro("Horários permitidos: 07:00 às 19:00.");
+	        return;
+	    }
 
-		try {
-			String json = mapper
-					.writeValueAsString(Map.of("diaSemana", diaSemana, "horaInicio", horaInicio, "horaFim", horaFim));
+	    if (horaFim.compareTo(horaInicio) <= 0) {
+	        addErro("Horário de fim deve ser maior que o de início.");
+	        return;
+	    }
 
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL + medicoId))
-					.header("Content-Type", "application/json").header("Authorization", "Bearer " + token)
-					.POST(HttpRequest.BodyPublishers.ofString(json)).build();
+	    boolean jaExiste = disponibilidades.stream()
+	            .anyMatch(d -> diaSemana.equals(d.get("diaSemana")));
+	    if (jaExiste) {
+	        addErro("Já existe um horário cadastrado para " + diaSemana + ". Remova antes de adicionar novo.");
+	        return;
+	    }
 
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	    try {
+	        HttpSession session = getSession();
+	        String tokenAtual = session != null ? (String) session.getAttribute("token") : token;
 
-			if (response.statusCode() == 200) {
-				addSucesso("Disponibilidade adicionada!");
-				diaSemana = null;
-				horaInicio = null;
-				horaFim = null;
-				carregarDisponibilidades();
-			} else {
-				addErro("Erro ao salvar: " + response.statusCode());
-			}
-		} catch (Exception e) {
-			addErro("Erro: " + e.getMessage());
-		}
+	        String json = mapper.writeValueAsString(
+	                Map.of("diaSemana", diaSemana, "horaInicio", horaInicio, "horaFim", horaFim));
+
+	        HttpRequest request = HttpRequest.newBuilder()
+	                .uri(URI.create(API_URL + medicoId))
+	                .header("Content-Type", "application/json")
+	                .header("Authorization", "Bearer " + tokenAtual)
+	                .POST(HttpRequest.BodyPublishers.ofString(json)).build();
+
+	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+	        if (response.statusCode() == 200) {
+	            addSucesso("Disponibilidade adicionada!");
+	            diaSemana = null;
+	            horaInicio = null;
+	            horaFim = null;
+	            carregarDisponibilidades();
+	        } else {
+	            addErro("Erro ao salvar: " + response.statusCode());
+	        }
+	    } catch (Exception e) {
+	        addErro("Erro: " + e.getMessage());
+	    }
 	}
 
 	public void remover(String id) {
-		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL + id))
-					.header("Authorization", "Bearer " + token).DELETE().build();
+	    try {
+	        HttpSession session = getSession();
+	        String tokenAtual = session != null ? (String) session.getAttribute("token") : token;
 
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	        HttpRequest request = HttpRequest.newBuilder()
+	                .uri(URI.create(API_URL + id))
+	                .header("Authorization", "Bearer " + tokenAtual)
+	                .DELETE().build();
 
-			if (response.statusCode() == 204) {
-				addSucesso("Disponibilidade removida!");
-				carregarDisponibilidades();
-			} else {
-				addErro("Erro ao remover.");
-			}
-		} catch (Exception e) {
-			addErro("Erro: " + e.getMessage());
-		}
+	        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+	        if (response.statusCode() == 204 || response.statusCode() == 200) {
+	            addSucesso("Disponibilidade removida!");
+	            carregarDisponibilidades();
+	        } else {
+	            addErro("Erro ao remover. Status: " + response.statusCode());
+	        }
+	    } catch (Exception e) {
+	        addErro("Erro: " + e.getMessage());
+	    }
 	}
+	
+	
 
 	private HttpSession getSession() {
 		return ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest())

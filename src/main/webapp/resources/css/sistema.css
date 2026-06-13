@@ -638,47 +638,140 @@ td {
 
 /* Título roxo */
 .page-header h1 {
-    color: #7c3aed !important;
+	color: #7c3aed !important;
 }
 
 /* Headers da tabela roxos */
 .tabela-dados .tabela-header th {
-    color: #7c3aed !important;
-    background: #faf5ff !important;
-    border-bottom-color: #ede9fe !important;
+	color: #7c3aed !important;
+	background: #faf5ff !important;
+	border-bottom-color: #ede9fe !important;
 }
 
 /* Conteúdo mais próximo do topo */
 .topbar {
-    margin-bottom: 0.75rem !important;
+	margin-bottom: 0.75rem !important;
 }
 
 /* Filtros — botão na mesma linha */
 .filtros-container .filtros-row {
-    flex-wrap: nowrap !important;
+	flex-wrap: nowrap !important;
 }
 
 .filtros-container .filtro-grupo {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
+	flex: 1 1 0 !important;
+	min-width: 0 !important;
 }
 
-.filtros-container .filtro-grupo .input-field,
-.filtros-container .filtro-grupo .select-field {
-    min-width: 0;
-    width: 100%;
+.filtros-container .filtro-grupo .input-field, .filtros-container .filtro-grupo .select-field
+	{
+	min-width: 0;
+	width: 100%;
 }
 
 .filtros-container .filtro-btn {
-    flex: 0 0 auto !important;
-    min-width: unset !important;
-    align-self: flex-end;
+	flex: 0 0 auto !important;
+	min-width: unset !important;
+	align-self: flex-end;
 }
 
 .filtros-container .filtro-btn .btn {
-    display: inline-flex !important;
-    align-items: center;
-    height: 36px;
-    white-space: nowrap;
-    padding: 0 1rem;
+	display: inline-flex !important;
+	align-items: center;
+	height: 36px;
+	white-space: nowrap;
+	padding: 0 1rem;
+}
+
+/* ── Sidebar sem quebra de linha ── */
+.nav-item {
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 13.5px;
+}
+
+.nav-item i {
+	flex-shrink: 0;
+	width: 16px;
+	text-align: center;
+}
+
+/* ── Quick access — 3 colunas com ícone em destaque ── */
+.quick-access {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.quick-btn {
+	padding: 20px 12px;
+}
+
+.quick-btn i {
+	background: #ede9fe;
+	padding: 12px;
+	border-radius: 10px;
+}
+
+.quick-btn:hover {
+	box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+/* ── Cards altura consistente ── */
+.bottom-grid {
+	align-items: start;
+}
+
+.panel {
+	min-height: 200px;
+}
+
+/* ── Sidebar maior ── */
+.sidebar {
+	width: 240px;
+	min-width: 240px;
+}
+
+.main-content {
+	margin-left: 240px;
+}
+
+.nav-item {
+	font-size: 14.5px;
+	padding: 11px 15px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.nav-item i {
+	flex-shrink: 0;
+	width: 18px;
+	text-align: center;
+}
+
+/* ── Stats todos roxos ── */
+.stat-icon.purple, .stat-icon.blue, .stat-icon.green, .stat-icon.orange
+	{
+	background: #ede9fe;
+	color: #7c3aed;
+}
+
+/* ── Cards do bottom-grid mesma altura ── */
+.bottom-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	align-items: stretch;
+}
+
+.bottom-grid .panel {
+	display: flex;
+	flex-direction: column;
+}
+
+.bottom-grid .panel .activity-list, .bottom-grid .panel .empty-state {
+	flex: 1;
+}
+
+.stat-icon.blue, .stat-icon.green, .stat-icon.orange {
+	background: #ede9fe !important;
+	color: #7c3aed !important;
 }
