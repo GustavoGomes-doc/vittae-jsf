@@ -10,11 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature; // Import obrigatório para configurar a data
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.MedicoEnvioDTO;
+import com.vittae.util.ConfigUtil;
 
 
 public class CadastrarMedicoService {
 
-    private static final String API_URL = "http://localhost:9090/api/medicos";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/medicos";
 
     public void salvarMedico(MedicoEnvioDTO dto, String token) throws Exception {
         try {

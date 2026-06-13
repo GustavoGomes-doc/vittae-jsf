@@ -21,12 +21,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.ConsultaAdminDTO;
+import com.vittae.util.ConfigUtil;
 
 @Named("todasConsultasBean")
 @ViewScoped
 public class TodasConsultasAdminBean implements Serializable {
 
-	private static final String BASE_URL = "http://localhost:9090";
+	private static final String BASE_URL = ConfigUtil.get("api.base.url");
 
 	private List<ConsultaAdminDTO> todasConsultas = new ArrayList<>();
 	private ConsultaAdminDTO consultaSelecionada;

@@ -37,7 +37,7 @@
         aplicarMascaras();
         aplicarCapitalizacao();
         monitorarNascimento();
-        monitorarNascimentoResponsavel(); // ← NOVO: hint de idade para o responsável
+        monitorarNascimentoResponsavel();
         renderizarCalendario();
 		carregarEspecialidades();
     }
@@ -167,20 +167,17 @@
     }
 
     /* ═══════════════════════════════════════════════
-       MONITORAR NASCIMENTO (RESPONSÁVEL) — NOVO
-       Mostra hint de idade igual ao do paciente.
-       Se a idade for < 18, exibe aviso de inválido.
+       MONITORAR NASCIMENTO (RESPONSÁVEL)
     ═══════════════════════════════════════════════ */
     function monitorarNascimentoResponsavel() {
         var campo = document.getElementById('respNascimento');
         if (!campo) return;
 
-        // Cria o elemento de hint dinamicamente (igual ao menorHint do paciente)
         var hint = document.getElementById('respIdadeHint');
         if (!hint) {
             hint = document.createElement('span');
             hint.id = 'respIdadeHint';
-            hint.className = 'ag-menor-hint'; // mesma classe do paciente
+            hint.className = 'ag-menor-hint';
             campo.parentNode.insertBefore(hint, campo.nextSibling);
         }
 
@@ -188,7 +185,6 @@
             var v = campo.value;
             var errEl = document.getElementById('errRespNasc');
 
-            // Esconde hint enquanto digita
             hint.classList.remove('visible');
 
             if (v.length < 10) {
@@ -218,17 +214,14 @@
 
             var idade = calcularIdade(data);
 
-            // Mostra a idade calculada no hint (igual ao do paciente)
             hint.classList.add('visible');
 
             if (idade < 18) {
-                // Menor de idade: hint vermelho/laranja de aviso
                 hint.textContent = '⚠ ' + idade + ' anos • Responsável deve ter +18 anos';
-                hint.style.color = '#f87171'; // tom vermelho para diferenciar do aviso do paciente
+                hint.style.color = '#f87171';
                 mostrarErro('errRespNasc', campo);
                 if (errEl) errEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> O responsável deve ser maior de idade (+18)';
             } else {
-                // Maior de idade: hint verde tranquilizador
                 hint.textContent = '✓ ' + idade + ' anos • Maior de idade';
                 hint.style.color = '#34d399';
                 esconderErro('errRespNasc', campo);
@@ -251,7 +244,6 @@
             if (rPar)  rPar.value  = '';
             if (rNasc) rNasc.value = '';
 
-            // Limpa também o hint do responsável ao esconder o bloco
             var respHint = document.getElementById('respIdadeHint');
             if (respHint) respHint.classList.remove('visible');
         }
@@ -353,13 +345,11 @@
     function validarDados() {
         var ok = true;
 
-        // Nome paciente
         var nome = document.getElementById('fAg:pacNome');
         if (!nome || nome.value.trim().split(/\s+/).length < 2) {
             mostrarErro('errNome', nome); ok = false;
         } else { esconderErro('errNome', nome); }
 
-        // Nascimento Paciente
         var nasc = document.getElementById('fAg:pacNascimento');
         var idadePaciente = null;
         if (!nasc || nasc.value.length < 10) {
@@ -377,25 +367,21 @@
             }
         }
 
-        // CPF paciente
         var cpf = document.getElementById('fAg:pacCpf');
         if (!cpf || cpf.value.replace(/\D/g,'').length !== 11) {
             mostrarErro('errCpf', cpf); ok = false;
         } else { esconderErro('errCpf', cpf); }
 
-        // Gênero
         var sexo = document.getElementById('fAg:pacGenero');
         if (!sexo || !sexo.value) {
             mostrarErro('errSexo', sexo); ok = false;
         } else { esconderErro('errSexo', sexo); }
 
-        // Telefone
         var tel = document.getElementById('fAg:pacTelefone');
         if (!tel || tel.value.replace(/\D/g,'').length < 10) {
             mostrarErro('errTel', tel); ok = false;
         } else { esconderErro('errTel', tel); }
 
-        // Termos
         var t1 = document.getElementById('termoVerdade');
         var t2 = document.getElementById('termoLgpd');
         if (!t1 || !t1.checked) { mostrarErro('errTermo1', null); ok = false; }
@@ -403,12 +389,9 @@
         if (!t2 || !t2.checked) { mostrarErro('errTermo2', null); ok = false; }
         else { esconderErro('errTermo2', null); }
 
-        // RESPONSÁVEL LEGAL
         var bloco = document.getElementById('blocoResponsavel');
         if (bloco && bloco.classList.contains('visible') && idadePaciente !== null && idadePaciente < 18) {
 
-            // ── VALIDAÇÃO 1: Nome do Responsável ─────────────────────────────
-            // Não pode ser vazio. Não pode ser igual ao nome do paciente.
             var rNome = document.getElementById('respNome');
             var nomePaciente = nome ? nome.value.trim().toLowerCase() : '';
             var nomeResp     = rNome ? rNome.value.trim().toLowerCase() : '';
@@ -427,8 +410,6 @@
                 esconderErro('errRespNome', rNome);
             }
 
-            // ── VALIDAÇÃO 2: CPF do Responsável ──────────────────────────────
-            // Deve ter 11 dígitos. Não pode ser igual ao CPF do paciente.
             var rCpf = document.getElementById('respCpf');
             var cpfPacienteStr = cpf ? cpf.value.replace(/\D/g, '') : '';
             var cpfRespStr     = rCpf ? rCpf.value.replace(/\D/g, '') : '';
@@ -447,8 +428,6 @@
                 esconderErro('errRespCpf', rCpf);
             }
 
-            // ── VALIDAÇÃO 3: Nascimento do Responsável ────────────────────────
-            // Data deve ser válida E responsável deve ter 18 anos ou mais.
             var rNasc = document.getElementById('respNascimento');
             if (!rNasc || rNasc.value.length < 10) {
                 mostrarErro('errRespNasc', rNasc);
@@ -476,14 +455,12 @@
                 }
             }
 
-            // Parentesco
             var rParent = document.getElementById('respParentesco');
             if (!rParent || !rParent.value) {
                 mostrarErro('errRespParent', rParent); ok = false;
             } else { esconderErro('errRespParent', rParent); }
         }
 
-        // Motivo
         var motivo = document.getElementById('fAg:motivoConsulta');
         if (!motivo || motivo.value.trim().length < 5) {
             mostrarErro('errMotivo', motivo); ok = false;
@@ -515,12 +492,10 @@
     }
 
 	function validarDataHora() {
-	    // 1. Pega os elementos ocultos do JSF que estão no seu XHTML
 	    var dataH = document.getElementById('fAg:dataConsultaHidden');
 	    var horaH = document.getElementById('fAg:horaConsultaHidden');
 	    var tipoH = document.getElementById('fAg:tipoConsultaHidden');
 
-	    // 2. Se o "state" sumiu, mas o input do JSF tem valor, recupera para o state
 	    if (!state.dataSelecionada && dataH && dataH.value) {
 	        state.dataSelecionada = dataH.value;
 	    }
@@ -528,28 +503,23 @@
 	        state.horaSelecionada = horaH.value;
 	    }
 
-	    // 3. LOG DE DEPURAÇÃO (Abra o Console do navegador [F12] para ver o que está vazio)
 	    console.log("=== VERIFICAÇÃO DE DADOS ===");
 	    console.log("State Data:", state.dataSelecionada, " | InputHidden Data:", dataH ? dataH.value : "não achou input");
 	    console.log("State Hora:", state.horaSelecionada, " | InputHidden Hora:", horaH ? horaH.value : "não achou input");
 
-	    // 4. VALIDAÇÃO REAL: Verifica tanto no state quanto no input oculto
 	    var temData = state.dataSelecionada || (dataH && dataH.value);
 	    var temHora = state.horaSelecionada || (horaH && horaH.value);
 
 	    if (!temData || !temHora) {
 	        mostrarErro('errData', null); 
-	        return false; // Trava aqui e mostra o erro na tela
+	        return false;
 	    }
 	    
-	    // Se chegou aqui, os dados existem! Esconde o erro da tela
 	    esconderErro('errData', null);
 
-	    // 5. Força o preenchimento dos inputs para o envio do formulário/fetch
 	    if (dataH) dataH.value = state.dataSelecionada || dataH.value;
 	    if (horaH) horaH.value = state.horaSelecionada || horaH.value;
 	    
-	    // Força um valor padrão para o tipo, já que é enfeite
 	    if (tipoH) {
 	        tipoH.value = state.tipoConsulta || 'rotina';
 	    }
@@ -600,7 +570,7 @@
 
         grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">⏳ Carregando médicos...</div>';
 
-        fetch('http://localhost:9090/api/medicos?especialidade=' + encodeURIComponent(especialidade))
+        fetch(window.API_BASE_URL + '/api/medicos?especialidade=' + encodeURIComponent(especialidade))
             .then(function(r) { return r.json(); })
             .then(function(medicos) {
                 renderizarCardsMedicos(medicos);
@@ -639,11 +609,10 @@
                 ? '<img src="data:image/jpeg;base64,' + med.foto + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%" />'
                 : iniciais;
 
-				var tagsHtml = (med.especialidades || []).map(function(e) {
-				    var nome = typeof e === 'string' ? e : e.nome;
-				    var desc = (e && e.descricao) ? e.descricao : '';
-				    return '<span class="ag-medico-tag"><i class="fas fa-stethoscope"></i> ' + nome + '</span>';
-				}).join('');
+			var tagsHtml = (med.especialidades || []).map(function(e) {
+			    var nome = typeof e === 'string' ? e : e.nome;
+			    return '<span class="ag-medico-tag"><i class="fas fa-stethoscope"></i> ' + nome + '</span>';
+			}).join('');
 
             var valor = med.valorConsulta ? parseFloat(med.valorConsulta).toFixed(2).replace('.',',') : '—';
 
@@ -710,7 +679,7 @@
 	       CALENDÁRIO & HORÁRIOS
 	    ═══════════════════════════════════════════════ */
 	    function carregarDisponibilidade(medicoId) {
-	        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres')
+	        fetch(window.API_BASE_URL + '/api/medicos/' + medicoId + '/horarios-livres')
 	            .then(function(r) { return r.json(); })
 	            .then(function(data) {
 	                state.diasDisponiveis = data.diasDisponiveis || [];
@@ -727,7 +696,7 @@
 	        var grid = document.getElementById('horariosGrid');
 	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
 
-	        fetch('http://localhost:9090/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
+	        fetch(window.API_BASE_URL + '/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
 	            .then(function(r) { return r.json(); })
 	            .then(function(data) {
 	                renderizarHorarios(data.horariosLivres || []);
@@ -807,18 +776,18 @@
 		
 	    function carregarEspecialidades() {
 	        Promise.all([
-	            fetch('http://localhost:9090/api/especialidades').then(function(r) { return r.json(); }),
-	            fetch('http://localhost:9090/api/medicos').then(function(r) { return r.json(); })
+	            fetch(window.API_BASE_URL + '/api/especialidades').then(function(r) { return r.json(); }),
+	            fetch(window.API_BASE_URL + '/api/medicos').then(function(r) { return r.json(); })
 	        ]).then(function(results) {
 	            var especialidades = results[0];
 	            var medicos = results[1];
 
 	            var comMedico = new Set();
-				medicos.forEach(function(med) {
-				    (med.especialidades || []).forEach(function(e) {
-				        comMedico.add(typeof e === 'string' ? e : e.nome);
-				    });
-				});
+			medicos.forEach(function(med) {
+			    (med.especialidades || []).forEach(function(e) {
+			        comMedico.add(typeof e === 'string' ? e : e.nome);
+			    });
+			});
 
 	            var grid = document.getElementById('espGrid');
 	            if (!grid) return;
@@ -842,7 +811,7 @@
 
 	    function selecionarDia(iso, dNum) {
 	        state.dataSelecionada = iso;
-	        state.horaSelecionada = null; // Reseta a hora ao mudar de dia
+	        state.horaSelecionada = null;
 	        
 	        var dataH = document.getElementById('fAg:dataConsultaHidden');
 	        if (dataH) dataH.value = iso;
@@ -994,11 +963,8 @@
 		        var btn = document.getElementById('btnSubmitJSF');
 		        if (btn) btn.disabled = true;
 
-		        // === CAPTURA INTELIGENTE E VALIDAÇÃO DO TOKEN (ATUALIZADO COM INJEÇÃO JSF) ===
-		        // 1. Tenta pegar primeiro o token injetado diretamente da sessão do JSF
 		        var token = window.TOKEN_SESSAO_VITTAE || null;
 
-		        // 2. Se não achar, faz a varredura automática nos storages por segurança
 		        if (!token || token === "" || token.indexOf('#{') === 0) {
 		            token = localStorage.getItem('token_vittae') || 
 		                    sessionStorage.getItem('token_vittae') || 
@@ -1008,30 +974,26 @@
 		                    sessionStorage.getItem('jwt');
 		        }
 
-		        // 3. Se ainda assim não achar, tenta ler dos Cookies
 		        if (!token) {
 		            var match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
 		            if (match) token = match[2];
 		        }
 
-		        // Limpa espaços ou aspas residuais que o JSF possa injetar
 		        if (token) {
 		            token = token.trim().replace(/^"|"$/g, '');
 		        }
 
-		        // Diagnóstico de credenciais no console do desenvolvedor
 		        console.log("=== VERIFICAÇÃO DE CREDENCIAIS ===");
 		        console.log("Token JWT recuperado:", token ? token.substring(0, 15) + "..." : "NULO/VAZIO");
 
 		        if (!token || token === "" || token === "null") {
-		            console.error("ERRO: Requisição bloqueada localmente. Nenhum token encontrado no Storage ou Sessão JSF.");
+		            console.error("ERRO: Nenhum token encontrado.");
 		            alert("Sessão inválida ou expirada. Por favor, realize o login novamente antes de prosseguir.");
 		            if (btn) btn.disabled = false;
-		            return; // Interrompe o envio
+		            return;
 		        }
 
-		        // === DISPARO DO AGENDAMENTO PARA O SPRING BOOT ===
-		        fetch('http://localhost:9090/api/agendamentos', {
+		        fetch(window.API_BASE_URL + '/api/agendamentos', {
 		            method: 'POST',
 		            headers: {
 		                'Content-Type': 'application/json',
@@ -1048,36 +1010,36 @@
 				.then(function(data) {
 				            console.log('Agendamento salvo com sucesso no banco!', data);
 				            
-				            // 1. Abre o modal de sucesso na tela
+				            var resumo = document.getElementById('modalResumoTexto');
+				            if (resumo) {
+				                resumo.innerHTML =
+				                    '<strong>Paciente:</strong> ' + state.pacienteNome + '<br>' +
+				                    '<strong>Especialidade:</strong> ' + state.especialidade + '<br>' +
+				                    '<strong>Medico:</strong> ' + state.medicoNome + '<br>' +
+				                    '<strong>Data:</strong> ' + state.dataSelecionada + ' as ' + state.horaSelecionada;
+				            }
+				            
 				            var modal = document.getElementById('modalSucesso');
 				            if (modal) {
 				                modal.style.display = 'flex';
 				            }
 
-				            // 2. CORREÇÃO DO BOTÃO "NOVO AGENDAMENTO" (Para conseguir sair da tela)
-				            // Procura o botão azul dentro do seu modal para dar uma função a ele
-				            var btnNovoAgendamento = modal ? modal.querySelector('.ag-modal-btn, button') : null;
-				            if (!btnNovoAgendamento) {
-				                // Caso não ache por classe, tenta pegar pelo texto do botão
-				                var botoes = document.querySelectorAll('button');
-				                botoes.forEach(function(b) {
-				                    if (b.textContent.trim() === 'Novo Agendamento') {
-				                        btnNovoAgendamento = b;
-				                    }
-				                });
-				            }
+			            var btnNovoAgendamento = modal ? modal.querySelector('.ag-modal-btn, button') : null;
+			            if (!btnNovoAgendamento) {
+			                var botoes = document.querySelectorAll('button');
+			                botoes.forEach(function(b) {
+			                    if (b.textContent.trim() === 'Novo Agendamento') {
+			                        btnNovoAgendamento = b;
+			                    }
+			                });
+			            }
 
-				            // Se encontrar o botão, programa ele para recarregar a página e limpar tudo
-				            if (btnNovoAgendamento) {
-				                btnNovoAgendamento.onclick = function() {
-				                    // Opção A: Recarrega a página do zero para fazer um novo agendamento limpo
-				                    window.location.reload();
-				                    
-				                    // Opção B (Caso queira mandar ele para a tela inicial do Paciente):
-				                    // window.location.href = 'inicio.xhtml';
-				                };
-				            }
-				        })
+			            if (btnNovoAgendamento) {
+			                btnNovoAgendamento.onclick = function() {
+			                    window.location.reload();
+			                };
+			            }
+			        })
 		        .catch(function(error) {
 		            console.error('Falha no POST:', error);
 		            alert('Não foi possível concluir o agendamento. Verifique suas credenciais.');
@@ -1085,9 +1047,8 @@
 		        .finally(function() {
 		            if (btn) btn.disabled = false;
 		        });
-		    }; // <-- Fecha a função salvarAgendamento corretamente
+		    };
 
-		    // Inicializa a tela
 		    init();
 
 		})();

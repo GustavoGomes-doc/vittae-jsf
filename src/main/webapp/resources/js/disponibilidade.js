@@ -34,12 +34,12 @@
         var medicoId = document.querySelector('meta[name="medicoId"]');
         if (!token || !medicoId) return;
 
-        fetch('http://localhost:9090/api/disponibilidade/' + medicoId.content, {
+       fetch(window.API_BASE_URL + '/api/disponibilidade/' + medicoId.content, {
             headers: { 'Authorization': 'Bearer ' + token.content }
         })
         .then(function(r) { return r.json(); })
         .then(function(disps) {
-            fetch('http://localhost:9090/api/usuarios/' + medicoId.content, {
+            fetch(window.API_BASE_URL + '/api/usuarios/' + medicoId.content, {
                 headers: { 'Authorization': 'Bearer ' + token.content }
             })
             .then(function(r) { return r.json(); })

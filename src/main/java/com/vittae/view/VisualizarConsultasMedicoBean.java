@@ -19,6 +19,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 import com.vittae.service.ConsultaService;
+import com.vittae.util.ConfigUtil;
 
 @Named("visualizarConsultasMedicoBean")
 @ViewScoped
@@ -63,7 +64,7 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	private List<MedicoConsultaDTO> buscarConsultasDoMedico(Long medicoId) throws Exception {
 	    java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
 	    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-	        .uri(java.net.URI.create("http://localhost:9090/api/agendamentos/medico/" + medicoId))
+	    		.uri(java.net.URI.create(ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/" + medicoId))
 	        .header("Authorization", "Bearer " + token) // <- token aqui
 	        .GET()
 	        .build();

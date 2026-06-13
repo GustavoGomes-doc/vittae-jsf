@@ -4,14 +4,16 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.PerfilAtualizarDTO;
 import com.vittae.dto.UsuarioPerfilDTO;
+import com.vittae.util.ConfigUtil;
 
 public class PerfilService {
 
-    private static final String API_URL = "http://localhost:9090/api/usuarios/";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/usuarios/";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());

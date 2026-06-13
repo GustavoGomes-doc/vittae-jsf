@@ -14,12 +14,12 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.vittae.dto.LoginResposta;
 import com.vittae.model.Usuario;
 import com.vittae.service.UsuarioService;
+import com.vittae.util.ConfigUtil;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -116,7 +116,7 @@ public class LoginBean implements Serializable {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     // ✅ CORREÇÃO 2: A URL agora aponta para /api/usuarios/cadastrar
-                    .uri(URI.create("http://localhost:9090/api/usuarios/cadastrar")) 
+            		.uri(URI.create(ConfigUtil.get("api.base.url") + "/api/usuarios/cadastrar")) 
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();

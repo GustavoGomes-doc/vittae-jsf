@@ -3,8 +3,8 @@ package com.vittae.service;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -13,11 +13,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.vittae.util.ConfigUtil;
 
 public class AgendarConsultaService {
 
-	private static final String API_URL = "http://localhost:9090/api/agendamentos";
-	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos";
+	private static final String API_MEDICOS = ConfigUtil.get("api.base.url") + "/api/medicos";
+
 
 	public void salvarAgendamento(AgendamentoDTO dto) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
@@ -52,17 +54,17 @@ public class AgendarConsultaService {
 		throw new Exception("Falha ao buscar médicos. Status: " + response.statusCode());
 	}
 
-	//buscahorariosocupadosdiretodaspringbootparanoofazerdoubledbooking
+	// buscahorariosocupadosdiretodaspringbootparanoofazerdoubledbooking
 	public List<String> buscarHorariosOcupados(Long medicoId, String data) throws Exception {
 		HttpClient client = HttpClient.newHttpClient();
-		//requisicaogetcomparametrosofazendofiltronaapi
+		// requisicaogetcomparametrosofazendofiltronaapi
 		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(API_URL + "/horarios-ocupados?medicoId=" + medicoId + "&data=" + data))
-				.GET().build();
+				.uri(URI.create(API_URL + "/horarios-ocupados?medicoId=" + medicoId + "&data=" + data)).GET().build();
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 		if (response.statusCode() == 200) {
 			ObjectMapper mapper = new ObjectMapper();
-			return mapper.readValue(response.body(), new TypeReference<List<String>>() {});
+			return mapper.readValue(response.body(), new TypeReference<List<String>>() {
+			});
 		}
 		throw new Exception("Falha ao buscar horários ocupados.");
 	}

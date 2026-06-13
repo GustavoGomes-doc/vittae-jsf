@@ -10,6 +10,7 @@
         <h:outputStylesheet library="css" name="vizualizar.css" />
         <h:outputStylesheet library="css" name="medico.css" />
         <h:outputStylesheet library="css" name="paciente.css" />
+          
     </ui:define>
 
     <ui:define name="corpo">
@@ -151,6 +152,14 @@
                                         <f:convertDateTime type="localTime" pattern="HH:mm" />
                                     </h:outputText>
                                 </div>
+                                <h:panelGroup rendered="#{not empty consulta.observacoes}" layout="block">
+								    <div class="detail-item">
+								        <span class="detail-label">
+								            <i class="fas fa-notes-medical"></i> Motivo
+								        </span>
+								        <span class="detail-value">#{consulta.observacoes}</span>
+								    </div>
+								</h:panelGroup>
                             </div>
 
                             <!-- Ações -->
@@ -192,7 +201,9 @@
             </h:panelGroup>
 
         </h:form>
-
+	<script>
+    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+</script>
         <h:outputScript library="js" name="visualizarMed.js" />
     </ui:define>
 </ui:composition>

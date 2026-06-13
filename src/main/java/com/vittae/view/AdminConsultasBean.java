@@ -25,13 +25,14 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vittae.util.ConfigUtil;
 
 @Named("adminConsultasBean")
 @ViewScoped
 public class AdminConsultasBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String API_URL = "http://localhost:9090/api/agendamentos";
+    private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos";
 
     private transient HttpClient httpClient;
     private transient ObjectMapper objectMapper;

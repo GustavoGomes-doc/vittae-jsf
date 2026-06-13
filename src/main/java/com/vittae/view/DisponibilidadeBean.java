@@ -18,13 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vittae.util.ConfigUtil;
 
 @Named("disponibilidadeBean")
 @ViewScoped
 public class DisponibilidadeBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final String API_URL = "http://localhost:9090/api/disponibilidade/";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/disponibilidade/";
 
 	private Long medicoId;
 	private String token;

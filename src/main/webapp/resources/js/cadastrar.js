@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	    var container = document.getElementById('chipsContainer');
 	    if (!container) return;
 
-	    fetch('http://localhost:9090/api/especialidades')
+	    fetch(window.API_BASE_URL + '/api/especialidades')
 	        .then(function(res) { return res.json(); })
 	        .then(function(lista) {
 	            lista.forEach(function(esp) {

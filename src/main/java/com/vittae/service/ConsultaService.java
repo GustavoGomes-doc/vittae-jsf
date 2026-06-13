@@ -19,14 +19,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.AdminConsultaDTO;
 import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
+import com.vittae.util.ConfigUtil;
 
 @Named
 @ApplicationScoped
 public class ConsultaService {
 
 	// mesma porta do seu Spring Boot — ajusta se precisar
-	private static final String API_URL = "http://localhost:9090/api/agendamentos";
-	private static final String API_MEDICOS = "http://localhost:9090/api/medicos";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos";
+	private static final String API_MEDICOS = ConfigUtil.get("api.base.url") + "/api/medicos";
 	
 	/**
 	 * Método utilitário para recuperar o token JWT armazenado na sessão do JSF
@@ -130,7 +131,7 @@ public class ConsultaService {
 	public List<AdminConsultaDTO> listarTodasAdmin(String token) throws Exception {
 	    HttpClient client = HttpClient.newHttpClient();
 	    HttpRequest request = HttpRequest.newBuilder()
-	            .uri(URI.create("http://localhost:9090/api/agendamentos/todos"))
+	    		.uri(URI.create(ConfigUtil.get("api.base.url") + "/api/agendamentos/todos"))
 	            .header("Authorization", "Bearer " + token)
 	            .GET()
 	            .build();

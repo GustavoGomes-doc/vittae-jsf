@@ -108,6 +108,7 @@
                                 <th>Data da Consulta</th>
                                 <th>Horário</th>
                                 <th>Status</th>
+                                <th>Motivo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -148,6 +149,10 @@
                                             <f:convertDateTime type="localTime" pattern="HH:mm" />
                                         </h:outputText>
                                     </td>
+                                    
+                                    <td>
+									    <h:outputText value="#{c.observacoes}" />
+									</td>
 
                                     <!-- Status badge -->
                                     <td>
@@ -169,7 +174,9 @@
             </h:panelGroup>
 
         </h:form>
-
+<script>
+    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+</script>
     </ui:define>
 
 </ui:composition>

@@ -20,12 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.PacienteListagemDTO;
+import com.vittae.util.ConfigUtil;
 
 @Named("inicioMedicoBean")
 @ViewScoped
 public class InicioMedicoBean implements Serializable {
 
-	private static final String API_URL = "http://localhost:9090/api/agendamentos/medico/";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/";
 
 	private List<PacienteListagemDTO> todasConsultas = new ArrayList<>();
 

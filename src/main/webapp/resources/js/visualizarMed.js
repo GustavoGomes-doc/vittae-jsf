@@ -59,13 +59,13 @@ if (visiveis === 0) {
 
 function cancelarConsulta(id) {
     if (confirm('Deseja realmente cancelar esta consulta?')) {
-        fetch('http://localhost:9090/api/agendamentos/' + id + '/cancelar', {
+        fetch(window.API_BASE_URL + '/api/agendamentos/' + id + '/cancelar', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' }
         })
         .then(function(response) {
             if (response.ok) {
-                // Esconde o card visualmente
+                // Esconde o card visualmente	
                 var cards = document.querySelectorAll('.consulta-card');
                 cards.forEach(function(card) {
                     if (card.getAttribute('data-id') == id) {
