@@ -11,12 +11,21 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <h:outputStylesheet library="css" name="login.css" />
     <link rel="shortcut icon"
-        href="#{request.contextPath}/resources/images/favicon.png"
+        href="#{request.contextPath}/resources/imagens/VittaeLogo.ico"
         type="image/x-icon" />
 </h:head>
 
 <h:body style="display:flex; justify-content:center; align-items:center;
                min-height:100vh; background-color:#f4f4f9;">
+
+    <!-- Toast de sucesso -->
+    <div id="toastSucesso" role="status" aria-live="polite">
+        <div class="toast-icon"><i class="fas fa-check"></i></div>
+        <div class="toast-texto">
+            <strong>Cadastro realizado!</strong>
+            <span>Bem-vindo(a)</span>
+        </div>
+    </div>
 
     <section class="container-pai"
         style="max-width:500px; width:100%; padding:20px;">
@@ -47,6 +56,7 @@
                         required="true"
                         requiredMessage="E-mail é obrigatório" />
                 </div>
+                <span id="emailHint" class="campo-hint"></span>
 
                 <!-- CPF + Telefone -->
                 <div style="display:flex; gap:10px;">
@@ -81,7 +91,7 @@
                         requiredMessage="CEP é obrigatório" />
                 </div>
 
-                <!-- Senha — olho injetado pelo JS -->
+                <!-- Senha -->
                 <div class="input-field">
                     <i class="fas fa-lock"></i>
                     <h:inputSecret id="senhaCadastro"
@@ -91,11 +101,21 @@
                         requiredMessage="Senha é obrigatória" />
                 </div>
 
+                <!-- Confirmar Senha — não vai pro bean, só validação visual -->
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <h:inputSecret id="confirmarSenha"
+                        pt:placeholder="Confirme a senha" />
+                </div>
+                <span id="pwHint" class="campo-hint"></span>
+
                 <h:commandButton value="Finalizar Cadastro"
                     action="#{loginBean.cadastrar()}"
                     styleClass="btn-main"
-                    style="width:100%; margin-top:15px;">
-                    <f:ajax execute="@form" render="messages" />
+                    style="width:100%; margin-top:15px;"
+                    onclick="return validarFormulario();">
+                    <f:ajax execute="@form" render="messages"
+                        onevent="tratarEventoAjax" />
                 </h:commandButton>
 
                 <div style="text-align:center; margin-top:20px;">
@@ -112,79 +132,7 @@
         </div>
     </section>
 
-
-   <script type="text/javascript">
-//<![CDATA[
-
-// Máscaras
-function mascaraCpf(campo) {
-    var v = campo.value.replace(/\D/g, '').substring(0, 11);
-    if (v.length > 9)
-        v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
-    else if (v.length > 6)
-        v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
-    else if (v.length > 3)
-        v = v.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
-    campo.value = v;
-}
-
-function mascaraTelefone(campo) {
-    var v = campo.value.replace(/\D/g, '').substring(0, 11);
-    if (v.length > 10)
-        v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
-    else if (v.length > 6)
-        v = v.replace(/^(\d{2})(\d{4,5})(\d{0,4})$/, '($1) $2-$3');
-    else if (v.length > 2)
-        v = v.replace(/^(\d{2})(\d{0,5})$/, '($1) $2');
-    else if (v.length > 0)
-        v = v.replace(/^(\d{0,2})$/, '($1');
-    campo.value = v;
-}
-
-function mascaraCep(campo) {
-    var v = campo.value.replace(/\D/g, '').substring(0, 8);
-    if (v.length > 5)
-        v = v.replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
-    campo.value = v;
-}
-
-// Olho na senha
-document.addEventListener('DOMContentLoaded', function () {
-    var senhas = document.querySelectorAll('input[type="password"]');
-    senhas.forEach(function (input) {
-        var wrapper = input.parentNode;
-        wrapper.style.position = 'relative';
-        input.style.paddingRight = '42px';
-
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.setAttribute('tabindex', '-1');
-        btn.style.cssText = 'position:absolute;right:10px;top:3px;' +
-        'background:none;border:none;' +
-        'cursor:pointer;color:#aaa;font-size:15px;z-index:99;padding:0;';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
-
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var icone = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icone.classList.replace('fa-eye', 'fa-eye-slash');
-                btn.style.color = '#7c3aed';
-            } else {
-                input.type = 'password';
-                icone.classList.replace('fa-eye-slash', 'fa-eye');
-                btn.style.color = '#aaa';
-            }
-        });
-
-        wrapper.appendChild(btn);
-    });
-});
-
-//]]>
-</script>
+    <h:outputScript library="js" name="login.js" target="body" />
 
 </h:body>
 </html>

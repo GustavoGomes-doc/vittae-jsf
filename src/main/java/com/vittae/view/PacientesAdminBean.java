@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -21,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.ConsultaAdminDTO;
-import com.vittae.dto.UsuarioPerfilDTO;
+import com.vittae.dto.PacienteAdminDTO;
 import com.vittae.util.ConfigUtil;
 
 @Named("pacientesAdminBean")
@@ -30,17 +28,15 @@ public class PacientesAdminBean implements Serializable {
 
 	private static final String BASE_URL = ConfigUtil.get("api.base.url");
 
-	private List<UsuarioPerfilDTO> todosPacientes = new ArrayList<>();
+	private List<PacienteAdminDTO> todosPacientes = new ArrayList<>();
 	private List<ConsultaAdminDTO> consultasDoPaciente = new ArrayList<>();
-	private Map<Long, Long> qtdConsultasPorPaciente = new HashMap<>();
 
-	private UsuarioPerfilDTO pacienteSelecionado;
+	private PacienteAdminDTO pacienteSelecionado;
 	private String filtroTexto = "";
 
 	@PostConstruct
 	public void init() {
 		carregarPacientes();
-		carregarQtdConsultas();
 	}
 
 	private void carregarPacientes() {
@@ -49,14 +45,14 @@ public class PacientesAdminBean implements Serializable {
 			if (session == null)
 				return;
 			String token = (String) session.getAttribute("token");
-			URL url = new URL(BASE_URL + "/api/usuarios/pacientes");
+			URL url = new URL(BASE_URL + "/api/pacientes/admin");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Authorization", "Bearer " + token);
 			conn.setRequestProperty("Content-Type", "application/json");
 			if (conn.getResponseCode() == 200) {
 				todosPacientes = criarMapper().readValue(conn.getInputStream(),
-						new TypeReference<List<UsuarioPerfilDTO>>() {
+						new TypeReference<List<PacienteAdminDTO>>() {
 						});
 			}
 			conn.disconnect();
@@ -65,29 +61,7 @@ public class PacientesAdminBean implements Serializable {
 		}
 	}
 
-	private void carregarQtdConsultas() {
-		try {
-			HttpSession session = obterSession();
-			if (session == null)
-				return;
-			String token = (String) session.getAttribute("token");
-			URL url = new URL(BASE_URL + "/api/agendamentos/todos");
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Authorization", "Bearer " + token);
-			if (conn.getResponseCode() == 200) {
-				List<ConsultaAdminDTO> todas = criarMapper().readValue(conn.getInputStream(),
-						new TypeReference<List<ConsultaAdminDTO>>() {
-						});
-				qtdConsultasPorPaciente = todas.stream().filter(c -> c.getPacienteId() != null)
-						.collect(Collectors.groupingBy(ConsultaAdminDTO::getPacienteId, Collectors.counting()));
-			}
-			conn.disconnect();
-		} catch (Exception e) {
-			/* silencioso */ }
-	}
-
-	public List<UsuarioPerfilDTO> getPacientesFiltrados() {
+	public List<PacienteAdminDTO> getPacientesFiltrados() {
 		if (filtroTexto == null || filtroTexto.isBlank())
 			return todosPacientes;
 		return todosPacientes.stream().filter(p -> contem(p.getNome(), filtroTexto) || contem(p.getCpf(), filtroTexto)
@@ -102,16 +76,16 @@ public class PacientesAdminBean implements Serializable {
 		filtroTexto = "";
 	}
 
-	public void verDetalhes(UsuarioPerfilDTO paciente) {
+	public void verDetalhes(PacienteAdminDTO paciente) {
 		this.pacienteSelecionado = paciente;
 	}
 
-	public void verHistorico(UsuarioPerfilDTO paciente) {
+	public void verHistorico(PacienteAdminDTO paciente) {
 		this.pacienteSelecionado = paciente;
 		carregarConsultasDoPaciente(paciente.getId());
 	}
 
-	public void excluirPaciente(UsuarioPerfilDTO paciente) {
+	public void excluirPaciente(PacienteAdminDTO paciente) {
 		if (paciente == null)
 			return;
 		try {
@@ -127,7 +101,6 @@ public class PacientesAdminBean implements Serializable {
 			conn.disconnect();
 			if (code == 200 || code == 204) {
 				todosPacientes.removeIf(p -> p.getId().equals(paciente.getId()));
-				qtdConsultasPorPaciente.remove(paciente.getId());
 				adicionarInfo("Paciente " + paciente.getNome() + " excluído com sucesso.");
 			} else {
 				adicionarErro("Não foi possível excluir o paciente. Código: " + code);
@@ -144,7 +117,7 @@ public class PacientesAdminBean implements Serializable {
 			if (session == null)
 				return;
 			String token = (String) session.getAttribute("token");
-			URL url = new URL(BASE_URL + "/api/agendamentos/paciente/" + pacienteId);
+			URL url = new URL(BASE_URL + "/api/agendamentos/pacientes/" + pacienteId);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Authorization", "Bearer " + token);
@@ -157,10 +130,6 @@ public class PacientesAdminBean implements Serializable {
 		} catch (Exception e) {
 			adicionarErro("Erro ao carregar histórico: " + e.getMessage());
 		}
-	}
-
-	public long getQtdConsultas(Long pacienteId) {
-		return qtdConsultasPorPaciente.getOrDefault(pacienteId, 0L);
 	}
 
 	private HttpSession obterSession() {
@@ -182,7 +151,7 @@ public class PacientesAdminBean implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
 	}
 
-	public List<UsuarioPerfilDTO> getTodosPacientes() {
+	public List<PacienteAdminDTO> getTodosPacientes() {
 		return todosPacientes;
 	}
 
@@ -190,14 +159,14 @@ public class PacientesAdminBean implements Serializable {
 		return consultasDoPaciente;
 	}
 
-	public UsuarioPerfilDTO getPacienteSelecionado() {
+	public PacienteAdminDTO getPacienteSelecionado() {
 		return pacienteSelecionado;
 	}
 
-	public void setPacienteSelecionado(UsuarioPerfilDTO p) {
+	public void setPacienteSelecionado(PacienteAdminDTO p) {
 		this.pacienteSelecionado = p;
 	}
-	
+
 	public String getFiltroTexto() {
 		return filtroTexto;
 	}

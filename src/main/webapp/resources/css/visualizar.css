@@ -42,7 +42,6 @@
 	color: #7c3aed;
 }
 
-
 .page-title {
 	font-size: 26px;
 	font-weight: 800;
@@ -631,19 +630,19 @@ to {
 
 /* 1 — Botão Nova Consulta à direita dos filtros */
 .toolbar {
-    justify-content: flex-start;
+	justify-content: flex-start;
 }
 
 .toolbar .btn-nova {
-    margin-left: auto;
-    flex-shrink: 0;
+	margin-left: auto;
+	flex-shrink: 0;
 }
 
 /* 2 — Subtítulo mais suave */
 .page-subtitle {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--text-label);
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--text-label);
 }
 
 .badge-pendente {
@@ -658,4 +657,84 @@ to {
 
 .badge-pendente .badge-dot {
 	background: #f59e0b;
+}
+
+<!--
+.rc-dow {
+	text-align: center;
+	font-size: 11px;
+	font-weight: 600;
+	color: #9ca3af;
+	padding: 4px 0
+}
+
+.rc-day {
+	text-align: center;
+	padding: 6px 4px;
+	border-radius: 6px;
+	font-size: 13px;
+	color: #374151;
+	cursor: default
+}
+
+.rc-day.has-slots {
+	background: #d1fae5;
+	color: #065f46;
+	cursor: pointer;
+	font-weight: 600
+}
+
+.rc-day.has-slots:hover {
+	background: #a7f3d0
+}
+
+.rc-day.selected {
+	background: #7c3aed !important;
+	color: #fff !important
+}
+
+.rc-day.disabled {
+	color: #d1d5db
+}
+
+.rc-day.empty {
+	background: transparent
+}
+
+.rc-horario-btn {
+	padding: 8px 14px;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	color: #374151;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500
+}
+
+.rc-horario-btn:hover {
+	background: #ede9fe;
+	border-color: #7c3aed;
+	color: #7c3aed
+}
+
+.rc-horario-btn.selected {
+	background: #7c3aed;
+	border-color: #7c3aed;
+	color: #fff
+}
+
+.rc-horarios-empty {
+	color: #9ca3af;
+	font-size: 13px;
+	padding: 8px 0
+}
+
+.rc-day.disabled {
+	color: #d1d5db;
+	cursor: not-allowed;
+}
+
+.rc-day:not(.has-slots):not(.empty) {
+	color: #d1d5db;
 }

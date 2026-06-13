@@ -7,248 +7,237 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.view.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import com.vittae.model.Consulta;
+import com.vittae.dto.ConsultaDTO;
 import com.vittae.service.ConsultaService;
 
 @Named("visualizarConsultasBean")
 @ViewScoped
 public class VisualizarConsultasBean implements Serializable {
 
-	private List<Consulta> consultas;
-	private Consulta consultaSelecionada;
-	private Consulta consultaParaCancelar;
-	private String filtroTexto;
-	private String filtroStatus;
-	private boolean exibirModalCancelamento = false;
-	private boolean exibirModalRemarcacao = false;
-	private Consulta consultaParaRemarcar;
-	private Long idConsultaSelecionada;
-	
-	private ConsultaService service = new ConsultaService();
+    private List<ConsultaDTO> consultas;
+    private ConsultaDTO consultaSelecionada;
+    private ConsultaDTO consultaParaCancelar;
+    private ConsultaDTO consultaParaRemarcar;
+    private String filtroTexto;
+    private String filtroStatus;
+    private boolean exibirModalCancelamento = false;
+    private boolean exibirModalRemarcacao = false;
+    private Long idConsultaSelecionada;
 
-	@PostConstruct
-	public void init() {
-		filtroStatus = "todas";
-		carregarConsultas();
-	}//
+    private ConsultaService service = new ConsultaService();
 
-	public void carregarConsultas() {
-		try {
-			consultas = service.listarTodas();
-		} catch (Exception e) {
-			consultas = new ArrayList<>();
+    @PostConstruct
+    public void init() {
+        filtroStatus = "todas";
+        carregarConsultas();
+    }
 
-			e.printStackTrace(); 
-			String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao carregar consultas: " + msg, null));
-		}
-	}
+    public void carregarConsultas() {
+        try {
+            consultas = service.listarTodas();
+        } catch (Exception e) {
+            consultas = new ArrayList<>();
+            e.printStackTrace();
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao carregar consultas: " + msg, null));
+        }
+    }
 
-	// ─── FILTROS ─────────────────────────────────────────
-	public List<Consulta> getConsultasFiltradas() {
-		if (consultas == null)
-			return new ArrayList<>();
-		return consultas.stream().filter(this::passaFiltroStatus).filter(this::passaFiltroTexto)
-				.collect(Collectors.toList());
-	}
+    // ─── FILTROS ─────────────────────────────────────────
+    public List<ConsultaDTO> getConsultasFiltradas() {
+        if (consultas == null)
+            return new ArrayList<>();
+        return consultas.stream()
+                .filter(this::passaFiltroStatus)
+                .filter(this::passaFiltroTexto)
+                .collect(Collectors.toList());
+    }
 
-	private boolean passaFiltroStatus(Consulta c) {
-	    if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
-	        return true;
-	    return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
+    private boolean passaFiltroStatus(ConsultaDTO c) {
+        if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
+            return true;
+        return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
+    }
 
-	}
+    private boolean passaFiltroTexto(ConsultaDTO c) {
+        if (filtroTexto == null || filtroTexto.trim().isEmpty())
+            return true;
+        String texto = filtroTexto.trim().toLowerCase();
 
-	private boolean passaFiltroTexto(Consulta c) {
-		if (filtroTexto == null || filtroTexto.trim().isEmpty())
-			return true;
-		String texto = filtroTexto.trim().toLowerCase();
+        boolean nomeOk = c.getNomeMedico() != null && c.getNomeMedico().toLowerCase().contains(texto);
+        boolean especOk = c.getEspecialidade() != null && c.getEspecialidade().toLowerCase().contains(texto);
 
-		boolean nomeOk = c.getMedico() != null && c.getMedico().getNome() != null
-				&& c.getMedico().getNome().toLowerCase().contains(texto);
+        return nomeOk || especOk;
+    }
 
-		boolean especOk = false;
-		if (c.getMedico() != null && c.getMedico().getEspecialidades() != null) {
-			especOk = c.getMedico().getEspecialidades().stream().filter(e -> e != null)
-					.anyMatch(e -> e.toLowerCase().contains(texto));
-		}
-		return nomeOk || especOk;
-	}
+    public void filtrar() {
+    }
 
-	public void filtrar() {
-	}
+    // ─── DETALHAR ────────────────────────────────────────
+    public void detalhar(ConsultaDTO c) {
+        if (consultaSelecionada != null && consultaSelecionada.getId().equals(c.getId())) {
+            consultaSelecionada = null;
+        } else {
+            consultaSelecionada = c;
+        }
+    }
 
-	// ─── DETALHAR ────────────────────────────────────────
-	public void detalhar(Consulta c) {
-		if (consultaSelecionada != null && consultaSelecionada.getId().equals(c.getId())) {
-			consultaSelecionada = null;
-		} else {
-			consultaSelecionada = c;
-		}
-	}
+    // ─── CANCELAR COM MODAL ───────────────────────────────
+    public void prepararCancelamento(ConsultaDTO c) {
+        this.consultaParaCancelar = c;
+        this.exibirModalCancelamento = true;
+    }
 
-	// ─── CANCELAR COM MODAL ───────────────────────────────
-	public void prepararCancelamento(Consulta c) {
-		this.consultaParaCancelar = c;
-		this.exibirModalCancelamento = true;
-	}
+    public void confirmarCancelamento() {
+        if (consultaParaCancelar != null) {
+            cancelar(consultaParaCancelar);
+        }
+        fecharModal();
+    }
 
-	public void confirmarCancelamento() {
-		if (consultaParaCancelar != null) {
-			cancelar(consultaParaCancelar);
-		}
-		fecharModal();
-	}
+    public void fecharModal() {
+        this.exibirModalCancelamento = false;
+        this.consultaParaCancelar = null;
+    }
 
-	public void fecharModal() {
-		this.exibirModalCancelamento = false;
-		this.consultaParaCancelar = null;
-	}
+    public void cancelar(ConsultaDTO c) {
+        try {
+            service.cancelar(c.getId(), c);
+            carregarConsultas();
+            addInfo("Consulta cancelada com sucesso!");
+        } catch (Exception e) {
+            addErro("Erro ao cancelar: " + e.getMessage());
+        }
+    }
 
-	public void cancelar(Consulta c) {
-	    try {
-	        service.cancelar(c.getId(), c);
-	        carregarConsultas();
-	        addInfo("Consulta cancelada com sucesso!");
-	    } catch (Exception e) {
-	        addErro("Erro ao cancelar: " + e.getMessage());
-	    }
-	}
+    // ─── REMARCAR COM MODAL ───────────────────────────────
+    public void prepararRemarcar(ConsultaDTO c) {
+        this.consultaParaRemarcar = c;
+        this.exibirModalRemarcacao = true;
+    }
 
-	
-	public void prepararRemarcar(Consulta c) {
-	    this.consultaParaRemarcar = new Consulta(
-	        c.getMedico(), c.getPaciente(), c.getStatus(),
-	        null, c.getDataConsulta(), c.getValorConsulta(),
-	        c.getHora(), c.getEspecialidade(),
-	        c.getRespNome(), c.getRespCpf(), c.getRespParentesco()
-	    );
-	    this.consultaParaRemarcar.setId(c.getId());
-	    this.exibirModalRemarcacao = true;
-	}
+    public void confirmarRemarcacao() {
+        if (consultaParaRemarcar != null) {
+            try {
+                service.remarcar(consultaParaRemarcar.getId(), consultaParaRemarcar);
+                carregarConsultas();
+                consultaSelecionada = null;
+                addInfo("Consulta remarcada com sucesso!");
+            } catch (Exception e) {
+                addErro("Erro ao remarcar: " + e.getMessage());
+            }
+        }
+        fecharModalRemarcacao();
+    }
 
-	public void confirmarRemarcacao() {
-		if (consultaParaRemarcar != null) {
-			try {
-				service.remarcar(consultaParaRemarcar.getId(), consultaParaRemarcar);
-				carregarConsultas();
-				consultaSelecionada = null;
-				addInfo("Consulta remarcada com sucesso!");
-			} catch (Exception e) {
-				addErro("Erro ao remarcar: " + e.getMessage());
-			}
-		}
-		fecharModalRemarcacao();
-	}
+    public void fecharModalRemarcacao() {
+        this.exibirModalRemarcacao = false;
+        this.consultaParaRemarcar = null;
+    }
 
-	public void fecharModalRemarcacao() {
-		this.exibirModalRemarcacao = false;
-		this.consultaParaRemarcar = null;
-	}
-	
-	// CONSULTA SELECIONADA 
-	public void prepararCancelamentoAction(Long id) {
-	    for (Consulta c : consultas) {
-	        if (c.getId().equals(id)) {
-	            prepararCancelamento(c);
-	            break;
-	        }
-	    }
-	}
+    // ─── ACTIONS POR ID ───────────────────────────────────
+    public void prepararCancelamentoAction(Long id) {
+        for (ConsultaDTO c : consultas) {
+            if (c.getId().equals(id)) {
+                prepararCancelamento(c);
+                break;
+            }
+        }
+    }
 
-	public void prepararRemarcarAction(Long id) {
-	    for (Consulta c : consultas) {
-	        if (c.getId().equals(id)) {
-	            prepararRemarcar(c);
-	            break;
-	        }
-	    }
-	}
-	
-	
+    public void prepararRemarcarAction(Long id) {
+        for (ConsultaDTO c : consultas) {
+            if (c.getId().equals(id)) {
+                prepararRemarcar(c);
+                break;
+            }
+        }
+    }
 
-	// ─── HELPERS ─────────────────────────────────────────
-	private void addInfo(String msg) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
-	}
+    // ─── HELPERS ─────────────────────────────────────────
+    private void addInfo(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
 
-	private void addErro(String msg) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
-	}
+    private void addErro(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }
 
-	// ─── GETTERS E SETTERS ────────────────────────────────
-	public List<Consulta> getConsultas() {
-		return consultas;
-	}
+    // ─── GETTERS E SETTERS ────────────────────────────────
+    public List<ConsultaDTO> getConsultas() {
+        return consultas;
+    }
 
-	public void setConsultas(List<Consulta> consultas) {
-		this.consultas = consultas;
-	}
+    public void setConsultas(List<ConsultaDTO> consultas) {
+        this.consultas = consultas;
+    }
 
-	public Consulta getConsultaSelecionada() {
-		return consultaSelecionada;
-	}
+    public ConsultaDTO getConsultaSelecionada() {
+        return consultaSelecionada;
+    }
 
-	public void setConsultaSelecionada(Consulta c) {
-		this.consultaSelecionada = c;
-	}
+    public void setConsultaSelecionada(ConsultaDTO c) {
+        this.consultaSelecionada = c;
+    }
 
-	public Consulta getConsultaParaCancelar() {
-		return consultaParaCancelar;
-	}
+    public ConsultaDTO getConsultaParaCancelar() {
+        return consultaParaCancelar;
+    }
 
-	public void setConsultaParaCancelar(Consulta c) {
-		this.consultaParaCancelar = c;
-	}
+    public void setConsultaParaCancelar(ConsultaDTO c) {
+        this.consultaParaCancelar = c;
+    }
 
-	public String getFiltroTexto() {
-		return filtroTexto;
-	}
+    public ConsultaDTO getConsultaParaRemarcar() {
+        return consultaParaRemarcar;
+    }
 
-	public void setFiltroTexto(String filtroTexto) {
-		this.filtroTexto = filtroTexto;
-	}
+    public void setConsultaParaRemarcar(ConsultaDTO c) {
+        this.consultaParaRemarcar = c;
+    }
 
-	public String getFiltroStatus() {
-		return filtroStatus;
-	}
+    public String getFiltroTexto() {
+        return filtroTexto;
+    }
 
-	public void setFiltroStatus(String filtroStatus) {
-		this.filtroStatus = filtroStatus;
-	}
+    public void setFiltroTexto(String filtroTexto) {
+        this.filtroTexto = filtroTexto;
+    }
 
-	public boolean isExibirModalCancelamento() {
-		return exibirModalCancelamento;
-	}
+    public String getFiltroStatus() {
+        return filtroStatus;
+    }
 
-	public void setExibirModalCancelamento(boolean exibirModalCancelamento) {
-		this.exibirModalCancelamento = exibirModalCancelamento;
-	}
+    public void setFiltroStatus(String filtroStatus) {
+        this.filtroStatus = filtroStatus;
+    }
 
-	public boolean isExibirModalRemarcacao() {
-		return exibirModalRemarcacao;
-	}
+    public boolean isExibirModalCancelamento() {
+        return exibirModalCancelamento;
+    }
 
-	public void setExibirModalRemarcacao(boolean v) {
-		this.exibirModalRemarcacao = v;
-	}
+    public void setExibirModalCancelamento(boolean exibirModalCancelamento) {
+        this.exibirModalCancelamento = exibirModalCancelamento;
+    }
 
-	public Consulta getConsultaParaRemarcar() {
-		return consultaParaRemarcar;
-	}
+    public boolean isExibirModalRemarcacao() {
+        return exibirModalRemarcacao;
+    }
 
-	public void setConsultaParaRemarcar(Consulta c) {
-		this.consultaParaRemarcar = c;
-	}
-	
-	public Long getIdConsultaSelecionada() { return idConsultaSelecionada;
-	}
-	
-	public void setIdConsultaSelecionada(Long id) { this.idConsultaSelecionada = id;
-	}
+    public void setExibirModalRemarcacao(boolean v) {
+        this.exibirModalRemarcacao = v;
+    }
+
+    public Long getIdConsultaSelecionada() {
+        return idConsultaSelecionada;
+    }
+
+    public void setIdConsultaSelecionada(Long id) {
+        this.idConsultaSelecionada = id;
+    }
 }

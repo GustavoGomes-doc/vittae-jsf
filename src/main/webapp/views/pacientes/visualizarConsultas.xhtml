@@ -124,16 +124,16 @@
 									</div>
 									<h:panelGroup layout="block">
 										<div class="doctor-name">
-											<h:outputText value="#{consulta.medico.nome}" />
+											<h:outputText value="#{consulta.nomeMedico}" />
 										</div>
 										<div class="doctor-specialty">
 											<i class="fas fa-stethoscope"></i>
-											<h:outputText value="#{consulta.medico.especialidade}" />
+											<h:outputText value="#{consulta.especialidade}" />
 										</div>
 										<!-- NOME DO PACIENTE -->
 										<div class="paciente-nome">
 											<i class="fas fa-user"></i>
-											<h:outputText value="#{consulta.paciente.nome}" />
+											<h:outputText value="#{consulta.nomePaciente}" />
 										</div>
 									</h:panelGroup>
 								</h:panelGroup>
@@ -180,10 +180,8 @@
 							<!-- Ações — só aparece se não cancelada/realizada -->
 							<div class="card-actions">
 								<h:commandButton value="Remarcar" styleClass="btn btn-remarcar"
-									rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}">
-									<f:ajax execute="@this" render="@form"
-										listener="#{visualizarConsultasBean.prepararRemarcarAction(consulta.id)}" />
-								</h:commandButton>
+								    rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}"
+								    onclick="abrirModalRemarcar(#{consulta.id}, #{consulta.medicoId}); return false;" />
 
 								<h:commandButton value="Cancelar" styleClass="btn btn-cancel"
 									rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}">
@@ -223,57 +221,83 @@
 					</div>
 				</div>
 			</h:panelGroup>
-
-			<!-- MODAL REMARCAÇÃO -->
-			<h:panelGroup id="modalRemarcacao" layout="block"
-				style="display:contents">
-				<div class="modal-overlay"
-					style="#{visualizarConsultasBean.exibirModalRemarcacao ? 'display:flex' : 'display:none'}">
-					<div class="modal-box modal-remarcar">
-						<div class="modal-icon">
-							<i class="fas fa-calendar-alt"></i>
-						</div>
-						<h3 class="modal-title">Remarcar Consulta</h3>
-						<p class="modal-text">Altere os dados e confirme.</p>
-
-						<h:panelGroup
-							rendered="#{visualizarConsultasBean.consultaParaRemarcar != null}">
-							<div class="form-group">
-								<label>Nova Data</label>
-								<h:inputText styleClass="form-control"
-									value="#{visualizarConsultasBean.consultaParaRemarcar.dataConsulta}">
-									<f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
-								</h:inputText>
-							</div>
-							<div class="form-group">
-								<label>Novo Horário</label>
-								<h:inputText styleClass="form-control"
-									value="#{visualizarConsultasBean.consultaParaRemarcar.hora}">
-									<f:convertDateTime type="localTime" pattern="HH:mm" />
-								</h:inputText>
-							</div>
-						</h:panelGroup>
-
-						<div class="modal-actions">
-							<h:commandButton value="Voltar" styleClass="btn btn-secondary">
-								<f:ajax execute="@this" render="@form"
-									listener="#{visualizarConsultasBean.fecharModalRemarcacao}" />
-							</h:commandButton>
-							<h:commandButton value="Confirmar"
-								styleClass="btn btn-confirmar-remarcar">
-								<f:ajax execute="@form" render="@form"
-									listener="#{visualizarConsultasBean.confirmarRemarcacao}" />
-							</h:commandButton>
-						</div>
-					</div>
-				</div>
-			</h:panelGroup>
-
 		</h:form>
 		
+		<div id="remarcarOverlay" style="display:none; position:fixed; inset:0;
+		     background:rgba(0,0,0,0.55); z-index:9999;
+		     align-items:center; justify-content:center;">
+		
+		    <div style="background:#fff; border-radius:16px; padding:28px;
+		                width:90%; max-width:600px; max-height:90vh; overflow-y:auto;
+		                box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+		
+		        <!-- Título -->
+		        <div style="text-align:center; margin-bottom:20px">
+		            <div style="font-size:36px; color:#7c3aed">&#128197;</div>
+		            <h3 style="margin:8px 0 4px; color:#1e1b4b">Remarcar Consulta</h3>
+		            <p style="color:#6b7280; margin:0">Escolha a nova data e horário</p>
+		        </div>
+		
+		        <!-- Calendário -->
+		        <div style="display:flex; gap:20px; flex-wrap:wrap">
+		            <div style="flex:1; min-width:220px">
+		                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+		                    <button type="button" onclick="navegarMesRemarcar(-1)"
+		                        style="background:none; border:1px solid #e5e7eb; border-radius:6px;
+		                               padding:4px 10px; cursor:pointer; font-size:16px; color:#4b5563">&#8249;</button>
+		                    <span id="remarcarCalTitulo" style="font-weight:600; color:#1e1b4b"></span>
+		                    <button type="button" onclick="navegarMesRemarcar(1)"
+		                        style="background:none; border:1px solid #e5e7eb; border-radius:6px;
+		                               padding:4px 10px; cursor:pointer; font-size:16px; color:#4b5563">&#8250;</button>
+		                </div>
+		                <div id="remarcarCalGrid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px"></div>
+		                <div style="margin-top:8px; display:flex; gap:12px; font-size:12px; color:#6b7280">
+		                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#059669;margin-right:4px"></span>Disponível</span>
+		                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c3aed;margin-right:4px"></span>Selecionado</span>
+		                </div>
+		            </div>
+		
+		            <!-- Horários -->
+		            <div style="flex:1; min-width:180px">
+		                <p id="remarcarHorariosSub"
+		                   style="font-size:13px; color:#6b7280; margin:0 0 10px">
+		                    Selecione uma data no calendário
+		                </p>
+		                <div id="remarcarHorariosGrid"
+		                     style="display:flex; flex-wrap:wrap; gap:8px">
+		                    <div class="rc-horarios-empty">&#128197; Selecione uma data</div>
+		                </div>
+		            </div>
+		        </div>
+		
+		        <!-- Erro -->
+		        <p id="remarcarErro"
+		           style="display:none; color:#dc2626; font-size:13px; margin:12px 0 0; text-align:center">
+		            &#9888; Selecione data e horário antes de confirmar
+		        </p>
+		
+		        <!-- Ações -->
+		        <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px">
+		            <button type="button" onclick="fecharModalRemarcar()"
+		                style="padding:10px 20px; border:1px solid #e5e7eb; border-radius:8px;
+		                       background:#fff; color:#374151; cursor:pointer; font-size:14px">
+		                Voltar
+		            </button>
+		            <button type="button" id="btnConfirmarRemarcar" onclick="confirmarRemarcarJS()"
+		                style="padding:10px 24px; border:none; border-radius:8px;
+		                       background:#7c3aed; color:#fff; cursor:pointer; font-size:14px; font-weight:600">
+		                Confirmar Remarcação
+		            </button>
+		        </div>
+		
+		    </div>
+		</div>			
+		
 <script>
-    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+    window.API_BASE_URL = 'http://localhost:9090';
+    window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
 </script>
 		<h:outputScript library="js" name="visualizar.js" />
+		<h:outputScript library="js" name="remarcar.js" />
 	</ui:define>
 </ui:composition>

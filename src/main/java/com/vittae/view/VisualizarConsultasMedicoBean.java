@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.vittae.model.Consulta;
 import com.vittae.model.enums.Status;
 import com.vittae.service.ConsultaService;
 import com.vittae.util.ConfigUtil;
@@ -115,19 +114,19 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	}
 
 	public void confirmarCancelamento() {
-		if (idParaCancelar != null) {
-			try {
-				Consulta consulta = new Consulta();
-				consulta.setId(idParaCancelar);
-				consulta.setStatus(Status.CANCELADA);
-				service.cancelar(idParaCancelar, consulta);
-				carregarConsultas();
-				addInfo("Consulta cancelada com sucesso!");
-			} catch (Exception e) {
-				addErro("Erro ao cancelar: " + e.getMessage());
-			}
-		}
-		fecharModal();
+	    if (idParaCancelar != null) {
+	        try {	
+	            com.vittae.dto.ConsultaDTO dto = new com.vittae.dto.ConsultaDTO();
+	            dto.setId(idParaCancelar);
+	            dto.setStatus(Status.CANCELADA);
+	            service.cancelar(idParaCancelar, dto);
+	            carregarConsultas();
+	            addInfo("Consulta cancelada com sucesso!");
+	        } catch (Exception e) {
+	            addErro("Erro ao cancelar: " + e.getMessage());
+	        }
+	    }
+	    fecharModal();
 	}
 
 	public void fecharModal() {

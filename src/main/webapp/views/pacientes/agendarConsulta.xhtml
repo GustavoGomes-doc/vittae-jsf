@@ -429,9 +429,10 @@
     window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
 </script>
 
-<script>
-    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+<script type="text/javascript">
+    window.API_BASE_URL = '#{configBean.apiBaseUrl}';
 </script>
+
 <h:outputScript library="js" name="agendar.js" />
 
 	</ui:define>
