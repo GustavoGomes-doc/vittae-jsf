@@ -7,58 +7,56 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature; // Import obrigatório para configurar a data
+import com.fasterxml.jackson.databind.SerializationFeature; 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.dto.MedicoEnvioDTO;
 import com.vittae.util.ConfigUtil;
-
 
 public class CadastrarMedicoService {
 
 	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/medicos";
 
-    public void salvarMedico(MedicoEnvioDTO dto, String token) throws Exception {
-        try {
-            // Configurar o Jackson para entender datas (LocalDate e LocalTime)
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule()); 
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	public void salvarMedico(MedicoEnvioDTO dto, String token) throws Exception {
+		try {
+			// Configurar o Jackson para entender datas (LocalDate e LocalTime)
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.registerModule(new JavaTimeModule()); 
+			mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-            // Converter o objeto Medico para String JSON
-            String json = mapper.writeValueAsString(dto);
-       
-            System.out.println("Enviando JSON: " + json);
+			// Converter o objeto Medico para String JSON
+			String json = mapper.writeValueAsString(dto);
+		
+			System.out.println("Enviando JSON: " + json);
 
-            // Criar o Cliente HTTP
-            HttpClient client = HttpClient.newHttpClient();
+			// Criar o Cliente HTTP
+			HttpClient client = HttpClient.newHttpClient();
 
-            // Montar a Requisição POST
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL))
-                    .header("Content-Type", "application/json") // avisa o spring que esta mandando um JSON
-                    .header("Authorization", "Bearer " + token)
-                    .POST(BodyPublishers.ofString(json)) // pega o JSON gerado e coloca no corpo da mensagem HTTP 
-                    .build();
+			// Montar a Requisição POST
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(API_URL))
+					.header("Content-Type", "application/json") 
+					.header("Authorization", "Bearer " + token)
+					.POST(BodyPublishers.ofString(json)) 
+					.build();
 
-            // Enviar e receber a resposta
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			// Enviar e receber a resposta
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // Validar o resultado (200 OK ou 201 Created)
-            if (response.statusCode() == 200 || response.statusCode() == 201) {
-                System.out.println("Médico enviado com sucesso para a API!");
-            } else {
-                String mensagemErro = response.body();
+			// Validar o resultado (200 OK ou 201 Created)
+			if (response.statusCode() == 200 || response.statusCode() == 201) {
+				System.out.println("Médico enviado com sucesso para a API!");
+			} else {
+				String mensagemErro = response.body();
 
-                if (mensagemErro == null || mensagemErro.trim().isEmpty()) {
-                    mensagemErro = "Não foi possível salvar o médico.";
-                }
+				if (mensagemErro == null || mensagemErro.trim().isEmpty()) {
+					mensagemErro = "Não foi possível salvar o médico.";
+				}
 
-                throw new Exception(mensagemErro);
-            }
-            
-        } catch (Exception e) {
-        	throw new Exception(e.getMessage());
-        }
-    }
+				throw new Exception(mensagemErro);
+			}
+			
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 }
-

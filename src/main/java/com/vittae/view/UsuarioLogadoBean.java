@@ -8,8 +8,6 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.vittae.model.Usuario;
-
 @Named("usuarioLogadoBean")
 @RequestScoped
 public class UsuarioLogadoBean implements Serializable {
@@ -17,17 +15,17 @@ public class UsuarioLogadoBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String getUsuarioDaSessao() {
-	    FacesContext context = FacesContext.getCurrentInstance();
-	    HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-	    HttpSession session = request.getSession(false);
-	    if (session == null) return null;
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+		HttpSession session = request.getSession(false);
+		if (session == null) return null;
 
-	    return (String) session.getAttribute("usuario"); // era (Usuario), agora é (String)
+		return (String) session.getAttribute("usuario");
 	}
 
 	public String getNome() {
-	    String nome = getUsuarioDaSessao();
-	    return nome != null ? nome : "";
+		String nome = getUsuarioDaSessao();
+		return nome != null ? nome : "";
 	}
 	
 	public String getPerfil () {
@@ -37,17 +35,15 @@ public class UsuarioLogadoBean implements Serializable {
 		if (session == null) return "";
 		Object perfil = session.getAttribute("perfil");
 		return perfil != null ? perfil.toString() : "";
-		
 	}
 	
 	public String getToken() {
-	    FacesContext context = FacesContext.getCurrentInstance();
-	    HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-	    HttpSession session = request.getSession(false);
-	    if (session == null) return "";
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+		HttpSession session = request.getSession(false);
+		if (session == null) return "";
 
-	    Object token = session.getAttribute("token");
-	    return token != null ? token.toString() : "";
+		Object token = session.getAttribute("token");
+		return token != null ? token.toString() : "";
 	}
-	
 }

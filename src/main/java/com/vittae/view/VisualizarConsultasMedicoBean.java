@@ -10,14 +10,12 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vittae.model.enums.Status;
-import com.vittae.service.ConsultaService;
 import com.vittae.util.ConfigUtil;
 
 @Named("visualizarConsultasMedicoBean")
@@ -29,44 +27,40 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	private String filtroStatus;
 	private boolean exibirModalCancelamento = false;
 	private Long idParaCancelar;
+	private Long idParaRealizar;
 	private Long medicoId;
 	private String token;
 
-	private ConsultaService service = new ConsultaService();
-
 	@PostConstruct
 	public void init() {
-	    filtroStatus = "todas";
-
-	    FacesContext fc = FacesContext.getCurrentInstance();
-	    HttpServletRequest req = (HttpServletRequest) fc.getExternalContext().getRequest();
-	    HttpSession session = req.getSession(false);
-
-	    if (session != null) {
-	        medicoId = (Long) session.getAttribute("usuarioId");
-	        token = (String) session.getAttribute("token");
-	    }
-
-	    carregarConsultas();
+		filtroStatus = "todas";
+		FacesContext fc = FacesContext.getCurrentInstance();
+		HttpSession session = (HttpSession) fc.getExternalContext().getSession(false);
+		if (session != null) {
+			Object idObj = session.getAttribute("usuarioId");
+			if (idObj != null) {
+				medicoId = idObj instanceof Long ? (Long) idObj : Long.valueOf(idObj.toString());
+			}
+			token = (String) session.getAttribute("token");
+		}
+		carregarConsultas();
 	}
 
 	public void carregarConsultas() {
-	    try {
-	        consultas = buscarConsultasDoMedico(medicoId); 
-	    } catch (Exception e) {
-	        consultas = new ArrayList<>();
-	        addErro("Erro ao carregar consultas: " + e.getMessage());
-	        e.printStackTrace();
-	    }
+		try {
+			consultas = buscarConsultasDoMedico(medicoId);
+		} catch (Exception e) {
+			consultas = new ArrayList<>();
+			addErro("Erro ao carregar consultas: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private List<MedicoConsultaDTO> buscarConsultasDoMedico(Long medicoId) throws Exception {
-	    java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-	    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-	    		.uri(java.net.URI.create(ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/" + medicoId))
-	        .header("Authorization", "Bearer " + token) // <- token aqui
-	        .GET()
-	        .build();
+		java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+				.uri(java.net.URI.create(ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/" + medicoId))
+				.header("Authorization", "Bearer " + token).GET().build();
 
 		java.net.http.HttpResponse<String> response = client.send(request,
 				java.net.http.HttpResponse.BodyHandlers.ofString());
@@ -81,7 +75,33 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		throw new Exception("Status: " + response.statusCode());
 	}
 
-	//filtros
+	public void marcarRealizada(Long id) {
+		try {
+			java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+			java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+					.uri(java.net.URI.create(ConfigUtil.get("api.base.url") + "/api/agendamentos/" + id + "/realizar"))
+					.header("Authorization", "Bearer " + token).header("Content-Type", "application/json")
+					.method("PATCH", java.net.http.HttpRequest.BodyPublishers.noBody()).build();
+
+			java.net.http.HttpResponse<String> response = client.send(request,
+					java.net.http.HttpResponse.BodyHandlers.ofString());
+
+			if (response.statusCode() == 200) {
+				carregarConsultas();
+			} else {
+				addErro("Erro ao marcar como realizada: status " + response.statusCode());
+			}
+		} catch (Exception e) {
+			addErro("Erro ao marcar como realizada: " + e.getMessage());
+		}
+	}
+
+	public void marcarRealizadaAction() {
+		if (idParaRealizar != null) {
+			marcarRealizada(idParaRealizar);
+		}
+	}
+
 	public List<MedicoConsultaDTO> getConsultasFiltradas() {
 		if (consultas == null)
 			return new ArrayList<>();
@@ -107,26 +127,35 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	public void filtrar() {
 	}
 
-	//cancelamento
 	public void prepararCancelamentoAction(Long id) {
 		this.idParaCancelar = id;
 		this.exibirModalCancelamento = true;
 	}
 
 	public void confirmarCancelamento() {
-	    if (idParaCancelar != null) {
-	        try {	
-	            com.vittae.dto.ConsultaDTO dto = new com.vittae.dto.ConsultaDTO();
-	            dto.setId(idParaCancelar);
-	            dto.setStatus(Status.CANCELADA);
-	            service.cancelar(idParaCancelar, dto);
-	            carregarConsultas();
-	            addInfo("Consulta cancelada com sucesso!");
-	        } catch (Exception e) {
-	            addErro("Erro ao cancelar: " + e.getMessage());
-	        }
-	    }
-	    fecharModal();
+		if (idParaCancelar != null) {
+			try {
+				java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+				java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+						.uri(java.net.URI.create(
+								ConfigUtil.get("api.base.url") + "/api/agendamentos/" + idParaCancelar + "/cancelar"))
+						.header("Authorization", "Bearer " + token).header("Content-Type", "application/json")
+						.method("PATCH", java.net.http.HttpRequest.BodyPublishers.noBody()).build();
+
+				java.net.http.HttpResponse<String> response = client.send(request,
+						java.net.http.HttpResponse.BodyHandlers.ofString());
+
+				if (response.statusCode() == 200) {
+					carregarConsultas();
+					addInfo("Consulta cancelada com sucesso!");
+				} else {
+					addErro("Erro ao cancelar: status " + response.statusCode());
+				}
+			} catch (Exception e) {
+				addErro("Erro ao cancelar: " + e.getMessage());
+			}
+		}
+		fecharModal();
 	}
 
 	public void fecharModal() {
@@ -134,7 +163,6 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		this.idParaCancelar = null;
 	}
 
-	//helpers
 	private void addInfo(String msg) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
 	}
@@ -142,7 +170,8 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 	private void addErro(String msg) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
 	}
-	
+
+	@com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MedicoConsultaDTO {
 		private Long id;
 		private String nomePaciente;
@@ -150,6 +179,8 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		private java.time.LocalTime hora;
 		private String especialidade;
 		private Status status;
+		private String observacoes;
+		private String telefonePaciente;
 
 		public Long getId() {
 			return id;
@@ -198,8 +229,23 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 		public void setStatus(Status v) {
 			this.status = v;
 		}
-	}
 
+		public String getObservacoes() {
+			return observacoes;
+		}
+
+		public void setObservacoes(String v) {
+			this.observacoes = v;
+		}
+
+		public String getTelefonePaciente() {
+			return telefonePaciente;
+		}
+
+		public void setTelefonePaciente(String v) {
+			this.telefonePaciente = v;
+		}
+	}
 
 	public String getFiltroTexto() {
 		return filtroTexto;
@@ -223,5 +269,13 @@ public class VisualizarConsultasMedicoBean implements Serializable {
 
 	public void setExibirModalCancelamento(boolean v) {
 		this.exibirModalCancelamento = v;
+	}
+
+	public Long getIdParaRealizar() {
+		return idParaRealizar;
+	}
+
+	public void setIdParaRealizar(Long v) {
+		this.idParaRealizar = v;
 	}
 }

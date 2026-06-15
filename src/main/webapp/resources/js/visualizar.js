@@ -21,40 +21,41 @@ function aplicarFiltros() {
         var status = card.getAttribute('data-status');
         var medico = (card.getAttribute('data-medico') + ' ' + card.getAttribute('data-especialidade')).toLowerCase();
 
-		var okStatus = (filtroAtivo === 'todas') ||
-		    (filtroAtivo === 'pendente'  && status === 'PENDENTE') ||
-		    (filtroAtivo === 'realizada' && status === 'REALIZADA') ||
-		    (filtroAtivo === 'cancelada' && status === 'CANCELADA');
+        var okStatus = (filtroAtivo === 'todas') ||
+            (filtroAtivo === 'pendente'  && status === 'PENDENTE') ||
+            (filtroAtivo === 'realizada' && status === 'REALIZADA') ||
+            (filtroAtivo === 'cancelada' && status === 'CANCELADA');
 
-		        var okTexto = textoBusca === '' || medico.indexOf(textoBusca) !== -1;
-				
-		        if (okStatus && okTexto) {
-		            card.style.display = '';
-		            visiveis++;
-		        } else {
-		            card.style.display = 'none';
-		        }
-});
+        var okTexto = textoBusca === '' || medico.indexOf(textoBusca) !== -1;
+        
+        if (okStatus && okTexto) {
+            card.style.display = '';
+            visiveis++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
 
-document.getElementById('count-num').textContent = visiveis;
+    document.getElementById('count-num').textContent = visiveis;
 
-// Substitua o trecho do empty state no seu JS por este:
-var empty = document.getElementById('empty-state');
-if (visiveis === 0) {
-    if (!empty) {
-        var div = document.createElement('div');
-        div.id = 'empty-state';
-        div.className = 'empty-state';
-        div.innerHTML =
-            '<div class="empty-icon">' +
-            '<i class="fas fa-calendar-times" style="font-size: 32px; color: #7C3AED;"></i>' +
-            '</div>' +
-            '<p class="empty-title">Nenhuma consulta encontrada</p>' +
-            '<p class="empty-text">Tente ajustar os filtros ou a busca</p>';
-        document.getElementById('lista-consultas').appendChild(div);
+    // Gerenciamento do Empty State
+    var empty = document.getElementById('empty-state');
+    if (visiveis === 0) {
+        if (!empty) {
+            var div = document.createElement('div');
+            div.id = 'empty-state';
+            div.className = 'empty-state';
+            div.innerHTML =
+                '<div class="emptyicon">' +
+                '<i class="fas fa-calendar-times" style="font-size: 32px; color: #7C3AED;"></i>' +
+                '</div>' +
+                '<p class="empty-title">Nenhuma consulta encontrada</p>' +
+                '<p class="empty-text">Tente ajustar os filtros ou a busca</p>';
+            document.getElementById('lista-consultas').appendChild(div);
+        }
+    } else if (empty) {
+        empty.remove();
     }
-} else if (empty) {
-    empty.remove();
 }
 
 function cancelarConsulta(id) {
@@ -73,6 +74,8 @@ function cancelarConsulta(id) {
                     }
                 });
                 alert('Consulta cancelada com sucesso!');
+                // Atualiza o contador de consultas visíveis após o cancelamento
+                aplicarFiltros();
             } else {
                 alert('Erro ao cancelar consulta.');
             }
@@ -85,5 +88,4 @@ function cancelarConsulta(id) {
 
 function remarcarConsulta(id) {
     window.location.href = 'agendarConsulta.xhtml?remarcar=true&id=' + id;
-}
 }

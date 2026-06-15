@@ -6,12 +6,12 @@
 <h:head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vittae - Login</title>
+    <title>Vittae | Login</title>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <h:outputStylesheet library="css" name="login.css" />
     <link rel="shortcut icon"
-        href="#{request.contextPath}/resources/imagens/facvicon VITTAE.png"
+        href="#{request.contextPath}/resources/imagens/facicon VITTAE.png"
         type="image/x-icon" />
 </h:head>
 
@@ -24,7 +24,6 @@
                     <h2>Acesse sua Conta</h2>
                     <p class="subtitle">Bem-vindo de volta ao Vittae!</p>
 
-                    <!-- CPF com máscara -->
                     <div class="input-field">
                         <i class="fas fa-id-card" />
                         <h:inputText id="cpfLogin" value="#{loginBean.cpf}"
@@ -36,7 +35,6 @@
                             onkeyup="mascaraCPF(this)" />
                     </div>
 
-                    <!-- Senha — olho injetado pelo JS -->
                     <div class="input-field">
                         <i class="fas fa-lock" />
                         <h:inputSecret id="senhaLogin" value="#{loginBean.senha}"

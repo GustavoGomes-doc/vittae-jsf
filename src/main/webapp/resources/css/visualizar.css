@@ -280,12 +280,12 @@ to {
 }
 
 .badge-realizada {
-	background: var(--status-done-bg);
-	color: var(--status-done);
+    background-color: #d1fae5;
+    color: #065f46;
 }
 
 .badge-realizada .badge-dot {
-	background: var(--status-done);
+    background-color: #059669;
 }
 
 .badge-cancelada {
@@ -416,7 +416,7 @@ to {
 	padding: 64px 24px;
 }
 
-.empty-icon {
+.emptyicon {
 	width: 80px;
 	height: 80px;
 	background: #EDE9FE;
@@ -515,7 +515,7 @@ to {
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
 }
 
-.modal-icon {
+.modalicon {
 	font-size: 2.5rem;
 	color: #e74c3c;
 	margin-bottom: 1rem;
@@ -737,4 +737,99 @@ to {
 
 .rc-day:not(.has-slots):not(.empty) {
 	color: #d1d5db;
+}
+
+/* ===== MODAL RELATÓRIO ===== */
+.modal-relatorio-box {
+    max-width: 560px;
+    text-align: left;
+}
+
+.relatorio-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.relatorio-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.relatorio-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-label);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.relatorio-label i {
+    color: var(--vittae-purple);
+}
+
+.relatorio-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-sizing: border-box;
+}
+
+.relatorio-textarea:focus {
+    border-color: var(--vittae-purple-light);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, .1);
+}
+
+.btn-relatorio {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    background: var(--status-confirmed-bg);
+    border: 1.5px solid var(--vittae-purple);
+    color: var(--vittae-purple);
+}
+
+.btn-relatorio:hover {
+    background: #DDD6FE;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, .2);
+}
+
+.btn-gerar-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--vittae-purple);
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .18s;
+}
+
+.btn-gerar-pdf:hover {
+    background: var(--vittae-purple-dark);
 }

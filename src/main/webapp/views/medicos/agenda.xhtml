@@ -9,6 +9,8 @@
 
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
 
+	<ui:define name="titulo">Médicos | Minha Agenda</ui:define>
+
     <ui:define name="css_extra">
         <h:outputStylesheet library="css" name="agenda.css" />
     </ui:define>
@@ -17,14 +19,12 @@
 
         <h:form id="formAgenda">
 
-            <!-- HEADER -->
             <div class="agenda-header">
                 <div class="agenda-titulo-wrap">
                     <i class="fas fa-calendar-alt agenda-titulo-icon"></i>
                     <h2 class="agenda-titulo">Minha Agenda</h2>
                 </div>
 
-                <!-- Navegação de mês -->
                 <div class="agenda-nav">
                     <h:commandButton styleClass="agenda-nav-btn" title="Mês anterior"
 					    action="#{agendaMedicoBean.mesAnterior}"
@@ -41,7 +41,6 @@
 					</h:commandButton>
                 </div>
 
-                <!-- Legenda -->
                 <div class="agenda-legenda">
                     <span class="legenda-item">
                         <span class="legenda-dot dot-pendente"></span> Pendente
@@ -55,10 +54,8 @@
                 </div>
             </div>
 
-            <!-- CALENDÁRIO -->
             <div class="agenda-calendario">
 
-                <!-- Cabeçalho dias da semana -->
                 <div class="agenda-grid-header">
                     <div class="agenda-dow">Dom</div>
                     <div class="agenda-dow">Seg</div>
@@ -69,7 +66,6 @@
                     <div class="agenda-dow">Sáb</div>
                 </div>
 
-                <!-- Grid de células -->
                 <div class="agenda-grid-body">
                     <ui:repeat value="#{agendaMedicoBean.celulas}" var="dia">
 
@@ -77,13 +73,11 @@
                             #{agendaMedicoBean.pertenceAoMes(dia) ? '' : 'celula-fora'}
                             #{agendaMedicoBean.eHoje(dia) ? 'celula-hoje' : ''}">
 
-                            <!-- Número do dia -->
                             <div class="agenda-dia-num
                                 #{agendaMedicoBean.eHoje(dia) ? 'dia-num-hoje' : ''}">
                                 <h:outputText value="#{dia.dayOfMonth}" />
                             </div>
 
-                            <!-- Consultas do dia -->
                             <div class="agenda-slots">
                                 <ui:repeat value="#{agendaMedicoBean.consultasDoDia(dia)}" var="c">
                                     <div class="agenda-slot #{agendaMedicoBean.cssDoStatus(c)}"

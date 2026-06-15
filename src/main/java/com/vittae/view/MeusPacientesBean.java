@@ -5,9 +5,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -28,16 +29,12 @@ public class MeusPacientesBean implements Serializable {
 
 	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/";
 
-	private List<PacienteListagemDTO> todasConsultas = new ArrayList<>();
-	private List<PacienteListagemDTO> consultasFiltradas = new ArrayList<>();
+	private List<PacienteResumoDTO> todosPacientes = new ArrayList<>();
+	private List<PacienteResumoDTO> pacientesFiltrados = new ArrayList<>();
 
 	private String filtroTexto = "";
-	private String filtroStatus = "todas";
-
 	private Long medicoId;
 	private String token;
-
-	// ── Init ────────────────────────────────────────────────────────────────
 
 	@PostConstruct
 	public void init() {
@@ -65,13 +62,25 @@ public class MeusPacientesBean implements Serializable {
 				mapper.registerModule(new JavaTimeModule());
 				mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-				todasConsultas = mapper.readValue(response.body(),
+				List<PacienteListagemDTO> consultas = mapper.readValue(response.body(),
 						mapper.getTypeFactory().constructCollectionType(List.class, PacienteListagemDTO.class));
 
-				// Ordena por data desc, hora desc
-				todasConsultas.sort(Comparator.comparing(PacienteListagemDTO::getDataConsulta,
-						Comparator.nullsLast(Comparator.reverseOrder()))
-						.thenComparing(PacienteListagemDTO::getHora, Comparator.nullsLast(Comparator.reverseOrder())));
+				// Agrupa por nome do paciente
+				Map<String, List<PacienteListagemDTO>> porPaciente = consultas.stream()
+						.collect(Collectors.groupingBy(c -> c.getNomePaciente() != null ? c.getNomePaciente() : "—"));
+
+				todosPacientes = porPaciente.entrySet().stream().map(entry -> {
+					String nome = entry.getKey();
+					List<PacienteListagemDTO> cs = entry.getValue();
+					PacienteListagemDTO primeira = cs.get(0);
+
+					PacienteResumoDTO p = new PacienteResumoDTO();
+					p.setNome(nome);
+					p.setDataNascimento(primeira.getDataNascimento());
+					p.setNomeResponsavel(primeira.getNomeResponsavel());
+					p.setQtdConsultas(cs.size());
+					return p;
+				}).sorted((a, b) -> a.getNome().compareToIgnoreCase(b.getNome())).collect(Collectors.toList());
 
 				aplicarFiltros();
 			}
@@ -80,33 +89,20 @@ public class MeusPacientesBean implements Serializable {
 		}
 	}
 
-	// ── Filtros ─────────────────────────────────────────────────────────────
-
 	public void filtrar() {
 		aplicarFiltros();
 	}
 
 	private void aplicarFiltros() {
-		consultasFiltradas = todasConsultas.stream().filter(this::passaFiltroStatus).filter(this::passaFiltroTexto)
-				.collect(Collectors.toList());
+		if (filtroTexto == null || filtroTexto.trim().isEmpty()) {
+			pacientesFiltrados = new ArrayList<>(todosPacientes);
+		} else {
+			String texto = filtroTexto.trim().toLowerCase();
+			pacientesFiltrados = todosPacientes.stream()
+					.filter(p -> p.getNome() != null && p.getNome().toLowerCase().contains(texto))
+					.collect(Collectors.toList());
+		}
 	}
-
-	private boolean passaFiltroStatus(PacienteListagemDTO c) {
-		if (filtroStatus == null || filtroStatus.equalsIgnoreCase("todas"))
-			return true;
-		return c.getStatus() != null && c.getStatus().toString().equalsIgnoreCase(filtroStatus);
-	}
-
-	private boolean passaFiltroTexto(PacienteListagemDTO c) {
-		if (filtroTexto == null || filtroTexto.trim().isEmpty())
-			return true;
-		String texto = filtroTexto.trim().toLowerCase();
-		boolean nomeOk = c.getNomePaciente() != null && c.getNomePaciente().toLowerCase().contains(texto);
-		boolean espOk = c.getEspecialidade() != null && c.getEspecialidade().toLowerCase().contains(texto);
-		return nomeOk || espOk;
-	}
-
-	// ── Helpers ─────────────────────────────────────────────────────────────
 
 	private HttpSession getSession() {
 		FacesContext fc = FacesContext.getCurrentInstance();
@@ -115,18 +111,12 @@ public class MeusPacientesBean implements Serializable {
 		return (HttpSession) fc.getExternalContext().getSession(false);
 	}
 
-	// ── Getters / Setters ───────────────────────────────────────────────────
-
-	public List<PacienteListagemDTO> getConsultasFiltradas() {
-		return consultasFiltradas;
-	}
-
-	public int getTotalConsultas() {
-		return todasConsultas.size();
+	public List<PacienteResumoDTO> getPacientesFiltrados() {
+		return pacientesFiltrados;
 	}
 
 	public int getTotalFiltradas() {
-		return consultasFiltradas.size();
+		return pacientesFiltrados.size();
 	}
 
 	public String getFiltroTexto() {
@@ -137,11 +127,43 @@ public class MeusPacientesBean implements Serializable {
 		this.filtroTexto = v;
 	}
 
-	public String getFiltroStatus() {
-		return filtroStatus;
-	}
+	// ── DTO interno ─────────────────────────────────────────────────────────
+	public static class PacienteResumoDTO implements Serializable {
+		private String nome;
+		private LocalDate dataNascimento;
+		private String nomeResponsavel;
+		private int qtdConsultas;
 
-	public void setFiltroStatus(String v) {
-		this.filtroStatus = v;
+		public String getNome() {
+			return nome;
+		}
+
+		public void setNome(String v) {
+			this.nome = v;
+		}
+
+		public LocalDate getDataNascimento() {
+			return dataNascimento;
+		}
+
+		public void setDataNascimento(LocalDate v) {
+			this.dataNascimento = v;
+		}
+
+		public String getNomeResponsavel() {
+			return nomeResponsavel;
+		}
+
+		public void setNomeResponsavel(String v) {
+			this.nomeResponsavel = v;
+		}
+
+		public int getQtdConsultas() {
+			return qtdConsultas;
+		}
+
+		public void setQtdConsultas(int v) {
+			this.qtdConsultas = v;
+		}
 	}
 }

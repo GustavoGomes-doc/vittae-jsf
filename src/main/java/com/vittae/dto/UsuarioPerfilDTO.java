@@ -16,7 +16,7 @@ public class UsuarioPerfilDTO {
 	private String perfil;
 	private LocalDate dataNascimento;
 
-	// Campos exclusivos do médico
+	// Campos exclusivos do méico
 	private String crm;
 	private String ufCrm;
 	private BigDecimal valorConsulta;

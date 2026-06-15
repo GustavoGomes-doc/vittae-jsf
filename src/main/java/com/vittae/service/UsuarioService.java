@@ -33,8 +33,8 @@ public class UsuarioService implements Serializable {
     private final String API_URL = ConfigUtil.get("api.base.url") + "/api/usuarios";
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper()
-    	    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    	    .configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
 
     public LoginResposta autenticar(String cpf, String senha) {
         try {
@@ -78,7 +78,6 @@ public class UsuarioService implements Serializable {
             log.info("Dados do usuário " + usuario.getNome() + " enviados para a API.");
 
             if (response.statusCode() == 201 || response.statusCode() == 200) {
-                // Devolve o usuário salvo (útil para pegar o ID gerado pelo banco)
                 return mapper.readValue(response.body(), Usuario.class);
             }
         } catch (Exception e) {
@@ -98,13 +97,12 @@ public class UsuarioService implements Serializable {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                // Transforma a lista JSON do Spring em uma List<Usuario> no Java
                 return mapper.readValue(response.body(), new TypeReference<List<Usuario>>(){});
             }
         } catch (Exception e) {
             log.error("Erro ao buscar todos os usuários: " + e.getMessage());
         }
-        return new ArrayList<>(); // Retorna vazio se der erro, para não quebrar a tela
+        return new ArrayList<>(); 
     }
     
     public List<Usuario> buscarTodosComToken(String token) {
@@ -141,7 +139,6 @@ public class UsuarioService implements Serializable {
     
     public void excluir(Usuario usuario) {
         try {
-            // Assumindo que a sua classe Usuario tem um getId()
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL + "/" + usuario.getId())) 
                     .DELETE()

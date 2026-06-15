@@ -5,9 +5,9 @@
         step: 1,
         pacienteNome: null,
         especialidade: null,
-        medicoId: null,
-        medicoNome: null,
-        medicoValor: null,
+        meicoId: null,
+        meicoNome: null,
+        meicoValor: null,
         dataSelecionada: null,
         horaSelecionada: null,
         tipoConsulta: null,
@@ -326,15 +326,15 @@
             if (btnS) btnS.style.display = 'none';
         }
 
-        if (state.step === 4 && state.medicoId) {
-            carregarDisponibilidade(state.medicoId);
+        if (state.step === 4 && state.meicoId) {
+            carregarDisponibilidade(state.meicoId);
         }
     }
 
     function validarStep(step) {
         if (step === 1) return validarDados();
         if (step === 2) return validarEspecialidade();
-        if (step === 3) return validarMedico();
+        if (step === 3) return validarMeico();
         if (step === 4) return validarDataHora();
         return true;
     }
@@ -482,12 +482,12 @@
         return true;
     }
 
-    function validarMedico() {
-        var hidden = document.getElementById('fAg:medicoIdHidden');
+    function validarMeico() {
+        var hidden = document.getElementById('fAg:meicoIdHidden');
         if (!hidden || !hidden.value) {
-            mostrarErro('errMedico', null); return false;
+            mostrarErro('errMeico', null); return false;
         }
-        esconderErro('errMedico', null);
+        esconderErro('errMeico', null);
         return true;
     }
 
@@ -545,7 +545,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-       ESPECIALIDADE & MÉDICO
+       ESPECIALIDADE & MÉico
     ═══════════════════════════════════════════════ */
     window.selecionarEsp = function(card, nome) {
         document.querySelectorAll('.ag-esp-card').forEach(function(c) {
@@ -560,50 +560,50 @@
         atualizarResumo('especialidade', nome);
         esconderErro('errEsp', null);
 
-        carregarMedicosPorEsp(nome);
+        carregarMeicosPorEsp(nome);
     };
 
-    function carregarMedicosPorEsp(especialidade) {
-        var grid = document.getElementById('medicosGrid');
-        var sub  = document.getElementById('subMedico');
+    function carregarMeicosPorEsp(especialidade) {
+        var grid = document.getElementById('meicosGrid');
+        var sub  = document.getElementById('subMeico');
         if (!grid) return;
 
-        grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">⏳ Carregando médicos...</div>';
+        grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">⏳ Carregando méicos...</div>';
 
-        fetch(window.API_BASE_URL + '/api/medicos?especialidade=' + encodeURIComponent(especialidade))
+        fetch(window.API_BASE_URL + '/api/meicos?especialidade=' + encodeUicomponent(especialidade))
             .then(function(r) { return r.json(); })
-            .then(function(medicos) {
-                renderizarCardsMedicos(medicos);
+            .then(function(meicos) {
+                renderizarCardsMeicos(meicos);
                 if (sub) sub.innerHTML = 'Profissionais em <strong>' + especialidade + '</strong>. Escolha o ideal para você.';
             })
             .catch(function(err) {
-                console.error('Erro ao carregar médicos:', err);
-                grid.innerHTML = '<div style="text-align:center;padding:32px;color:#f87171">Erro ao carregar médicos. Tente novamente.</div>';
+                console.error('Erro ao carregar méicos:', err);
+                grid.innerHTML = '<div style="text-align:center;padding:32px;color:#f87171">Erro ao carregar méicos. Tente novamente.</div>';
             });
     }
 
-    function renderizarCardsMedicos(medicos) {
-        var grid = document.getElementById('medicosGrid');
+    function renderizarCardsMeicos(meicos) {
+        var grid = document.getElementById('meicosGrid');
         if (!grid) return;
         grid.innerHTML = '';
 
-        if (!medicos || medicos.length === 0) {
-            grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">Nenhum médico disponível para essa especialidade.</div>';
+        if (!meicos || meicos.length === 0) {
+            grid.innerHTML = '<div style="text-align:center;padding:32px;color:#a5b4fc">Nenhum méico disponível para essa especialidade.</div>';
             return;
         }
 
-        medicos.forEach(function(med) {
+        meicos.forEach(function(med) {
             var iniciais = (med.nome || '').split(' ').map(function(p) { return p[0]; }).join('').slice(0,2).toUpperCase();
             var cores = ['#4f46e5','#7c3aed','#2563eb','#0891b2','#059669','#d97706'];
             var cor   = cores[med.id % cores.length] || '#4f46e5';
 
             var card = document.createElement('div');
-            card.className = 'ag-medico-card';
+            card.className = 'ag-meico-card';
             card.setAttribute('data-nome', med.nome || '');
             card.setAttribute('data-crm',  med.crm  || '');
             card.setAttribute('data-id',   med.id   || '');
             card.setAttribute('data-valor', med.valorConsulta || '');
-            card.onclick = function() { window.selecionarMedico(card); };
+            card.onclick = function() { window.selecionarMeico(card); };
 
             var fotoHtml = med.foto
                 ? '<img src="data:image/jpeg;base64,' + med.foto + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%" />'
@@ -611,29 +611,29 @@
 
 			var tagsHtml = (med.especialidades || []).map(function(e) {
 			    var nome = typeof e === 'string' ? e : e.nome;
-			    return '<span class="ag-medico-tag"><i class="fas fa-stethoscope"></i> ' + nome + '</span>';
+			    return '<span class="ag-meico-tag"><i class="fas fa-stethoscope"></i> ' + nome + '</span>';
 			}).join('');
 
             var valor = med.valorConsulta ? parseFloat(med.valorConsulta).toFixed(2).replace('.',',') : '—';
 
             card.innerHTML =
-                '<div class="ag-medico-check"><i class="fas fa-check"></i></div>' +
-                '<div class="ag-medico-avatar" style="background:' + cor + '">' + fotoHtml + '</div>' +
-                '<div class="ag-medico-nome">' + (med.nome || '') + '</div>' +
-                '<div class="ag-medico-crm">CRM ' + (med.crm || '') + '</div>' +
-                '<div class="ag-medico-tags">' + tagsHtml + '</div>' +
-                '<div class="ag-medico-info">' +
-                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Duração</span><span class="ag-medico-info-value">' + (med.tempoConsultaMinutos || '—') + ' min</span></div>' +
-                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Consulta</span><span class="ag-medico-info-value">R$ ' + valor + '</span></div>' +
-                    '<div class="ag-medico-info-item"><span class="ag-medico-info-label">Telefone</span><span class="ag-medico-info-value">' + (med.telefone || '—') + '</span></div>' +
+                '<div class="ag-meico-check"><i class="fas fa-check"></i></div>' +
+                '<div class="ag-meico-avatar" style="background:' + cor + '">' + fotoHtml + '</div>' +
+                '<div class="ag-meico-nome">' + (med.nome || '') + '</div>' +
+                '<div class="ag-meico-crm">CRM ' + (med.crm || '') + '</div>' +
+                '<div class="ag-meico-tags">' + tagsHtml + '</div>' +
+                '<div class="ag-meico-info">' +
+                    '<div class="ag-meico-info-item"><span class="ag-meico-info-label">Duração</span><span class="ag-meico-info-value">' + (med.tempoConsultaMinutos || '—') + ' min</span></div>' +
+                    '<div class="ag-meico-info-item"><span class="ag-meico-info-label">Consulta</span><span class="ag-meico-info-value">R$ ' + valor + '</span></div>' +
+                    '<div class="ag-meico-info-item"><span class="ag-meico-info-label">Telefone</span><span class="ag-meico-info-value">' + (med.telefone || '—') + '</span></div>' +
                 '</div>';
 
             grid.appendChild(card);
         });
     }
 
-	window.selecionarMedico = function(card) {
-	        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
+	window.selecionarMeico = function(card) {
+	        document.querySelectorAll('.ag-meico-card').forEach(function(c) {
 	            c.classList.remove('selected');
 	        });
 	        card.classList.add('selected');
@@ -642,24 +642,24 @@
 	        var nome  = card.getAttribute('data-nome');
 	        var valor = card.getAttribute('data-valor');
 
-	        var hidden = document.getElementById('fAg:medicoIdHidden');
+	        var hidden = document.getElementById('fAg:meicoIdHidden');
 	        if (hidden) hidden.value = id;
 
-	        state.medicoId    = id;
-	        state.medicoNome  = nome;
-	        state.medicoValor = valor;
+	        state.meicoId    = id;
+	        state.meicoNome  = nome;
+	        state.meicoValor = valor;
 
-	        atualizarResumo('medico', nome);
+	        atualizarResumo('meico', nome);
 	        atualizarResumo('valor', valor);
-	        esconderErro('errMedico', null);
+	        esconderErro('errMeico', null);
 
 	        var sub = document.getElementById('subDataHora');
 	        if (sub) sub.textContent = 'Com ' + nome + '.';
 	    };
 
-	    window.filtrarMedicos = function() {
-	        var q = (document.getElementById('buscaMedico').value || '').toLowerCase();
-	        document.querySelectorAll('.ag-medico-card').forEach(function(c) {
+	    window.filtrarMeicos = function() {
+	        var q = (document.getElementById('buscaMeico').value || '').toLowerCase();
+	        document.querySelectorAll('.ag-meico-card').forEach(function(c) {
 	            var nome = (c.getAttribute('data-nome') || '').toLowerCase();
 	            var crm  = (c.getAttribute('data-crm')  || '').toLowerCase();
 	            c.style.display = (nome.includes(q) || crm.includes(q)) ? '' : 'none';
@@ -678,8 +678,8 @@
 	    /* ═══════════════════════════════════════════════
 	       CALENDÁRIO & HORÁRIOS
 	    ═══════════════════════════════════════════════ */
-	    function carregarDisponibilidade(medicoId) {
-	        fetch(window.API_BASE_URL + '/api/medicos/' + medicoId + '/horarios-livres')
+	    function carregarDisponibilidade(meicoId) {
+	        fetch(window.API_BASE_URL + '/api/meicos/' + meicoId + '/horarios-livres')
 	            .then(function(r) { return r.json(); })
 	            .then(function(data) {
 	                state.diasDisponiveis = data.diasDisponiveis || [];
@@ -692,11 +692,11 @@
 	            });
 	    }
 
-	    function buscarHorariosLivres(medicoId, dataISO) {
+	    function buscarHorariosLivres(meicoId, dataISO) {
 	        var grid = document.getElementById('horariosGrid');
-	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
+	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-emptyicon">⏳</div><div class="ag-empty-text">Carregando horários...</div></div>';
 
-	        fetch(window.API_BASE_URL + '/api/medicos/' + medicoId + '/horarios-livres?data=' + dataISO)
+	        fetch(window.API_BASE_URL + '/api/meicos/' + meicoId + '/horarios-livres?data=' + dataISO)
 	            .then(function(r) { return r.json(); })
 	            .then(function(data) {
 	                renderizarHorarios(data.horariosLivres || []);
@@ -777,15 +777,15 @@
 	    function carregarEspecialidades() {
 	        Promise.all([
 	            fetch(window.API_BASE_URL + '/api/especialidades').then(function(r) { return r.json(); }),
-	            fetch(window.API_BASE_URL + '/api/medicos').then(function(r) { return r.json(); })
+	            fetch(window.API_BASE_URL + '/api/meicos').then(function(r) { return r.json(); })
 	        ]).then(function(results) {
 	            var especialidades = results[0];
-	            var medicos = results[1];
+	            var meicos = results[1];
 
-	            var comMedico = new Set();
-			medicos.forEach(function(med) {
+	            var comMeico = new Set();
+			meicos.forEach(function(med) {
 			    (med.especialidades || []).forEach(function(e) {
-			        comMedico.add(typeof e === 'string' ? e : e.nome);
+			        comMeico.add(typeof e === 'string' ? e : e.nome);
 			    });
 			});
 
@@ -794,7 +794,7 @@
 	            grid.innerHTML = '';
 
 	            especialidades
-	                .filter(function(esp) { return comMedico.has(esp.nome); })
+	                .filter(function(esp) { return comMeico.has(esp.nome); })
 	                .forEach(function(esp) {
 	                    var card = document.createElement('div');
 	                    card.className = 'ag-esp-card';
@@ -825,7 +825,7 @@
 	        var sub = document.getElementById('horariosSub');
 	        if (sub) sub.textContent = nomes[data.getDay()] + ', ' + dNum + '/' + (state.calMes+1);
 
-	        buscarHorariosLivres(state.medicoId, iso);
+	        buscarHorariosLivres(state.meicoId, iso);
 	    }
 
 	    function renderizarHorarios(horarios) {
@@ -835,7 +835,7 @@
 	        grid.innerHTML = '';
 
 	        if (!horarios || horarios.length === 0) {
-	            grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">😔</div><div class="ag-empty-text">Sem horários disponíveis</div></div>';
+	            grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-emptyicon">😔</div><div class="ag-empty-text">Sem horários disponíveis</div></div>';
 	            return;
 	        }
 
@@ -881,7 +881,7 @@
 	        state.horaSelecionada = null;
 	        renderizarCalendario();
 	        var grid = document.getElementById('horariosGrid');
-	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-empty-icon">📅</div><div class="ag-empty-text">Selecione uma data</div></div>';
+	        if (grid) grid.innerHTML = '<div class="ag-horarios-empty"><div class="ag-emptyicon">📅</div><div class="ag-empty-text">Selecione uma data</div></div>';
 	    };
 
 	    /* ═══════════════════════════════════════════════
@@ -890,27 +890,27 @@
 	    function atualizarResumo(campo, valor) {
 	        if (campo === 'paciente') {
 	            var el = document.getElementById('rPaciente');
-	            var ic = document.getElementById('rIconPaciente');
+	            var ic = document.getElementById('iconPaciente');
 	            if (el) { el.textContent = valor || 'pendente'; el.classList.toggle('pending', !valor); }
-	            if (ic) { ic.className = 'ag-resumo-icon ' + (valor ? 'done' : 'pending'); ic.textContent = valor ? '✓' : '👤'; }
+	            if (ic) { ic.className = 'ag-resumoicon ' + (valor ? 'done' : 'pending'); ic.textContent = valor ? '✓' : '👤'; }
 	        }
 	        if (campo === 'especialidade') {
 	            var el = document.getElementById('rEspecialidade');
-	            var ic = document.getElementById('rIconEsp');
+	            var ic = document.getElementById('iconEsp');
 	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	            if (ic) { ic.className = 'ag-resumoicon done'; ic.textContent = '✓'; }
 	        }
-	        if (campo === 'medico') {
-	            var el = document.getElementById('rMedico');
-	            var ic = document.getElementById('rIconMedico');
+	        if (campo === 'meico') {
+	            var el = document.getElementById('rMeico');
+	            var ic = document.getElementById('iconMeico');
 	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	            if (ic) { ic.className = 'ag-resumoicon done'; ic.textContent = '✓'; }
 	        }
 	        if (campo === 'data') {
 	            var el = document.getElementById('rData');
-	            var ic = document.getElementById('rIconData');
+	            var ic = document.getElementById('iconData');
 	            if (el) { el.textContent = valor; el.classList.remove('pending'); }
-	            if (ic) { ic.className = 'ag-resumo-icon done'; ic.textContent = '✓'; }
+	            if (ic) { ic.className = 'ag-resumoicon done'; ic.textContent = '✓'; }
 	        }
 	    }
 
@@ -940,24 +940,24 @@
 
 		        var payload = {
 		            especialidade: state.especialidade,
-		            medicoId: state.medicoId,
+		            meicoId: state.meicoId,
 		            dataConsulta: state.dataSelecionada,
 		            hora: state.horaSelecionada,
 		            observacoes: document.getElementById('fAg:motivoConsulta') ? document.getElementById('fAg:motivoConsulta').value : null,
 		            tipoConsulta: state.tipoConsulta,
 		            
-		            paciente: {
-		                nome: document.getElementById('fAg:pacNome').value,
-		                cpf: document.getElementById('fAg:pacCpf').value.replace(/\D/g, ''),
-		                dataNascimento: pacDataIso, 
-		                genero: document.getElementById('fAg:pacGenero').value,
-		                telefone: document.getElementById('fAg:pacTelefone').value.replace(/\D/g, '')
-		            },
+					paciente: {
+					    nome: document.getElementById('fAg:pacNome').value,
+					    cpf: document.getElementById('fAg:pacCpf').value.replace(/\D/g, ''),
+					    nascimento: pacDataIso,        // ← CORRIGIDO
+					    genero: document.getElementById('fAg:pacGenero').value,
+					    telefone: document.getElementById('fAg:pacTelefone').value.replace(/\D/g, '')
+					},
 
-		            respNome: (respNomeEl && respNomeEl.value.trim() !== '') ? respNomeEl.value : null,
-		            respCpf: (respCpfEl && respCpfEl.value.trim() !== '') ? respCpfEl.value.replace(/\D/g, '') : null,
-		            respDataNascimento: respDataIso,
-		            respParentesco: (respParentescoEl && respParentescoEl.value !== '') ? respParentescoEl.value : null
+					respNome: (respNomeEl && respNomeEl.value.trim() !== '') ? respNomeEl.value : null,
+					respCpf: (respCpfEl && respCpfEl.value.trim() !== '') ? respCpfEl.value.replace(/\D/g, '') : null,
+					respDataNascimento: respDataIso,   // já estava certo, só garantir que o DTO tem o campo
+					respParentesco: (respParentescoEl && respParentescoEl.value !== '') ? respParentescoEl.value : null
 		        };
 		        
 		        var btn = document.getElementById('btnSubmitJSF');
@@ -1015,7 +1015,7 @@
 				                resumo.innerHTML =
 				                    '<strong>Paciente:</strong> ' + state.pacienteNome + '<br>' +
 				                    '<strong>Especialidade:</strong> ' + state.especialidade + '<br>' +
-				                    '<strong>Medico:</strong> ' + state.medicoNome + '<br>' +
+				                    '<strong>Meico:</strong> ' + state.meicoNome + '<br>' +
 				                    '<strong>Data:</strong> ' + state.dataSelecionada + ' as ' + state.horaSelecionada;
 				            }
 				            

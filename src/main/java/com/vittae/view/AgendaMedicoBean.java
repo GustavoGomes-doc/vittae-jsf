@@ -27,7 +27,7 @@ import com.vittae.util.ConfigUtil;
 @ViewScoped
 public class AgendaMedicoBean implements Serializable {
 
-	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/medicos/";
+	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos/medico/";
 
 	private List<PacienteListagemDTO> todasConsultas = new ArrayList<>();
 
@@ -36,8 +36,6 @@ public class AgendaMedicoBean implements Serializable {
 	private int ano;
 
 	// Células do calendário — 42 posições (6 semanas × 7 dias)
-	// Cada célula é um LocalDate (pode ser do mês anterior/próximo para preencher
-	// grid)
 	private List<LocalDate> celulas = new ArrayList<>();
 
 	private Long medicoId;
@@ -101,7 +99,7 @@ public class AgendaMedicoBean implements Serializable {
 						mapper.getTypeFactory().constructCollectionType(List.class, PacienteListagemDTO.class));
 			}
 		} catch (Exception e) {
-			System.err.println("MinhaAgendaBean.carregarConsultas: " + e.getMessage());
+			System.err.println("AgendaMedicoBean.carregarConsultas: " + e.getMessage());
 		}
 	}
 

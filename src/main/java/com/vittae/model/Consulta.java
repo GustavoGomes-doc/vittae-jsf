@@ -21,6 +21,8 @@ public class Consulta {
 	private BigDecimal valorConsulta;
 	private Especialidade especialidade;
 	
+	private String observacoes;
+	
 	private String respNome;
 	
 	private String respCpf;
@@ -32,7 +34,8 @@ public class Consulta {
 	}
 
 	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta,
-			BigDecimal valorConsulta, LocalTime hora, Especialidade especialidade, String respNome, String respCpf, String respParentesco) {
+			BigDecimal valorConsulta, LocalTime hora, Especialidade especialidade, String respNome, String respCpf, String respParentesco,
+			String observacoes) {
 		this.medico = medico;
 		this.paciente = paciente;
 		this.status = status;
@@ -43,6 +46,7 @@ public class Consulta {
 		this.respCpf = respCpf;
 		this.respNome = respNome;
 		this.respParentesco = respParentesco;
+		this.observacoes = observacoes;
 	}
 
 
@@ -134,6 +138,12 @@ public class Consulta {
 		this.respParentesco = respParentesco;
 	}
 	
-	
+	public String getObservacoes() {
+	    return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+	    this.observacoes = observacoes;
+	}
 
 }

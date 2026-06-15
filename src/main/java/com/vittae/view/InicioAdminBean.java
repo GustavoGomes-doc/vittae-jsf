@@ -23,66 +23,66 @@ import com.vittae.service.ConsultaService;
 import com.vittae.service.UsuarioService;
 
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 @Getter
 @Named("inicioAdminBean")
 @RequestScoped
 public class InicioAdminBean implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Inject
-    private UsuarioService usuarioService;
+	@Inject
+	private UsuarioService usuarioService;
 
-    @Inject
-    private ConsultaService consultaService;
+	@Inject
+	private ConsultaService consultaService;
 
-    private long totalMedicos;
-    private long totalPacientes;
-    private long consultasHoje;
-    private long consultasPendentes;
-    private long consultasConfirmadas;
+	private long totalMedicos;
+	private long totalPacientes;
+	private long consultasHoje;
+	private long consultasPendentes;
+	private long consultasConfirmadas;
 
-    private List<Usuario> ultimosMedicos = new ArrayList<>();
-    private List<AdminConsultaDTO> consultasRecentes = new ArrayList<>();
+	private List<Usuario> ultimosMedicos = new ArrayList<>();
+	private List<AdminConsultaDTO> consultasRecentes = new ArrayList<>();
 
-    @PostConstruct
-    public void inicializar() {
-        HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
-                .getExternalContext().getSession(false);
-        String token = session != null ? (String) session.getAttribute("token") : null;
+	@PostConstruct
+	public void inicializar() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
+				.getExternalContext().getSession(false);
+		String token = session != null ? (String) session.getAttribute("token") : null;
 
-        this.totalMedicos   = usuarioService.contarPorPerfilComToken(Perfil.MEDICO, token);
-        this.totalPacientes = usuarioService.contarPorPerfilComToken(Perfil.PACIENTE, token);
-        this.ultimosMedicos = usuarioService.buscarUltimosMedicosComToken(5, token);
-        carregarConsultas(token);
-    }
+		this.totalMedicos = usuarioService.contarPorPerfilComToken(Perfil.MEDICO, token);
+		this.totalPacientes = usuarioService.contarPorPerfilComToken(Perfil.PACIENTE, token);
+		this.ultimosMedicos = usuarioService.buscarUltimosMedicosComToken(5, token);
+		carregarConsultas(token);
+	}
 
-    private void carregarConsultas(String token) {
-        try {
-            List<AdminConsultaDTO> consultas = consultaService.listarTodasAdmin(token);
-            this.consultasHoje = consultas.stream()
-                    .filter(c -> LocalDate.now().equals(c.getDataConsulta()))
-                    .count();
-            this.consultasPendentes = consultas.stream()
-                    .filter(c -> "PENDENTE".equals(c.getStatus()))
-                    .count();
-            this.consultasConfirmadas = consultas.stream()
-                    .filter(c -> "REALIZADA".equals(c.getStatus()))
-                    .count();
-            this.consultasRecentes = consultas.stream()
-                    .sorted(Comparator.comparing(AdminConsultaDTO::getDataConsulta,
-                            Comparator.nullsLast(Comparator.reverseOrder())))
-                    .limit(5)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Erro ao carregar consultas: " + e.getMessage());
-            this.consultasHoje = 0;
-            this.consultasPendentes = 0;
-            this.consultasConfirmadas = 0;
-            this.consultasRecentes = new ArrayList<>();
-        }
-    }
+	private void carregarConsultas(String token) {
+		try {
+			List<AdminConsultaDTO> consultas = consultaService.listarTodasAdmin(token);
+			this.consultasHoje = consultas.stream()
+					.filter(c -> LocalDate.now().equals(c.getDataConsulta()))
+					.count();
+			this.consultasPendentes = consultas.stream()
+					.filter(c -> "PENDENTE".equals(c.getStatus()))
+					.count();
+			this.consultasConfirmadas = consultas.stream()
+					.filter(c -> "REALIZADA".equals(c.getStatus()))
+					.count();
+			this.consultasRecentes = consultas.stream()
+					.sorted(Comparator.comparing(AdminConsultaDTO::getDataConsulta,
+							Comparator.nullsLast(Comparator.reverseOrder())))
+					.limit(5)
+					.collect(Collectors.toList());
+		} catch (Exception e) {
+			log.error("Erro ao carregar consultas: " + e.getMessage());
+			this.consultasHoje = 0;
+			this.consultasPendentes = 0;
+			this.consultasConfirmadas = 0;
+			this.consultasRecentes = new ArrayList<>();
+		}
+	}
 }

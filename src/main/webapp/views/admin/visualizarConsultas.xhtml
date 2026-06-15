@@ -1,245 +1,298 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
 
-        <ui:define name="titulo">Todas as Consultas</ui:define>
+	<ui:define name="titulo">Admin | Todas as Consultas</ui:define>
 
-        <ui:define name="corpo">
+	<ui:define name="corpo">
 
-            <h:form id="formConsultas">
+		<h:form id="formConsultas">
 
-                <div class="page-header">
-                    <h1><i class="fas fa-calendar-alt"></i> Todas as Consultas</h1>
-                    <p class="page-subtitle">Gerencie todas as consultas do sistema</p>
-                </div>
+			<div class="page-header">
+				<h1>
+					<i class="fas fa-calendar-alt"></i> Todas as Consultas
+				</h1>
+				<p class="page-subtitle">Gerencie todas as consultas do sistema</p>
+			</div>
 
-                <!-- Filtros -->
-                <div class="filtros-container card">
-                    <div class="filtros-row">
-                        <div class="filtro-grupo">
-                            <label for="filtroTexto">Buscar</label>
-                            <h:inputText id="filtroTexto"
-                                         value="#{todasConsultasBean.filtroTexto}"
-                                         styleClass="input-field"
-                                         placeholder="Paciente, médico ou especialidade...">
-                                <f:ajax event="keyup" render="tabelaConsultas contadorResultados" delay="300"/>
-                            </h:inputText>
-                        </div>
+			<div class="filtros-container card">
+				<div class="filtros-row">
+					<div class="filtro-grupo">
+						<label for="filtroTexto">Buscar</label>
+						<h:inputText id="filtroTexto"
+							value="#{todasConsultasBean.filtroTexto}"
+							styleClass="input-field"
+							placeholder="Paciente, médico ou especialidade...">
+							<f:ajax event="keyup" render="tabelaConsultas contadorResultados"
+								delay="300" />
+						</h:inputText>
+					</div>
 
-                        <div class="filtro-grupo">
-                            <label for="filtroStatus">Status</label>
-                            <h:selectOneMenu id="filtroStatus"
-                                             value="#{todasConsultasBean.filtroStatus}"
-                                             styleClass="input-field select-field">
-                                <f:selectItem itemValue="" itemLabel="Todos os status"/>
-                                <f:selectItem itemValue="AGENDADA"   itemLabel="Agendada"/>
-                                <f:selectItem itemValue="CONFIRMADA" itemLabel="Confirmada"/>
-                                <f:selectItem itemValue="REALIZADA"  itemLabel="Realizada"/>
-                                <f:selectItem itemValue="CANCELADA"  itemLabel="Cancelada"/>
-                                <f:ajax event="change" render="tabelaConsultas contadorResultados"/>
-                            </h:selectOneMenu>
-                        </div>
+					<div class="filtro-grupo">
+						<label for="filtroStatus">Status</label>
+						<h:selectOneMenu id="filtroStatus"
+							value="#{todasConsultasBean.filtroStatus}"
+							styleClass="input-field select-field">
+							<f:selectItem itemValue="" itemLabel="Todos os status" />
+							<f:selectItem itemValue="AGENDADA" itemLabel="Agendada" />
+							<f:selectItem itemValue="CONFIRMADA" itemLabel="Confirmada" />
+							<f:selectItem itemValue="REALIZADA" itemLabel="Realizada" />
+							<f:selectItem itemValue="CANCELADA" itemLabel="Cancelada" />
+							<f:ajax event="change"
+								render="tabelaConsultas contadorResultados" />
+						</h:selectOneMenu>
+					</div>
 
-                        <div class="filtro-grupo">
-                            <label for="filtroDataInicio">Data início</label>
-                            <h:inputText id="filtroDataInicio"
-                                         value="#{todasConsultasBean.filtroDataInicio}"
-                                         styleClass="input-field"
-                                         type="date">
-                                <f:ajax event="change" render="tabelaConsultas contadorResultados"/>
-                            </h:inputText>
-                        </div>
+					<div class="filtro-grupo">
+						<label for="filtroDataInicio">Data início</label>
+						<h:inputText id="filtroDataInicio"
+							value="#{todasConsultasBean.filtroDataInicio}"
+							styleClass="input-field" type="date">
+							<f:ajax event="change"
+								render="tabelaConsultas contadorResultados" />
+						</h:inputText>
+					</div>
 
-                        <div class="filtro-grupo">
-                            <label for="filtroDataFim">Data fim</label>
-                            <h:inputText id="filtroDataFim"
-                                         value="#{todasConsultasBean.filtroDataFim}"
-                                         styleClass="input-field"
-                                         type="date">
-                                <f:ajax event="change" render="tabelaConsultas contadorResultados"/>
-                            </h:inputText>
-                        </div>
+					<div class="filtro-grupo">
+						<label for="filtroDataFim">Data fim</label>
+						<h:inputText id="filtroDataFim"
+							value="#{todasConsultasBean.filtroDataFim}"
+							styleClass="input-field" type="date">
+							<f:ajax event="change"
+								render="tabelaConsultas contadorResultados" />
+						</h:inputText>
+					</div>
 
-                        <div class="filtro-grupo filtro-btn">
-                            <h:commandLink styleClass="btn btn-secondary" style="height:36px; padding: 0 1rem;">
-                                <i class="fas fa-eraser"></i> Limpar filtros
-                                <f:ajax listener="#{todasConsultasBean.limparFiltros}"
-                                        execute="@form"
-                                        render="tabelaConsultas contadorResultados filtroTexto filtroStatus filtroDataInicio filtroDataFim"/>
-                            </h:commandLink>
-                        </div>
-                    </div>
-                </div>
+					<div class="filtro-grupo filtro-btn">
+						<h:commandLink styleClass="btn btn-secondary"
+							style="height:36px; padding: 0 1rem;">
+							<i class="fas fa-eraser"></i> Limpar filtros
+                                <f:ajax
+								listener="#{todasConsultasBean.limparFiltros}" execute="@form"
+								render="tabelaConsultas contadorResultados filtroTexto filtroStatus filtroDataInicio filtroDataFim" />
+						</h:commandLink>
+					</div>
+				</div>
+			</div>
 
-                <!-- Contador -->
-                <h:panelGroup id="contadorResultados" layout="block" styleClass="contador-resultados">
-                    <i class="fas fa-list"></i>
-                    <h:outputText value=" #{todasConsultasBean.consultasFiltradas.size()} consulta(s) encontrada(s)"/>
-                </h:panelGroup>
+			<h:panelGroup id="contadorResultados" layout="block"
+				styleClass="contador-resultados">
+				<i class="fas fa-list"></i>
+				<h:outputText
+					value=" #{todasConsultasBean.consultasFiltradas.size()} consulta(s) encontrada(s)" />
+			</h:panelGroup>
 
-                <!-- Mensagem de feedback -->
-                <h:messages id="mensagem" styleClass="mensagem-feedback" errorClass="mensagem-erro" infoClass="mensagem-sucesso"/>
+			<h:messages id="mensagem" styleClass="mensagem-feedback"
+				errorClass="mensagem-erro" infoClass="mensagem-sucesso" />
 
-                <!-- Tabela -->
-                <div class="card">
-                    <h:dataTable id="tabelaConsultas"
-                                 value="#{todasConsultasBean.consultasFiltradas}"
-                                 var="consulta"
-                                 styleClass="tabela-dados"
-                                 headerClass="tabela-header"
-                                 rowClasses="tabela-linha-par,tabela-linha-impar">
+			<div class="card">
+				<h:dataTable id="tabelaConsultas"
+					value="#{todasConsultasBean.consultasFiltradas}" var="consulta"
+					styleClass="tabela-dados" headerClass="tabela-header"
+					rowClasses="tabela-linha-par,tabela-linha-impar">
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-calendar-day"/> Data</f:facet>
-                            <h:outputText value="#{consulta.dataConsulta}"/>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-calendar-day" /> Data</f:facet>
+						<h:outputText value="#{consulta.dataConsulta}" />
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-clock"/> Hora</f:facet>
-                            <h:outputText value="#{consulta.hora}"/>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-clock" /> Hora</f:facet>
+						<h:outputText value="#{consulta.hora}" />
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-user"/> Paciente</f:facet>
-                            <h:outputText value="#{consulta.nomePaciente}"/>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-user" /> Paciente</f:facet>
+						<h:outputText value="#{consulta.nomePaciente}" />
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-user-md"/> Médico</f:facet>
-                            <h:outputText value="#{consulta.nomeMedico}"/>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-user-md" /> Médico</f:facet>
+						<h:outputText value="#{consulta.nomeMedico}" />
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-stethoscope"/> Especialidade</f:facet>
-                            <h:outputText value="#{consulta.especialidade}"/>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-stethoscope" /> Especialidade</f:facet>
+						<h:outputText value="#{consulta.especialidade}" />
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header"><i class="fas fa-dollar-sign"/> Valor</f:facet>
-                            <h:outputText value="#{consulta.valorConsulta}">
-                                <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
-                            </h:outputText>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">
+							<i class="fas fa-dollar-sign" /> Valor</f:facet>
+						<h:outputText value="#{consulta.valorConsulta}">
+							<f:convertNumber type="currency" currencySymbol="R$ "
+								locale="pt_BR" />
+						</h:outputText>
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header">Status</f:facet>
-                            <span class="badge badge-#{todasConsultasBean.getStatusClass(consulta.status)}">
-                                <h:outputText value="#{consulta.status}"/>
-                            </span>
-                        </h:column>
+					<h:column>
+						<f:facet name="header">Status</f:facet>
+						<span
+							class="badge badge-#{todasConsultasBean.getStatusClass(consulta.status)}">
+							<h:outputText value="#{consulta.status}" />
+						</span>
+					</h:column>
 
-                        <h:column>
-                            <f:facet name="header">Ações</f:facet>
-                            <div class="acoes-cell">
-                                <!-- Botão Ver Detalhes -->
-                                <h:commandLink styleClass="btn btn-sm btn-info"
-                                               action="#{todasConsultasBean.verDetalhes(consulta)}"
-                                               update="painelDetalhes"
-                                               oncomplete="document.getElementById('modalDetalhes').style.display='flex'">
-                                    <i class="fas fa-eye"></i>
-                                </h:commandLink>
+					<h:column>
+						<f:facet name="header">Ações</f:facet>
+						<div class="acoes-cell">
+							<h:commandLink styleClass="btn btn-sm btn-info"
+								action="#{todasConsultasBean.verDetalhes(consulta)}"
+								update="painelDetalhes"
+								oncomplete="document.getElementById('modalDetalhes').style.display='flex'">
+								<i class="fas fa-eye"></i>
+							</h:commandLink>
 
-                                <!-- Botão Cancelar — abre modal de confirmação -->
-                                <h:commandLink styleClass="btn btn-sm btn-danger"
-								               rendered="#{consulta.status != 'CANCELADA' and consulta.status != 'REALIZADA'}"
-								               onclick="return confirm('Confirmar cancelamento desta consulta?')"
-								               action="#{todasConsultasBean.cancelarConsulta(consulta)}"
-								               update="tabelaConsultas contadorResultados mensagem">
-								    <i class="fas fa-ban"></i>
-								</h:commandLink>
-                            </div>
-                        </h:column>
-                    </h:dataTable>
+							<h:commandLink styleClass="btn btn-sm btn-danger"
+								rendered="#{consulta.status != 'CANCELADA' and consulta.status != 'REALIZADA'}"
+								onclick="return confirm('Confirmar cancelamento desta consulta?')"
+								action="#{todasConsultasBean.cancelarConsulta(consulta)}"
+								update="tabelaConsultas contadorResultados mensagem">
+								<i class="fas fa-ban"></i>
+							</h:commandLink>
+						</div>
+					</h:column>
+				</h:dataTable>
 
-                    <h:panelGroup rendered="#{empty todasConsultasBean.consultasFiltradas}" styleClass="empty-state">
-                        <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
-                        <p>Nenhuma consulta encontrada com os filtros aplicados.</p>
-                    </h:panelGroup>
-                </div>
+				<h:panelGroup
+					rendered="#{empty todasConsultasBean.consultasFiltradas}"
+					styleClass="empty-state">
+					<div class="emptyicon">
+						<i class="fas fa-calendar-times"></i>
+					</div>
+					<p>Nenhuma consulta encontrada com os filtros aplicados.</p>
+				</h:panelGroup>
+			</div>
 
-                <!-- ============================================================ -->
-                <!-- Modal de Detalhes da Consulta                                -->
-                <!-- ============================================================ -->
-                <div id="modalDetalhes" class="modal-overlay" style="display:none;"
-                     onclick="if(event.target===this) this.style.display='none'">
-                    <div class="modal-box">
-                        <div class="modal-header">
-                            <h2><i class="fas fa-info-circle"></i> Detalhes da Consulta</h2>
-                            <button class="modal-fechar" onclick="document.getElementById('modalDetalhes').style.display='none'">
-                                <i class="fas fa-times"/>
-                            </button>
-                        </div>
-                        <div id="painelDetalhes" class="modal-body">
-                            <h:panelGroup rendered="#{not empty todasConsultasBean.consultaSelecionada}">
-                                <div class="detalhe-grid">
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Paciente</span>
-                                        <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.nomePaciente}</span>
-                                    </div>
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Médico</span>
-                                        <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.nomeMedico}</span>
-                                    </div>
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Especialidade</span>
-                                        <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.especialidade}</span>
-                                    </div>
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Data / Hora</span>
-                                        <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.dataConsulta} às #{todasConsultasBean.consultaSelecionada.hora}</span>
-                                    </div>
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Valor</span>
-                                        <span class="detalhe-valor">
-                                            <h:outputText value="#{todasConsultasBean.consultaSelecionada.valorConsulta}">
-                                                <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
-                                            </h:outputText>
-                                        </span>
-                                    </div>
-                                    <div class="detalhe-item">
-                                        <span class="detalhe-label">Status</span>
-                                        <span class="detalhe-valor">
-                                            <span class="badge badge-#{todasConsultasBean.getStatusClass(todasConsultasBean.consultaSelecionada.status)}">
-                                                #{todasConsultasBean.consultaSelecionada.status}
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <h:panelGroup rendered="#{not empty todasConsultasBean.consultaSelecionada.observacoes}">
-                                        <div class="detalhe-item detalhe-full">
-                                            <span class="detalhe-label">Observações</span>
-                                            <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.observacoes}</span>
-                                        </div>
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{not empty todasConsultasBean.consultaSelecionada.respNome}">
-                                        <div class="detalhe-item detalhe-full detalhe-secao">
-                                            <i class="fas fa-user-friends"></i> Responsável
-                                        </div>
-                                        <div class="detalhe-item">
-                                            <span class="detalhe-label">Nome</span>
-                                            <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respNome}</span>
-                                        </div>
-                                        <div class="detalhe-item">
-                                            <span class="detalhe-label">CPF</span>
-                                            <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respCpf}</span>
-                                        </div>
-                                        <div class="detalhe-item">
-                                            <span class="detalhe-label">Parentesco</span>
-                                            <span class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respParentesco}</span>
-                                        </div>
-                                    </h:panelGroup>
-                                </div>
-                            </h:panelGroup>
-                        </div>
-                    </div>
-                </div>         
-            </h:form>
-            
-        </ui:define>
+			<div id="modalDetalhes" class="modal-overlay" style="display: none;"
+				onclick="if(event.target===this) this.style.display='none'">
+				<div class="modal-box">
+					<div class="modal-header">
+						<h2>
+							<i class="fas fa-info-circle"></i> Detalhes da Consulta
+						</h2>
+						<button class="modal-fechar"
+							onclick="document.getElementById('modalDetalhes').style.display='none'">
+							<i class="fas fa-times" />
+						</button>
+					</div>
+					<div id="painelDetalhes" class="modal-body">
+						<h:panelGroup
+							rendered="#{not empty todasConsultasBean.consultaSelecionada}">
+							<div class="detalhe-grid">
+								<div class="detalhe-item">
+									<span class="detalhe-label">Paciente</span> <span
+										class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.nomePaciente}</span>
+								</div>
+								<div class="detalhe-item">
+									<span class="detalhe-label">Médico</span> <span
+										class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.nomeMedico}</span>
+								</div>
+								<div class="detalhe-item">
+									<span class="detalhe-label">Especialidade</span> <span
+										class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.especialidade}</span>
+								</div>
+								<div class="detalhe-item">
+									<span class="detalhe-label">Data / Hora</span> <span
+										class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.dataConsulta}
+										às #{todasConsultasBean.consultaSelecionada.hora}</span>
+								</div>
+								<div class="detalhe-item">
+									<span class="detalhe-label">Valor</span> <span
+										class="detalhe-valor"> <h:outputText
+											value="#{todasConsultasBean.consultaSelecionada.valorConsulta}">
+											<f:convertNumber type="currency" currencySymbol="R$ "
+												locale="pt_BR" />
+										</h:outputText>
+									</span>
+								</div>
+								<div class="detalhe-item">
+									<span class="detalhe-label">Status</span> <span
+										class="detalhe-valor"> <span
+										class="badge badge-#{todasConsultasBean.getStatusClass(todasConsultasBean.consultaSelecionada.status)}">
+											#{todasConsultasBean.consultaSelecionada.status} </span>
+									</span>
+								</div>
+								<h:panelGroup
+									rendered="#{not empty todasConsultasBean.consultaSelecionada.observacoes}">
+									<div class="detalhe-item detalhe-full">
+										<span class="detalhe-label">Observações</span> <span
+											class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.observacoes}</span>
+									</div>
+								</h:panelGroup>
+								<h:panelGroup
+									rendered="#{not empty todasConsultasBean.consultaSelecionada.respNome}">
+									<div class="detalhe-item detalhe-full detalhe-secao">
+										<i class="fas fa-user-friends"></i> Responsável
+									</div>
+									<div class="detalhe-item">
+										<span class="detalhe-label">Nome</span> <span
+											class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respNome}</span>
+									</div>
+									<div class="detalhe-item">
+										<span class="detalhe-label">CPF</span> <span
+											class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respCpf}</span>
+									</div>
+									<div class="detalhe-item">
+										<span class="detalhe-label">Parentesco</span> <span
+											class="detalhe-valor">#{todasConsultasBean.consultaSelecionada.respParentesco}</span>
+									</div>
+								</h:panelGroup>
+							</div>
+						</h:panelGroup>
+					</div>
+				</div>
+			</div>
 
-    </ui:composition>
+			<div id="modalRelatorio" class="modal-overlay" style="display: none">
+				<div class="modal-box modal-relatorio-box">
+					<div class="modalicon" style="color: #7c3aed;">
+						<i class="fas fa-file-medical"></i>
+					</div>
+					<h3 class="modal-title">Gerar Relatório da Consulta</h3>
+
+					<div class="relatorio-form">
+						<div class="relatorio-field">
+							<label class="relatorio-label"> <i
+								class="fas fa-clipboard"></i> Relatório / Observações
+							</label>
+							<textarea id="relatorioTexto" class="relatorio-textarea"
+								placeholder="Descreva o quadro clínico, diagnóstico, orientações..."></textarea>
+						</div>
+
+						<div class="relatorio-field">
+							<label class="relatorio-label"> <i class="fas fa-pills"></i>
+								Medicamentos Prescritos
+							</label>
+							<textarea id="relatorioMedicamentos" class="relatorio-textarea"
+								placeholder="Ex: Dipirona 500mg - 1 comprimido a cada 6h por 5 dias..."></textarea>
+						</div>
+					</div>
+
+					<div class="modal-actions" style="margin-top: 20px;">
+						<button type="button" class="btn-secondary"
+							onclick="fecharModalRelatorio()">
+							<i class="fas fa-times"></i> Cancelar
+						</button>
+						<button type="button" class="btn-gerar-pdf" onclick="gerarPDF()">
+							<i class="fas fa-file-download"></i> Baixar PDF
+						</button>
+					</div>
+				</div>
+			</div>
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>
 </html>

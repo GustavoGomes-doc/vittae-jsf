@@ -11,6 +11,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,7 +32,6 @@ public class AgendarConsultaBean implements Serializable {
 	private AgendarConsultaService service;
 
 	private String especialidade;
-	private String tipoConsulta;
 	private String dataConsulta;
 	private String horaConsulta;
 	private Long medicoId;
@@ -65,6 +65,15 @@ public class AgendarConsultaBean implements Serializable {
 
 	public String salvarAgendamento() {
 		try {
+			HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
+					.getSession(false);
+			String token = session != null ? (String) session.getAttribute("token") : null;
+
+			if (token == null || token.isEmpty()) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro",
+						"Sessão expirada. Faça login novamente."));
+				return null;
+			}
 
 			AgendamentoDTO dto = new AgendamentoDTO();
 			dto.setEspecialidade(especialidade);
@@ -82,16 +91,16 @@ public class AgendarConsultaBean implements Serializable {
 			paciente.setNome(pacienteNome);
 			paciente.setCpf(pacienteCpf != null ? pacienteCpf.replaceAll("\\D", "") : "");
 			paciente.setTelefone(pacienteTelefone);
-			dto.setPaciente(paciente);
-			paciente.setGenero(pacienteGenero); // ← adicionar
+			paciente.setGenero(pacienteGenero);
 			paciente.setNascimento(pacienteNascimento);
+			dto.setPaciente(paciente);
 
-			service.salvarAgendamento(dto);
+			service.salvarAgendamento(dto, token);
 
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso!", "Consulta agendada com sucesso."));
 
-			return "/views/pacientes/visualizarConsulta?faces-redirect=true";
+			return "/views/pacientes/visualizarConsultas?faces-redirect=true";
 
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,
@@ -120,7 +129,6 @@ public class AgendarConsultaBean implements Serializable {
 		}
 	}
 
-	// ── MedicoUI ──
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class MedicoUI {
 		private Long id;
@@ -144,14 +152,6 @@ public class AgendarConsultaBean implements Serializable {
 		public String getCorAvatar() {
 			String[] cores = { "#7c3aed", "#059669", "#dc2626", "#d97706", "#2563eb", "#db2777" };
 			return cores[Math.abs(nome.hashCode()) % cores.length];
-		}
-
-		public Integer getTempoConsultaMinutos() {
-			return tempoConsultaMinutos;
-		}
-
-		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
-			this.tempoConsultaMinutos = tempoConsultaMinutos;
 		}
 
 		public Long getId() {
@@ -194,6 +194,14 @@ public class AgendarConsultaBean implements Serializable {
 			this.especialidades = especialidades;
 		}
 
+		public Integer getTempoConsultaMinutos() {
+			return tempoConsultaMinutos;
+		}
+
+		public void setTempoConsultaMinutos(Integer tempoConsultaMinutos) {
+			this.tempoConsultaMinutos = tempoConsultaMinutos;
+		}
+
 		public Double getValorConsulta() {
 			return valorConsulta;
 		}
@@ -211,21 +219,13 @@ public class AgendarConsultaBean implements Serializable {
 		}
 	}
 
-	// ── Getters e Setters do Bean ──
+	// Getters e Setters
 	public String getEspecialidade() {
 		return especialidade;
 	}
 
 	public void setEspecialidade(String especialidade) {
 		this.especialidade = especialidade;
-	}
-
-	public String getTipoConsulta() {
-		return tipoConsulta;
-	}
-
-	public void setTipoConsulta(String tipoConsulta) {
-		this.tipoConsulta = tipoConsulta;
 	}
 
 	public String getDataConsulta() {
@@ -307,5 +307,4 @@ public class AgendarConsultaBean implements Serializable {
 	public void setObservacoes(String observacoes) {
 		this.observacoes = observacoes;
 	}
-
 }

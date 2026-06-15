@@ -5,19 +5,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var cpfInput     = document.getElementById('formCadastro:cpfMedico');
     var telefoneInput= document.getElementById('formCadastro:telefoneMedico');
     var fotoInput    = document.getElementById('formCadastro:fotoMedico');
-    var fotoCirculo  = document.getElementById('fotoCirculo');
+    var fotoCircle  = document.getElementById('fotoCirculo');
     var fotoPreview  = document.getElementById('fotoPreview');
-    var fotoIcone    = document.getElementById('fotoIcone');
+    var foticone    = document.getElementById('foticone');
     var nascInput    = document.getElementById('formCadastro:dataNascimento');
     var valorInput   = document.getElementById('formCadastro:valorConsulta');
     var nomeInput    = document.getElementById('formCadastro:nomeMedico');
 
-    
-
     var especialidadesSelecionadas = [];
 
     // ── Foto ─────────────────────────────────────────────────────────────────
-    if (fotoCirculo) fotoCirculo.addEventListener('click', function () { fotoInput.click(); });
+    if (fotoCircle) fotoCircle.addEventListener('click', function () { fotoInput.click(); });
 
     if (fotoInput) {
         fotoInput.addEventListener('change', function () {
@@ -28,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             reader.onload = function (e) {
                 fotoPreview.src = e.target.result;
                 fotoPreview.style.display = 'block';
-                fotoIcone.style.display = 'none';
+                foticone.style.display = 'none';
             };
             reader.readAsDataURL(file);
         });
@@ -68,24 +66,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── Máscara valor da consulta ────────────────────────────────────────────
-    // Digita apenas números, formata como moeda brasileira
     if (valorInput) {
         valorInput.addEventListener('input', function () {
             var v = this.value.replace(/\D/g, '').slice(0, 6); // máx 9999,99
             if (v === '') { this.value = ''; return; }
             var num = parseInt(v, 10);
-            // Converte centavos: 35000 → 350,00
             var reais = Math.floor(num / 100);
             var centavos = num % 100;
             this.value = reais + ',' + (centavos < 10 ? '0' : '') + centavos;
         });
 
-        // Ao sair do campo, normaliza para envio (troca , por . para o backend)
         valorInput.addEventListener('blur', function () {
             var v = this.value.replace('.', '').replace(',', '.');
             var num = parseFloat(v);
             if (!isNaN(num) && num > 0) {
-                // Mantém display com vírgula, mas o hidden pode ser ajustado se necessário
                 var reais = Math.floor(num);
                 var cents = Math.round((num - reais) * 100);
                 this.value = reais + ',' + (cents < 10 ? '0' : '') + cents;
@@ -95,15 +89,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── Data de Nascimento com hint de idade ─────────────────────────────────
     if (nascInput) {
-        // Cria hint dinâmico — insere depois do input, antes do h:message
         var hintNasc = document.createElement('span');
         hintNasc.id = 'hint-nasc';
         hintNasc.style.cssText = 'font-size:12px;font-weight:600;display:block;margin-top:3px;min-height:16px;';
-        // Insere logo após o input de nascimento
         nascInput.parentNode.insertBefore(hintNasc, nascInput.nextSibling);
 
         nascInput.addEventListener('input', function () {
-            // Máscara DD/MM/AAAA
             var v = this.value.replace(/\D/g, '').slice(0, 8);
             v = v.replace(/(\d{2})(\d)/, '$1/$2').replace(/(\d{2})(\d)/, '$1/$2');
             this.value = v;
@@ -156,18 +147,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── Máscara de horário ───────────────────────────────────────────────────
-    // Digita "9" → "09:00" | "123" → "12:30" | "1234" → "12:34"
     function aplicarMascaraHora(input) {
         input.addEventListener('keydown', function (e) {
-            // Permite: backspace, delete, tab, setas, ':'
             var permite = [8, 9, 35, 36, 37, 38, 39, 40, 46];
             if (permite.indexOf(e.keyCode) !== -1) return;
-            // Bloqueia qualquer coisa que não seja número
             if (e.key < '0' || e.key > '9') {
                 e.preventDefault();
                 return;
             }
-            // Bloqueia se já tem 5 caracteres (HH:MM completo)
             if (this.value.length >= 5 && this.selectionStart === this.selectionEnd) {
                 e.preventDefault();
             }
@@ -177,19 +164,14 @@ document.addEventListener('DOMContentLoaded', function () {
             var raw = this.value.replace(/\D/g, '').slice(0, 4);
             if (raw.length === 0) { this.value = ''; return; }
 
-            // Se o primeiro dígito for >= 3, hora só pode ser de 1 dígito → adiciona 0 na frente
-            // Ex: digita "8" → raw vira "08" → insere "08:" automaticamente
             if (raw.length === 1 && parseInt(raw, 10) >= 3) {
                 raw = '0' + raw;
-                // Com 2 dígitos já formados, insere o ':' e posiciona cursor após ele
                 this.value = raw + ':';
                 return;
             }
 
-            // Insere ':' automaticamente após os 2 primeiros dígitos
             if (raw.length <= 2) {
                 this.value = raw;
-                // Se completou 2 dígitos e primeiro dígito indica hora válida, insere ':'
                 if (raw.length === 2) {
                     this.value = raw + ':';
                 }
@@ -206,18 +188,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (checkbox.checked) {
             row.classList.add('ativa');
-            // Habilita e aplica máscara nos inputs de hora dessa linha
             var inputs = row.querySelectorAll('.input-hora-texto');
             inputs.forEach(function (inp) {
                 inp.disabled = false;
                 inp.style.opacity = '1';
                 inp.style.pointerEvents = 'auto';
-                // Aplica máscara apenas uma vez
                 if (!inp.dataset.mascaraAplicada) {
                     aplicarMascaraHora(inp);
                     inp.dataset.mascaraAplicada = '1';
 
-                    // Validação ao sair do campo
                     inp.addEventListener('blur', function () {
                         validarHorasDia(valorEnum);
                     });
@@ -252,12 +231,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var horaInicio = inputs[0].value;
         var horaFim    = inputs[1].value;
 
-        if (!horaInicio || !horaFim) return true; // ainda digitando
+        if (!horaInicio || !horaFim) return true;
 
         var minInicio = horaParaMinutos(horaInicio);
         var minFim    = horaParaMinutos(horaFim);
 
-        // Mínimo 07:00, máximo 19:00
         if (minInicio < 7 * 60) {
             mostrarErroHora(valorEnum, 'Início mínimo: 07:00');
             return false;
@@ -288,7 +266,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (span) span.style.display = 'none';
     }
 
-    // Inicializa os inputs de hora como desabilitados
     document.querySelectorAll('.input-hora-texto').forEach(function (inp) {
         inp.disabled = true;
         inp.style.opacity = '0.35';
@@ -296,46 +273,46 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ── Chips de especialidade ───────────────────────────────────────────────
-	function inicializarChips() {
-	    var container = document.getElementById('chipsContainer');
-	    if (!container) return;
+    function inicializarChips() {
+        var container = document.getElementById('chipsContainer');
+        if (!container) return;
 
-	    fetch(window.API_BASE_URL + '/api/especialidades')
-	        .then(function(res) { return res.json(); })
-	        .then(function(lista) {
-	            lista.forEach(function(esp) {
-	                var chip = document.createElement('div');
-	                chip.className = 'chip';
-	                chip.textContent = esp.nome;
-	                chip.dataset.nome = esp.nome;
-	                chip.dataset.id = esp.id;
-	                chip.addEventListener('click', function () { toggleChip(chip, esp); });
-	                container.appendChild(chip);
-	            });
-	        })
-	        .catch(function() {
-	            mostrarToast('Erro ao carregar especialidades.', 'erro');
-	        });
-	}
+        fetch(window.API_BASE_URL + '/api/especialidades')
+            .then(function(res) { return res.json(); })
+            .then(function(lista) {
+                lista.forEach(function(esp) {
+                    var chip = document.createElement('div');
+                    chip.className = 'chip';
+                    chip.textContent = esp.nome;
+                    chip.dataset.nome = esp.nome;
+                    chip.dataset.id = esp.id;
+                    chip.addEventListener('click', function () { toggleChip(chip, esp); });
+                    container.appendChild(chip);
+                });
+            })
+            .catch(function() {
+                mostrarToast('Erro ao carregar especialidades.', 'erro');
+            });
+    }
 
-	function toggleChip(chip, esp) {
-	    if (chip.classList.contains('bloqueado')) return;
-	    if (chip.classList.contains('ativo')) {
-	        chip.classList.remove('ativo');
-	        especialidadesSelecionadas = especialidadesSelecionadas.filter(function (e) { return e.id !== esp.id; });
-	    } else {
-	        if (especialidadesSelecionadas.length >= 3) {
-	            mostrarToast('Máximo de 3 especialidades.', 'erro');
-	            return;
-	        }
-	        chip.classList.add('ativo');
-	        especialidadesSelecionadas.push(esp);
-	    }
-	    var hidden = document.getElementById('formCadastro:especialidadesHidden');
-	    if (hidden) hidden.value = especialidadesSelecionadas.map(function(e){ return e.id; }).join(',');
-	    atualizarChips();
-	    if (especialidadesSelecionadas.length > 0) ocultarErro('especialidade');
-	}
+    function toggleChip(chip, esp) {
+        if (chip.classList.contains('bloqueado')) return;
+        if (chip.classList.contains('ativo')) {
+            chip.classList.remove('ativo');
+            especialidadesSelecionadas = especialidadesSelecionadas.filter(function (e) { return e.id !== esp.id; });
+        } else {
+            if (especialidadesSelecionadas.length >= 3) {
+                mostrarToast('Máximo de 3 especialidades.', 'erro');
+                return;
+            }
+            chip.classList.add('ativo');
+            especialidadesSelecionadas.push(esp);
+        }
+        var hidden = document.getElementById('formCadastro:especialidadesHidden');
+        if (hidden) hidden.value = especialidadesSelecionadas.map(function(e){ return e.id; }).join(',');
+        atualizarChips();
+        if (especialidadesSelecionadas.length > 0) ocultarErro('especialidade');
+    }
 
     function atualizarChips() {
         var max = especialidadesSelecionadas.length >= 3;
@@ -387,7 +364,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Data nascimento + idade
         var nasc = nascInput ? nascInput.value : '';
-        var idadeValida = false;
         if (nasc.length < 10) {
             marcarInputErro('formCadastro:dataNascimento', true);
             exibirErro('nasc', 'Data obrigatória');
@@ -407,7 +383,6 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 marcarInputErro('formCadastro:dataNascimento', false);
                 ocultarErro('nasc');
-                idadeValida = true;
             }
         }
 
@@ -449,7 +424,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var diasMarcados = Array.from(checkboxes).some(function (el) { return el.checked; });
         if (!diasMarcados) { exibirErro('disp', 'Selecione ao menos um dia'); valido = false; }
         else {
-            // Valida horários de cada dia marcado
             var diasEnums = ['SEGUNDA','TERCA','QUARTA','QUINTA','SEXTA','SABADO'];
             diasEnums.forEach(function (e) {
                 var row = document.getElementById('row-' + e);

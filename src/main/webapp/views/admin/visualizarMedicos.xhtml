@@ -8,7 +8,7 @@
     <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
    
 
-        <ui:define name="titulo">Médicos</ui:define>
+        <ui:define name="titulo">Admin | Médicos</ui:define>
 
         <ui:define name="corpo">
 
@@ -22,7 +22,6 @@
                             styleClass="btn btn-primary"/>
                 </div>
 
-                <!-- Filtros -->
                 <div class="filtros-container card">
                     <div class="filtros-row">
                         <div class="filtro-grupo">
@@ -60,17 +59,14 @@
                     </div>
                 </div>
 
-                <!-- Contador -->
                 <h:panelGroup id="contadorMedicos" layout="block" styleClass="contador-resultados">
                     <i class="fas fa-list"></i>
                     <h:outputText value=" #{medicosAdminBean.medicosFiltrados.size()} médico(s) encontrado(s)"/>
                 </h:panelGroup>
 
-                <!-- Mensagem -->
                 <h:messages id="mensagemMedico" styleClass="mensagem-feedback"
                             errorClass="mensagem-erro" infoClass="mensagem-sucesso"/>
 
-                <!-- Tabela -->
                 <div class="card">
                     <h:dataTable id="tabelaMedicos"
                                  value="#{medicosAdminBean.medicosFiltrados}"
@@ -119,7 +115,6 @@
                         <h:column>
                             <f:facet name="header">Ações</f:facet>
                             <div class="acoes-cell">
-                                <!-- Botão Ver Detalhes -->
                                 <h:commandLink styleClass="btn btn-sm btn-info"
 								               oncomplete="document.getElementById('modalDetalhesMedico').style.display='flex'">
 								    <f:ajax listener="#{medicosAdminBean.verDetalhes(medico)}"
@@ -128,7 +123,6 @@
 								    <i class="fas fa-eye"></i>
 								</h:commandLink>
 
-                                <!-- Botão Excluir — abre modal de confirmação -->
                                 <h:commandLink styleClass="btn btn-sm btn-danger"
 								               onclick="return confirm('Excluir o médico? Esta ação não pode ser desfeita.')"
 								               action="#{medicosAdminBean.excluirMedico(medico)}"
@@ -140,7 +134,7 @@
                     </h:dataTable>
 
                     <h:panelGroup rendered="#{empty medicosAdminBean.medicosFiltrados}" styleClass="empty-state">
-                        <div class="empty-icon"><i class="fas fa-user-md"></i></div>
+                        <div class="emptyicon"><i class="fas fa-user-md"></i></div>
                         <p>Nenhum médico encontrado.</p>
                         <h:link value="Cadastrar primeiro médico"
                                 outcome="/views/admin/cadastrarMedico"
@@ -148,9 +142,6 @@
                     </h:panelGroup>
                 </div>
 
-                <!-- ============================================================ -->
-                <!-- Modal Detalhes do Médico                                     -->
-                <!-- ============================================================ -->
                 <div id="modalDetalhesMedico" class="modal-overlay" style="display:none;"
                      onclick="if(event.target===this) this.style.display='none'">
                     <div class="modal-box">

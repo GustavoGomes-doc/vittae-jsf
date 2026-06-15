@@ -8,13 +8,11 @@
 		<h:outputStylesheet library="css" name="paciente.css" />
 	</ui:define>
 
-	<ui:define name="titulo">Início | Paciente Vittae</ui:define>
+	<ui:define name="titulo">Paciente | Início</ui:define>
 
-	<!-- Aqui usamos "corpo" para encaixar certinho no seu LayoutPadrao.xhtml -->
 	<ui:define name="corpo">
 		<h:form id="formDashboard">
 
-			<!-- CABEÇALHO -->
 			<div class="welcome-banner">
    			 	<div class="welcome-text">
 			        <h1>Olá, <h:outputText value="#{inicioPacienteBean.primeiroNome}" />!</h1>
@@ -29,11 +27,9 @@
 
 			<div class="dashboard-grid">
 
-				<!-- CARD 1: PRÓXIMA CONSULTA -->
 				<div class="dash-card">
 					<h2 class="dash-card-title">Sua Próxima Consulta</h2>
 
-					<!-- Se TEM consulta agendada -->
 					<h:panelGroup
 						rendered="#{not empty inicioPacienteBean.proximaConsulta}">
 						<div class="appointment-box-dash">
@@ -76,11 +72,9 @@
 						</div>
 					</h:panelGroup>
 
-					<!-- Se NÃO TEM consulta agendada -->
 					<h:panelGroup
 						rendered="#{empty inicioPacienteBean.proximaConsulta}">
 						<div class="empty-state">
-							<!-- Ícone do FontAwesome no lugar do emoji -->
 							<i class="far fa-calendar-times"
 								style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px; display: block;"></i>
 							<p>Você não possui consultas agendadas no momento.</p>
@@ -91,7 +85,6 @@
 					</h:panelGroup>
 				</div>
 
-				<!-- CARD 2: AÇÕES RÁPIDAS -->
 				<div class="dash-card">
 					<h2 class="dash-card-title">Ações Rápidas</h2>
 					<div class="quick-actions">
@@ -114,7 +107,6 @@
 				<div class="dash-card">
 					<h2 class="dash-card-title">Última Consulta</h2>
 
-					<!-- Se TEM uma consulta anterior -->
 					<h:panelGroup
 						rendered="#{not empty inicioPacienteBean.ultimaConsulta}">
 						<div style="padding: 10px 0;">
@@ -128,7 +120,6 @@
 									value="#{inicioPacienteBean.ultimaConsulta.medico.especialidade}" />
 							</p>
 
-							<!-- Botão Mágico do Retorno -->
 							<h:commandLink value="Agendar Retorno"
 								action="#{inicioPacienteBean.agendarRetorno(inicioPacienteBean.ultimaConsulta)}"
 								styleClass="btn-primary-dash"
@@ -136,7 +127,6 @@
 						</div>
 					</h:panelGroup>
 
-					<!-- Se NÃO TEM consulta anterior -->
 					<h:panelGroup rendered="#{empty inicioPacienteBean.ultimaConsulta}">
 						<div style="text-align: center; color: #a0aec0; padding: 20px 0;">
 							<i class="fas fa-folder-open"
@@ -146,8 +136,6 @@
 					</h:panelGroup>
 				</div>
 
-				<!-- CARD 4: DICA DE SAÚDE -->
-				<!-- Coloquei um fundo roxo bem bonito nele para dar destaque visual na tela -->
 				<div class="dash-card"
 					style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); color: white; border: none;">
 					<h2 class="dash-card-title"
@@ -169,7 +157,7 @@
 		</h:form>
 		
 		<script>
-    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
-</script>
+			window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+		</script>
 	</ui:define>
 </ui:composition>

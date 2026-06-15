@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Telefone
+    // ── Máscara Dinâmica de Telefone ─────────────────────────────────────────
     var campoTel = document.querySelector('input[id$="novoTelefone"]');
     if (campoTel) {
         campoTel.addEventListener('input', function () {
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Email
+    // ── Validação de E-mail (Blur) ───────────────────────────────────────────
     var campoEmail = document.querySelector('input[id$="novoEmail"]');
     if (campoEmail) {
         campoEmail.addEventListener('blur', function () {
@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
             this.style.borderColor = (!val || valido) ? '' : '#ef4444';
             var msg = document.getElementById('emailErro');
+            
             if (!valido && val) {
                 if (!msg) {
                     msg = document.createElement('span');
@@ -38,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Confirmação de senha em tempo real
-    var novaSenha     = document.querySelector('input[id$="novaSenha"]');
+    // ── Confirmação de Senha em Tempo Real ───────────────────────────────────
+    var novaSenha       = document.querySelector('input[id$="novaSenha"]');
     var confirmarSenha = document.querySelector('input[id$="confirmarSenha"]');
     var btnAlterarSenha = document.querySelector('.btn-perfil-salvar:last-of-type');
 
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Força mínimo de 6 caracteres na nova senha
+    // ── Força Mínimo de 6 Caracteres na Nova Senha ────────────────────────────
     if (novaSenha) {
         novaSenha.addEventListener('input', function () {
             var msg = document.getElementById('senhaTamanhoMsg');

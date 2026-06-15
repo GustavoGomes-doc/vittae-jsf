@@ -9,7 +9,7 @@
 
 <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
 
-    <ui:define name="titulo">Vittae - Meu Perfil</ui:define>
+    <ui:define name="titulo">Vittae | Meu Perfil</ui:define>
 
     <ui:define name="corpo">
 
@@ -17,7 +17,6 @@
 
         <div class="perfil-container">
 
-            <!-- Cabeçalho -->
             <div class="perfil-header">
                 <img src="https://ui-avatars.com/api/?name=#{usuarioLogadoBean.nome}&amp;background=7c3aed&amp;color=fff&amp;size=96"
                      alt="Avatar" class="perfil-avatar" />
@@ -29,7 +28,6 @@
 
             <h:messages globalOnly="true" styleClass="perfil-messages" />
 
-            <!-- Dados pessoais (somente leitura) -->
             <div class="perfil-card">
                 <div class="perfil-card-titulo">
                     <i class="fas fa-id-card"></i> Dados Pessoais
@@ -66,9 +64,8 @@
                 </div>
             </div>
 
-            <!-- Dados profissionais do médico (somente leitura) -->
             <h:panelGroup layout="block"
-                          rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}">
+                          rendered="#{usuarioLogadoBean.perfil eq 'Medico'}">
                 <div class="perfil-card">
                     <div class="perfil-card-titulo">
                         <i class="fas fa-stethoscope"></i> Dados Profissionais
@@ -106,7 +103,6 @@
                 </div>
             </h:panelGroup>
 
-            <!-- Editar dados -->
             <div class="perfil-card">
                 <div class="perfil-card-titulo">
                     <i class="fas fa-pen"></i> Editar Dados
@@ -127,9 +123,8 @@
                         </div>
                     </div>
 
-                    <!-- Campos extras para médico -->
                     <h:panelGroup layout="block"
-                                  rendered="#{usuarioLogadoBean.perfil eq 'MEDICO'}"
+                                  rendered="#{usuarioLogadoBean.perfil eq 'Medico'}"
                                   styleClass="perfil-grid"
                                   style="margin-top:1rem; padding-top:1rem; border-top:1px solid #e5e7eb;">
                         <div class="perfil-campo">
@@ -156,7 +151,6 @@
                 </h:form>
             </div>
 
-            <!-- Trocar senha -->
             <div class="perfil-card">
                 <div class="perfil-card-titulo">
                     <i class="fas fa-lock"></i> Trocar Senha

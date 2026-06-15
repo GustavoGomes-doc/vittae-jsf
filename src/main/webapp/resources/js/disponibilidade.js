@@ -16,8 +16,8 @@
         var slots = [];
         var partsI = horaInicio.split(':');
         var partsF = horaFim.split(':');
-        var minI = parseInt(partsI[0]) * 60 + parseInt(partsI[1]);
-        var minF = parseInt(partsF[0]) * 60 + parseInt(partsF[1]);
+        var minI = parseInt(partsI[0], 10) * 60 + parseInt(partsI[1], 10);
+        var minF = parseInt(partsF[0], 10) * 60 + parseInt(partsF[1], 10);
         for (var m = minI; m < minF; m += intervaloMin) {
             slots.push(pad(Math.floor(m / 60)) + ':' + pad(m % 60));
         }
@@ -34,7 +34,7 @@
         var medicoId = document.querySelector('meta[name="medicoId"]');
         if (!token || !medicoId) return;
 
-       fetch(window.API_BASE_URL + '/api/disponibilidade/' + medicoId.content, {
+        fetch(window.API_BASE_URL + '/api/disponibilidade/' + medicoId.content, {
             headers: { 'Authorization': 'Bearer ' + token.content }
         })
         .then(function(r) { return r.json(); })

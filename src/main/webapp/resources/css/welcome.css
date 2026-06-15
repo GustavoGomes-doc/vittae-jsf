@@ -27,61 +27,61 @@ main {
 	margin-top: 80px;
 }
 
-
-@keyframes slideDown {from { opacity:0;
-	transform: translateY(-20px);
+@keyframes slideDown {
+	from { 
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-to {
-	opacity: 1;
-	transform: translateY(0);
+@keyframes slideInLeft {
+	from { 
+		opacity: 0;
+		transform: translateX(-50px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
 }
 
+@keyframes slideInRight {
+	from { 
+		opacity: 0;
+		transform: translateX(50px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
 }
 
-@keyframes slideInLeft {from { opacity:0;
-	transform: translateX(-50px);
+@keyframes fadeInUp {
+	from { 
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-to {
-	opacity: 1;
-	transform: translateX(0);
+@keyframes fadeIn {
+	from { 
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-}
-
-@keyframes slideInRight {from { opacity:0;
-	transform: translateX(50px);
-}
-
-to {
-	opacity: 1;
-	transform: translateX(0);
-}
-
-}
-
-@keyframes fadeInUp {from { opacity:0;
-	transform: translateY(30px);
-}
-
-to {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-}
-
-@keyframes fadeIn {from { opacity:0;
-	transform: translateY(20px);
-}
-
-to {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-}
 .auth-buttons {
 	display: flex;
 	align-items: center;
@@ -298,8 +298,7 @@ to {
 	background-color: white;
 	font-weight: 500;
 	color: #374151;
-	box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-		rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+	box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 	padding: 0.5rem 1.5rem;
 	border-radius: 2rem;
 	border: 4.5px solid rgba(255, 255, 255, .2);
@@ -379,8 +378,7 @@ to {
 .image-overlay {
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(to top, rgba(124, 58, 237, 0.2) 0%,
-		transparent 100%);
+	background: linear-gradient(to top, rgba(124, 58, 237, 0.2) 0%, transparent 100%);
 }
 
 .features {
@@ -818,7 +816,8 @@ to {
 	text-align: center;
 }
 
-.success-check {
+/* PADRONIZAÇÃO: .success-check -> .success-check-icon */
+.success-check-icon {
 	width: 70px;
 	height: 70px;
 	background: #c6f6d5;
@@ -927,7 +926,7 @@ to {
 	color: #9ca3af;
 }
 
-@media ( max-width : 768px) {
+@media (max-width: 768px) {
 	.appointment-container {
 		padding: 25px;
 	}

@@ -1,18 +1,19 @@
 package com.vittae.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConsultaAdminDTO implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	private Long id;
 	private String nomePaciente;
 	private String nomeMedico;
 	private String especialidade;
-	private String dataConsulta; // formato dd/MM/yyyy ou yyyy-MM-dd
+	private String dataConsulta; 
 	private String hora;
 	private String status;
 	private BigDecimal valorConsulta;
@@ -25,9 +26,7 @@ public class ConsultaAdminDTO implements Serializable {
 	private String respParentesco;
 	private String respDataNascimento;
 
-	// -------------------------------------------------------------------------
-	// Getters / Setters
-	// -------------------------------------------------------------------------
+	// ── Getters e Setters ───────────────────────────────────────────────────
 
 	public Long getId() {
 		return id;
@@ -42,7 +41,7 @@ public class ConsultaAdminDTO implements Serializable {
 	}
 
 	public void setNomePaciente(String v) {
-		this.nomePaciente= v;
+		this.nomePaciente = v;
 	}
 
 	public String getNomeMedico() {

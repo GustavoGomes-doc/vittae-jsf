@@ -65,8 +65,6 @@ public class CadastrarMedicoBean implements Serializable {
 	public void salvar() {
 		FacesContext ctx = FacesContext.getCurrentInstance();
 		boolean valido = true;
-		
-		
 
 		// 1. Validação de data de nascimento e idade
 		if (dto.getDataNascimento() == null) {
@@ -112,12 +110,22 @@ public class CadastrarMedicoBean implements Serializable {
 			valido = false;
 		}
 
+		// 5. Validação restritiva contra extensões perigosas ou inválidas (.ico, .jfif)
+		if (foto != null && foto.getSubmittedFileName() != null) {
+			String nomeArquivo = foto.getSubmittedFileName().toLowerCase();
+			if (nomeArquivo.endsWith(".ico") || nomeArquivo.endsWith(".jfif")) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Imagem inválida",
+						"Formatos .ico e .jfif não são aceitos para a foto do perfil."));
+				valido = false;
+			}
+		}
+
 		if (!valido) {
 			return;
 		}
 
 		try {
-			//pega o token da sessao
+			// pega o token da sessao
 			HttpSession session = (HttpSession) ctx.getExternalContext().getSession(false);
 			String token = (String) session.getAttribute("token");
 			
@@ -129,7 +137,7 @@ public class CadastrarMedicoBean implements Serializable {
 				return;
 			}
 			
-			//monta o DTO de envio
+			// monta o DTO de envio
 			MedicoEnvioDTO medicoDTO = new MedicoEnvioDTO();
 			medicoDTO.setNome(dto.getNome());
 			medicoDTO.setCpf(dto.getCpf());
@@ -170,8 +178,6 @@ public class CadastrarMedicoBean implements Serializable {
 						return d;
 					}).collect(Collectors.toList());
 			medicoDTO.setDisponibilidades(disponibilidades);
-			
-			
 
 			// Envia para a API
 			service.salvarMedico(medicoDTO, token);
@@ -291,8 +297,6 @@ public class CadastrarMedicoBean implements Serializable {
 	    this.modalVisivel = false;
 	    return null;
 	}
-
-	// ── Classe interna DiaUI ─────────────────────────────────────────────────
 
 	public static class DiaUI {
 		private String label;

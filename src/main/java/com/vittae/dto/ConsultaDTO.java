@@ -16,6 +16,7 @@ public class ConsultaDTO {
 	private BigDecimal valorConsulta;
 	private Long pacienteId;
 	private Long medicoId;
+	private LocalDate respDataNascimento;
 
 	// getters e setters
 	public Long getId() {
@@ -97,4 +98,14 @@ public class ConsultaDTO {
 	public void setMedicoId(Long v) {
 		this.medicoId = v;
 	}
+
+	public LocalDate getRespDataNascimento() {
+		return respDataNascimento;
+	}
+
+	public void setRespDataNascimento(LocalDate respDataNascimento) {
+		this.respDataNascimento = respDataNascimento;
+	}
+	
+	
 }

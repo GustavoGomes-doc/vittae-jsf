@@ -7,9 +7,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -20,8 +18,8 @@ public class AgendarConsultaService {
 	private static final String API_URL = ConfigUtil.get("api.base.url") + "/api/agendamentos";
 	private static final String API_MEDICOS = ConfigUtil.get("api.base.url") + "/api/medicos";
 
-
-	public void salvarAgendamento(AgendamentoDTO dto) throws Exception {
+	// ── SALVAR ──────────────────────────────────────────────────────────────
+	public void salvarAgendamento(AgendamentoDTO dto, String token) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new JavaTimeModule());
 		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -31,7 +29,8 @@ public class AgendarConsultaService {
 
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_URL))
-				.header("Content-Type", "application/json").POST(BodyPublishers.ofString(json)).build();
+				.header("Content-Type", "application/json").header("Authorization", "Bearer " + token)
+				.POST(BodyPublishers.ofString(json)).build();
 
 		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -42,6 +41,7 @@ public class AgendarConsultaService {
 		System.out.println("Agendamento salvo com sucesso!");
 	}
 
+	// ── BUSCAR MÉDICOS ───────────────────────────────────────────────────────
 	public String buscarMedicosJson() throws Exception {
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(API_MEDICOS)).GET().build();
@@ -54,21 +54,7 @@ public class AgendarConsultaService {
 		throw new Exception("Falha ao buscar médicos. Status: " + response.statusCode());
 	}
 
-	// buscahorariosocupadosdiretodaspringbootparanoofazerdoubledbooking
-	public List<String> buscarHorariosOcupados(Long medicoId, String data) throws Exception {
-		HttpClient client = HttpClient.newHttpClient();
-		// requisicaogetcomparametrosofazendofiltronaapi
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(API_URL + "/horarios-ocupados?medicoId=" + medicoId + "&data=" + data)).GET().build();
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-		if (response.statusCode() == 200) {
-			ObjectMapper mapper = new ObjectMapper();
-			return mapper.readValue(response.body(), new TypeReference<List<String>>() {
-			});
-		}
-		throw new Exception("Falha ao buscar horários ocupados.");
-	}
-
+	// ── DTOs ─────────────────────────────────────────────────────────────────
 	public static class AgendamentoDTO {
 		private String especialidade;
 		private LocalDate dataConsulta;
@@ -76,9 +62,11 @@ public class AgendarConsultaService {
 		private Long medicoId;
 		private String observacoes;
 		private PacienteDTO paciente;
+
+		// responsável (só preenchido quando paciente é menor de idade)
 		private String respNome;
 		private String respCpf;
-		private String respParentesco;;
+		private String respParentesco;
 
 		public AgendamentoDTO() {
 		}
@@ -87,72 +75,72 @@ public class AgendarConsultaService {
 			return especialidade;
 		}
 
-		public void setEspecialidade(String especialidade) {
-			this.especialidade = especialidade;
+		public void setEspecialidade(String v) {
+			this.especialidade = v;
 		}
 
 		public LocalDate getDataConsulta() {
 			return dataConsulta;
 		}
 
-		public void setDataConsulta(LocalDate dataConsulta) {
-			this.dataConsulta = dataConsulta;
+		public void setDataConsulta(LocalDate v) {
+			this.dataConsulta = v;
 		}
 
 		public LocalTime getHora() {
 			return hora;
 		}
 
-		public void setHora(LocalTime hora) {
-			this.hora = hora;
+		public void setHora(LocalTime v) {
+			this.hora = v;
 		}
 
 		public Long getMedicoId() {
 			return medicoId;
 		}
 
-		public void setMedicoId(Long medicoId) {
-			this.medicoId = medicoId;
+		public void setMedicoId(Long v) {
+			this.medicoId = v;
 		}
 
 		public String getObservacoes() {
 			return observacoes;
 		}
 
-		public void setObservacoes(String observacoes) {
-			this.observacoes = observacoes;
+		public void setObservacoes(String v) {
+			this.observacoes = v;
 		}
 
 		public PacienteDTO getPaciente() {
 			return paciente;
 		}
 
-		public void setPaciente(PacienteDTO paciente) {
-			this.paciente = paciente;
+		public void setPaciente(PacienteDTO v) {
+			this.paciente = v;
 		}
 
 		public String getRespNome() {
 			return respNome;
 		}
 
-		public void setRespNome(String respNome) {
-			this.respNome = respNome;
+		public void setRespNome(String v) {
+			this.respNome = v;
 		}
 
 		public String getRespCpf() {
 			return respCpf;
 		}
 
-		public void setRespCpf(String respCpf) {
-			this.respCpf = respCpf;
+		public void setRespCpf(String v) {
+			this.respCpf = v;
 		}
 
 		public String getRespParentesco() {
 			return respParentesco;
 		}
 
-		public void setRespParentesco(String respParentesco) {
-			this.respParentesco = respParentesco;
+		public void setRespParentesco(String v) {
+			this.respParentesco = v;
 		}
 	}
 
@@ -161,7 +149,7 @@ public class AgendarConsultaService {
 		private String cpf;
 		private String telefone;
 		private String genero;
-		private String nacimiento;
+		private String nascimento;
 
 		public PacienteDTO() {
 		}
@@ -170,40 +158,40 @@ public class AgendarConsultaService {
 			return nome;
 		}
 
-		public void setNome(String nome) {
-			this.nome = nome;
+		public void setNome(String v) {
+			this.nome = v;
 		}
 
 		public String getCpf() {
 			return cpf;
 		}
 
-		public void setCpf(String cpf) {
-			this.cpf = cpf;
+		public void setCpf(String v) {
+			this.cpf = v;
 		}
 
 		public String getTelefone() {
 			return telefone;
 		}
 
-		public void setTelefone(String telefone) {
-			this.telefone = telefone;
+		public void setTelefone(String v) {
+			this.telefone = v;
 		}
 
 		public String getGenero() {
 			return genero;
 		}
 
-		public void setGenero(String genero) {
-			this.genero = genero;
+		public void setGenero(String v) {
+			this.genero = v;
 		}
 
 		public String getNascimento() {
-			return nacimiento;
+			return nascimento;
 		}
 
-		public void setNascimento(String nascimento) {
-			this.nacimiento = nascimento;
+		public void setNascimento(String v) {
+			this.nascimento = v;
 		}
 	}
 }

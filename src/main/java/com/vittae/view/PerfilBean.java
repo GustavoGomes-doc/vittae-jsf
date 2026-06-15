@@ -47,8 +47,8 @@ public class PerfilBean implements Serializable {
 				novoTelefone = usuario.getTelefone();
 				
 				if (usuario != null && "MEDICO".equals(usuario.getPerfil())) {
-				    novoValorConsulta = usuario.getValorConsulta();
-				    novoTempoConsulta = usuario.getTempoConsultaMinutos();
+					novoValorConsulta = usuario.getValorConsulta();
+					novoTempoConsulta = usuario.getTempoConsultaMinutos();
 				}
 				
 			} catch (Exception e) {
@@ -74,7 +74,7 @@ public class PerfilBean implements Serializable {
 			// Atualiza email na sessão se mudou
 			session.setAttribute("usuarioEmail", novoEmail);
 
-			addSucesso("Dados atualizados com sucesso!");
+			addSucesso("Dados updated com sucesso!");
 		} catch (Exception e) {
 			addErro("Erro ao atualizar dados: " + e.getMessage());
 		}
@@ -178,8 +178,8 @@ public class PerfilBean implements Serializable {
 		return novoValorConsulta;
 	}
 
-	public void setNovoValorConsulta(BigDecimal novoValorConsulta) {
-		this.novoValorConsulta = novoValorConsulta;
+	public void setNovoValorConsulta(BigDecimal Float) {
+		this.novoValorConsulta = Float;
 	}
 
 	public Integer getNovoTempoConsulta() {

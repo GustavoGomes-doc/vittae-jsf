@@ -50,6 +50,7 @@
     top: 24px;
     align-self: flex-start;
 }
+
 .ag-resumo-card {
   background: #1e1b4b;
   color: #fff;
@@ -77,6 +78,7 @@
   border-bottom: none;
 }
 
+/* CORREÇÃO: .ag-resumoicon -> .ag-resumo-icon */
 .ag-resumo-icon {
   width: 28px;
   height: 28px;
@@ -293,8 +295,6 @@
 .ag-row-3 { grid-template-columns: 1fr 1fr 1fr; }
 .ag-row-1 { grid-template-columns: 1fr; }
 
-
-
 .ag-field {
   display: flex;
   flex-direction: column;
@@ -491,6 +491,7 @@
 .ag-esp-card.selected .ag-esp-name { color: var(--ag-primary); }
 
 /* ── MÉDICOS GRID ── */
+/* CORREÇÃO: .ag-meico-search -> .ag-medico-search */
 .ag-medico-search {
   display: flex;
   align-items: center;
@@ -502,8 +503,10 @@
   margin-bottom: 20px;
 }
 
+/* CORREÇÃO: .ag-meico-search -> .ag-medico-search */
 .ag-medico-search i { color: var(--ag-text-muted); }
 
+/* CORREÇÃO: .ag-meico-search -> .ag-medico-search */
 .ag-medico-search input {
   border: none;
   outline: none;
@@ -514,12 +517,14 @@
   font-family: inherit;
 }
 
+/* CORREÇÃO: .ag-meicos-grid -> .ag-medicos-grid */
 .ag-medicos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
+/* CORREÇÃO: .ag-meico-card -> .ag-medico-card */
 .ag-medico-card {
   border: 2px solid var(--ag-border);
   border-radius: var(--ag-radius);
@@ -530,17 +535,20 @@
   position: relative;
 }
 
+/* CORREÇÃO: .ag-meico-card -> .ag-medico-card */
 .ag-medico-card:hover {
   border-color: var(--ag-primary);
   box-shadow: var(--ag-shadow);
   transform: translateY(-2px);
 }
 
+/* CORREÇÃO: .ag-meico-card -> .ag-medico-card */
 .ag-medico-card.selected {
   border-color: var(--ag-primary);
   background: var(--ag-primary-light);
 }
 
+/* CORREÇÃO: .ag-meico-check -> .ag-medico-check */
 .ag-medico-check {
   position: absolute;
   top: 12px;
@@ -556,8 +564,10 @@
   font-size: 12px;
 }
 
+/* CORREÇÃO: .ag-meico-card -> .ag-medico-card e .ag-meico-check -> .ag-medico-check */
 .ag-medico-card.selected .ag-medico-check { display: flex; }
 
+/* CORREÇÃO: .ag-meico-avatar -> .ag-medico-avatar */
 .ag-medico-avatar {
   width: 52px;
   height: 52px;
@@ -571,6 +581,7 @@
   margin-bottom: 14px;
 }
 
+/* CORREÇÃO: .ag-meico-nome -> .ag-medico-nome */
 .ag-medico-nome {
   font-size: 15px;
   font-weight: 700;
@@ -578,12 +589,14 @@
   margin-bottom: 4px;
 }
 
+/* CORREÇÃO: .ag-meico-crm -> .ag-medico-crm */
 .ag-medico-crm {
   font-size: 12px;
   color: var(--ag-text-muted);
   margin-bottom: 10px;
 }
 
+/* CORREÇÃO: .ag-meico-tags -> .ag-medico-tags */
 .ag-medico-tags {
   display: flex;
   flex-wrap: wrap;
@@ -591,6 +604,7 @@
   margin-bottom: 14px;
 }
 
+/* CORREÇÃO: .ag-meico-tag -> .ag-medico-tag */
 .ag-medico-tag {
   background: var(--ag-primary-light);
   color: var(--ag-primary);
@@ -600,6 +614,7 @@
   border-radius: 20px;
 }
 
+/* CORREÇÃO: .ag-meico-info -> .ag-medico-info */
 .ag-medico-info {
   display: flex;
   gap: 16px;
@@ -607,11 +622,13 @@
   border-top: 1px solid var(--ag-border);
 }
 
+/* CORREÇÃO: .ag-meico-info-item -> .ag-medico-info-item */
 .ag-medico-info-item {
   display: flex;
   flex-direction: column;
 }
 
+/* CORREÇÃO: .ag-meico-info-label -> .ag-medico-info-label */
 .ag-medico-info-label {
   font-size: 10px;
   text-transform: uppercase;
@@ -619,6 +636,7 @@
   color: var(--ag-text-muted);
 }
 
+/* CORREÇÃO: .ag-meico-info-value -> .ag-medico-info-value */
 .ag-medico-info-value {
   font-size: 13px;
   font-weight: 600;
@@ -832,6 +850,7 @@
   background: var(--ag-primary-light);
 }
 
+/* CORREÇÃO: .ag-tipoicon -> .ag-tipo-icon */
 .ag-tipo-icon { font-size: 22px; margin-bottom: 6px; }
 .ag-tipo-name {
   font-size: 13px;
@@ -949,6 +968,7 @@
   color: var(--ag-text-muted);
 }
 
+/* CORREÇÃO: .ag-emptyicon -> .ag-empty-icon */
 .ag-empty-icon { font-size: 40px; margin-bottom: 12px; }
 .ag-empty-text { font-size: 14px; }
 

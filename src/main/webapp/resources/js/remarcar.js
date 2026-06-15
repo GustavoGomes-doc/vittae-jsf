@@ -22,25 +22,25 @@
     function pad(n) { return n < 10 ? '0' + n : n; }
 
     // ── Abre o modal de remarcação ──────────────────────────────
-	window.abrirModalRemarcar = function(consultaId, medicoId) {
-	    remarcarState.consultaId    = consultaId;
-	    remarcarState.medicoId      = medicoId;
-	    remarcarState.dataSelecionada = null;
-	    remarcarState.horaSelecionada = null;
-	    remarcarState.diasDisponiveis = [];
+    window.abrirModalRemarcar = function(consultaId, medicoId) {
+        remarcarState.consultaId    = consultaId;
+        remarcarState.medicoId      = medicoId;
+        remarcarState.dataSelecionada = null;
+        remarcarState.horaSelecionada = null;
+        remarcarState.diasDisponiveis = [];
 
-	    var hoje = new Date();
-	    remarcarState.calAno = hoje.getFullYear();
-	    remarcarState.calMes = hoje.getMonth();
+        var hoje = new Date();
+        remarcarState.calAno = hoje.getFullYear();
+        remarcarState.calMes = hoje.getMonth();
 
-	    document.getElementById('remarcarOverlay').style.display = 'flex';
+        document.getElementById('remarcarOverlay').style.display = 'flex';
 
-	    limparHorarios();
-	    // NÃO renderiza calendário ainda — espera a disponibilidade
-	    document.getElementById('remarcarCalGrid').innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">⏳ Carregando...</div>';
-	    document.getElementById('remarcarCalTitulo').textContent = '';
-	    carregarDisponibilidadeRemarcar(medicoId);
-	};
+        limparHorarios();
+        // NÃO renderiza calendário ainda — espera a disponibilidade
+        document.getElementById('remarcarCalGrid').innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af">⏳ Carregando...</div>';
+        document.getElementById('remarcarCalTitulo').textContent = '';
+        carregarDisponibilidadeRemarcar(medicoId);
+    };
 
     window.fecharModalRemarcar = function() {
         document.getElementById('remarcarOverlay').style.display = 'none';
@@ -222,7 +222,6 @@
         .then(function(r) {
             if (!r.ok) throw new Error('Status ' + r.status);
             window.fecharModalRemarcar();
-            // Recarrega a lista via JSF AJAX ou reload simples
             window.location.reload();
         })
         .catch(function(err) {

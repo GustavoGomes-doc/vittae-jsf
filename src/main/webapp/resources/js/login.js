@@ -1,159 +1,164 @@
-document.addEventListener('DOMContentLoaded', function () {
+(function () {
+    "use strict";
 
-    // ══════════════════════════════════════════════
-    // ANIMAÇÕES DA TELA (login/cadastro toggle)
-    // ══════════════════════════════════════════════
-    var container  = document.getElementById('mainContainer');
-    var signInBtn  = document.getElementById('signInBtn');
-    var signUpBtn  = document.getElementById('signUpBtn');
-    var signUpBtn2 = document.getElementById('signUpBtn2');
+    document.addEventListener('DOMContentLoaded', function () {
 
-    if (signUpBtn)  signUpBtn.addEventListener('click',  function () { container.classList.add('register-active'); });
-    if (signInBtn)  signInBtn.addEventListener('click',  function () { container.classList.remove('register-active'); });
-    if (signUpBtn2) signUpBtn2.addEventListener('click', function () { container.classList.add('register-active'); });
+        // ══════════════════════════════════════════════
+        // ANIMAÇÕES DA TELA (login/cadastro toggle)
+        // ══════════════════════════════════════════════
+        var container  = document.getElementById('mainContainer');
+        var signInBtn  = document.getElementById('signInBtn');
+        var signUpBtn  = document.getElementById('signUpBtn');
+        var signUpBtn2 = document.getElementById('signUpBtn2');
 
-    // ══════════════════════════════════════════════
-    // MÁSCARAS (reaplicáveis após AJAX)
-    // ══════════════════════════════════════════════
-    function aplicarMascaraCPF() {
-        document.querySelectorAll('input[placeholder*="CPF"]').forEach(function (input) {
-            if (input._cpfMask) return; // evita listener duplicado
-            input._cpfMask = true;
-            input.addEventListener('input', function (e) {
-                var v = e.target.value.replace(/\D/g, '');
-                if (v.length <= 11) {
-                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        if (signUpBtn)  signUpBtn.addEventListener('click',  function () { container.classList.add('register-active'); });
+        if (signInBtn)  signInBtn.addEventListener('click',  function () { container.classList.remove('register-active'); });
+        if (signUpBtn2) signUpBtn2.addEventListener('click', function () { container.classList.add('register-active'); });
+
+        // ══════════════════════════════════════════════
+        // MÁSCARAS (reaplicáveis após AJAX)
+        // ══════════════════════════════════════════════
+        function aplicarMascaraCPF() {
+            document.querySelectorAll('input[placeholder*="CPF"]').forEach(function (input) {
+                if (input._cpfMask) return; // evita listener duplicado
+                input._cpfMask = true;
+                input.addEventListener('input', function (e) {
+                    var v = e.target.value.replace(/\D/g, '');
+                    if (v.length <= 11) {
+                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                    }
+                    e.target.value = v;
+                });
+            });
+        }
+
+        function aplicarMascaraTelefone() {
+            document.querySelectorAll('input[id*="telefone"]').forEach(function (input) {
+                if (input._telMask) return;
+                input._telMask = true;
+                input.addEventListener('input', function (e) {
+                    var v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 11) v = v.substring(0, 11);
+                    if (v.length >= 2) v = '(' + v.substring(0, 2) + ')' + v.substring(2);
+                    if (v.length >= 9) v = v.substring(0, 8) + '-' + v.substring(8);
+                    e.target.value = v;
+                });
+            });
+        }
+
+        aplicarMascaraCPF();
+        aplicarMascaraTelefone();
+
+        // Reaplicar máscaras após AJAX do JSF
+        if (typeof jsf !== 'undefined') {
+            jsf.ajax.addOnEvent(function (data) {
+                if (data.status === 'success') {
+                    aplicarMascaraCPF();
+                    aplicarMascaraTelefone();
                 }
-                e.target.value = v;
             });
-        });
-    }
+        }
 
-    function aplicarMascaraTelefone() {
-        document.querySelectorAll('input[id*="telefone"]').forEach(function (input) {
-            if (input._telMask) return;
-            input._telMask = true;
-            input.addEventListener('input', function (e) {
-                var v = e.target.value.replace(/\D/g, '');
-                if (v.length > 11) v = v.substring(0, 11);
-                if (v.length >= 2) v = '(' + v.substring(0, 2) + ')' + v.substring(2);
-                if (v.length >= 9) v = v.substring(0, 8) + '-' + v.substring(8);
-                e.target.value = v;
+        // ══════════════════════════════════════════════
+        // VALIDAÇÃO DE E-MAIL EM TEMPO REAL
+        // ══════════════════════════════════════════════
+        var emailInp  = document.getElementById('cadastroForm:email');
+        var emailHint = document.getElementById('emailHint');
+
+        if (emailInp && emailHint) {
+            emailInp.addEventListener('input', function () {
+                var v = this.value.trim();
+                if (!v) {
+                    setHint(emailHint, '', '');
+                    setInputClass(emailInp, '');
+                    return;
+                }
+                if (!v.includes('@')) {
+                    setHint(emailHint, 'Falta o @ no e-mail', 'erro');
+                    setInputClass(emailInp, 'campo-erro');
+                    return;
+                }
+                var partes = v.split('@');
+                if (!partes[1] || !partes[1].includes('.')) {
+                    setHint(emailHint, 'Domínio inválido (ex: gmail.com)', 'erro');
+                    setInputClass(emailInp, 'campo-erro');
+                    return;
+                }
+                if (!validarEmail(v)) {
+                    setHint(emailHint, 'E-mail inválido', 'erro');
+                    setInputClass(emailInp, 'campo-erro');
+                    return;
+                }
+                setHint(emailHint, '✓ E-mail válido', 'ok');
+                setInputClass(emailInp, 'campo-ok');
             });
-        });
-    }
-
-    aplicarMascaraCPF();
-    aplicarMascaraTelefone();
-
-    // Reaplicar máscaras após AJAX do JSF
-    if (typeof jsf !== 'undefined') {
-        jsf.ajax.addOnEvent(function (data) {
-            if (data.status === 'success') {
-                aplicarMascaraCPF();
-                aplicarMascaraTelefone();
-            }
-        });
-    }
-
-    // ══════════════════════════════════════════════
-    // VALIDAÇÃO DE E-MAIL EM TEMPO REAL
-    // ══════════════════════════════════════════════
-    var emailInp  = document.getElementById('cadastroForm:email');
-    var emailHint = document.getElementById('emailHint');
-
-    if (emailInp && emailHint) {
-        emailInp.addEventListener('input', function () {
-            var v = this.value.trim();
-            if (!v) {
-                setHint(emailHint, '', '');
-                setInputClass(emailInp, '');
-                return;
-            }
-            if (!v.includes('@')) {
-                setHint(emailHint, 'Falta o @ no e-mail', 'erro');
-                setInputClass(emailInp, 'campo-erro');
-                return;
-            }
-            var partes = v.split('@');
-            if (!partes[1] || !partes[1].includes('.')) {
-                setHint(emailHint, 'Domínio inválido (ex: gmail.com)', 'erro');
-                setInputClass(emailInp, 'campo-erro');
-                return;
-            }
-            if (!validarEmail(v)) {
-                setHint(emailHint, 'E-mail inválido', 'erro');
-                setInputClass(emailInp, 'campo-erro');
-                return;
-            }
-            setHint(emailHint, '✓ E-mail válido', 'ok');
-            setInputClass(emailInp, 'campo-ok');
-        });
-    }
-
-    // ══════════════════════════════════════════════
-    // CONFIRMAÇÃO DE SENHA EM TEMPO REAL
-    // ══════════════════════════════════════════════
-    var senhaInp  = document.getElementById('cadastroForm:senhaCadastro');
-    var senha2Inp = document.getElementById('cadastroForm:confirmarSenha');
-    var pwHint    = document.getElementById('pwHint');
-
-    function checarSenhas() {
-        if (!senha2Inp || !senhaInp) return;
-        var s2 = senha2Inp.value;
-        if (!s2) {
-            setHint(pwHint, '', '');
-            setInputClass(senha2Inp, '');
-            return;
         }
-        if (senhaInp.value === s2) {
-            setHint(pwHint, '✓ Senhas coincidem', 'ok');
-            setInputClass(senha2Inp, 'campo-ok');
-        } else {
-            setHint(pwHint, 'Senhas não coincidem', 'erro');
-            setInputClass(senha2Inp, 'campo-erro');
-        }
-    }
 
-    if (senhaInp)  senhaInp.addEventListener('input',  checarSenhas);
-    if (senha2Inp) senha2Inp.addEventListener('input', checarSenhas);
+        // ══════════════════════════════════════════════
+        // CONFIRMAÇÃO DE SENHA EM TEMPO REAL
+        // ══════════════════════════════════════════════
+        var senhaInp  = document.getElementById('cadastroForm:senhaCadastro');
+        var senha2Inp = document.getElementById('cadastroForm:confirmarSenha');
+        var pwHint    = document.getElementById('pwHint');
 
-    // ══════════════════════════════════════════════
-    // ÍCONE OLHO NOS CAMPOS DE SENHA
-    // ══════════════════════════════════════════════
-    document.querySelectorAll('input[type="password"]').forEach(function (input) {
-        var wrapper = input.parentNode;
-        wrapper.style.position = 'relative';
-        input.style.paddingRight = '42px';
-
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.setAttribute('tabindex', '-1');
-        btn.style.cssText =
-            'position:absolute;right:10px;top:50%;transform:translateY(-50%);' +
-            'background:none;border:none;cursor:pointer;color:#aaa;font-size:15px;z-index:99;padding:0;';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
-
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var icone = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icone.classList.replace('fa-eye', 'fa-eye-slash');
-                btn.style.color = '#7c3aed';
+        function checarSenhas() {
+            if (!senha2Inp || !senhaInp) return;
+            var s2 = senha2Inp.value;
+            if (!s2) {
+                setHint(pwHint, '', '');
+                setInputClass(senha2Inp, '');
+                return;
+            }
+            if (senhaInp.value === s2) {
+                setHint(pwHint, '✓ Senhas coincidem', 'ok');
+                setInputClass(senha2Inp, 'campo-ok');
             } else {
-                input.type = 'password';
-                icone.classList.replace('fa-eye-slash', 'fa-eye');
-                btn.style.color = '#aaa';
+                setHint(pwHint, 'Senhas não coincidem', 'erro');
+                setInputClass(senha2Inp, 'campo-erro');
             }
-        });
+        }
 
-        wrapper.appendChild(btn);
+        if (senhaInp)  senhaInp.addEventListener('input',  checarSenhas);
+        if (senha2Inp) senha2Inp.addEventListener('input', checarSenhas);
+
+        // ══════════════════════════════════════════════
+        // ÍCONE OLHO NOS CAMPOS DE SENHA
+        // ══════════════════════════════════════════════
+        document.querySelectorAll('input[type="password"]').forEach(function (input) {
+            var wrapper = input.parentNode;
+            wrapper.style.position = 'relative';
+            input.style.paddingRight = '42px';
+
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.setAttribute('tabindex', '-1');
+            btn.style.cssText =
+                'position:absolute;right:10px;top:50%;transform:translateY(-50%);' +
+                'background:none;border:none;cursor:pointer;color:#aaa;font-size:15px;z-index:99;padding:0;';
+            btn.innerHTML = '<i class="fas fa-eye"></i>';
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var icone = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icone.classList.replace('fa-eye', 'fa-eye-slash');
+                    btn.style.color = '#7c3aed';
+                } else {
+                    input.type = 'password';
+                    icone.classList.replace('fa-eye-slash', 'fa-eye');
+                    btn.style.color = '#aaa';
+                }
+            });
+
+            wrapper.appendChild(btn);
+        });
     });
-});
+
+})();
 
 // ══════════════════════════════════════════════
 // MÁSCARA CPF TELA DE LOGIN (chamada via onkeyup)

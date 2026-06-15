@@ -6,7 +6,7 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
 	
-	<ui:define name="titulo">Visualizar Consulta | Vittae</ui:define>
+	<ui:define name="titulo">Paciente | Visualizar Consultas</ui:define>
 
 	<ui:define name="css_extra">
 		<h:outputStylesheet library="css" name="visualizar.css" />
@@ -21,17 +21,13 @@
 
 		<h:form id="formVisualizarConsultas">
 
-			<!-- HEADER -->
 			<div class="page-header">
 				<h:panelGroup layout="block">
 					<h2 class="page-title">Minhas Consultas</h2>
-					<p class="page-subtitle">Gerencie seus agendamentos no sistema
-						Vittae</p>
+					<p class="page-subtitle">Gerencie seus agendamentos no sistema Vittae</p>
 				</h:panelGroup>
-				
 			</div>
 
-			<!-- TOOLBAR -->
 			<div class="toolbar">
 				<h:panelGroup layout="block" styleClass="search-wrap">
 					<i class="fas fa-search"></i>
@@ -90,7 +86,6 @@
 				</div>
 			</div>
 
-			<!-- LISTA -->
 			<h:panelGroup id="listaConsultasGroup" layout="block">
 
 				<h:panelGroup
@@ -112,11 +107,9 @@
 					<ui:repeat value="#{visualizarConsultasBean.consultasFiltradas}"
 						var="consulta">
 
-						<!-- CLASSE CONDICIONAL: cinza se cancelada -->
 						<h:panelGroup layout="block"
 							styleClass="consulta-card #{consulta.status.toString() == 'CANCELADA' ? 'consulta-cancelada' : ''}">
 
-							<!-- Card Header -->
 							<div class="card-header">
 								<h:panelGroup layout="block" styleClass="doctor-info">
 									<div class="avatar">
@@ -130,7 +123,6 @@
 											<i class="fas fa-stethoscope"></i>
 											<h:outputText value="#{consulta.especialidade}" />
 										</div>
-										<!-- NOME DO PACIENTE -->
 										<div class="paciente-nome">
 											<i class="fas fa-user"></i>
 											<h:outputText value="#{consulta.nomePaciente}" />
@@ -138,7 +130,6 @@
 									</h:panelGroup>
 								</h:panelGroup>
 
-								<!-- BADGE COM COR -->
 								<h:panelGroup layout="block"
 									styleClass="badge badge-#{consulta.status.toString().toLowerCase()}">
 									<div class="badge-dot"></div>
@@ -148,7 +139,6 @@
 
 							<div class="card-divider"></div>
 
-							<!-- Detalhes -->
 							<div class="card-details">
 								<div class="detail-item">
 									<span class="detail-label"><i
@@ -159,8 +149,7 @@
 									</h:outputText>
 								</div>
 								<div class="detail-item">
-									<span class="detail-label"><i class="fas fa-clock"></i>
-										Horário</span>
+									<span class="detail-label"><i class="fas fa-clock"></i> Horário</span>
 									<h:outputText value="#{consulta.hora}"
 										styleClass="detail-value">
 										<f:convertDateTime type="localTime" pattern="HH:mm" />
@@ -177,7 +166,6 @@
 								</div>
 							</div>
 
-							<!-- Ações — só aparece se não cancelada/realizada -->
 							<div class="card-actions">
 								<h:commandButton value="Remarcar" styleClass="btn btn-remarcar"
 								    rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}"
@@ -195,7 +183,6 @@
 				</h:panelGroup>
 			</h:panelGroup>
 
-			<!-- MODAL CANCELAMENTO -->
 			<h:panelGroup id="modalCancelamento" layout="block"
 				style="display:contents">
 				<div class="modal-overlay"
@@ -205,8 +192,7 @@
 							<i class="fas fa-exclamation-triangle"></i>
 						</div>
 						<h3 class="modal-title">Cancelar Consulta</h3>
-						<p class="modal-text">Tem certeza que deseja cancelar esta
-							consulta?</p>
+						<p class="modal-text">Tem certeza que deseja cancelar esta consulta?</p>
 						<div class="modal-actions">
 							<h:commandButton value="Voltar" styleClass="btn btn-secondary">
 								<f:ajax execute="@this" render="@form"
@@ -231,14 +217,12 @@
 		                width:90%; max-width:600px; max-height:90vh; overflow-y:auto;
 		                box-shadow:0 20px 60px rgba(0,0,0,0.3);">
 		
-		        <!-- Título -->
 		        <div style="text-align:center; margin-bottom:20px">
 		            <div style="font-size:36px; color:#7c3aed">&#128197;</div>
 		            <h3 style="margin:8px 0 4px; color:#1e1b4b">Remarcar Consulta</h3>
 		            <p style="color:#6b7280; margin:0">Escolha a nova data e horário</p>
 		        </div>
 		
-		        <!-- Calendário -->
 		        <div style="display:flex; gap:20px; flex-wrap:wrap">
 		            <div style="flex:1; min-width:220px">
 		                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
@@ -257,7 +241,6 @@
 		                </div>
 		            </div>
 		
-		            <!-- Horários -->
 		            <div style="flex:1; min-width:180px">
 		                <p id="remarcarHorariosSub"
 		                   style="font-size:13px; color:#6b7280; margin:0 0 10px">
@@ -270,13 +253,11 @@
 		            </div>
 		        </div>
 		
-		        <!-- Erro -->
 		        <p id="remarcarErro"
 		           style="display:none; color:#dc2626; font-size:13px; margin:12px 0 0; text-align:center">
 		            &#9888; Selecione data e horário antes de confirmar
 		        </p>
 		
-		        <!-- Ações -->
 		        <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px">
 		            <button type="button" onclick="fecharModalRemarcar()"
 		                style="padding:10px 20px; border:1px solid #e5e7eb; border-radius:8px;
@@ -293,10 +274,10 @@
 		    </div>
 		</div>			
 		
-<script>
-    window.API_BASE_URL = 'http://localhost:9090';
-    window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
-</script>
+		<script>
+			window.API_BASE_URL = 'http://localhost:9090';
+			window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
+		</script>
 		<h:outputScript library="js" name="visualizar.js" />
 		<h:outputScript library="js" name="remarcar.js" />
 	</ui:define>
