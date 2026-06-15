@@ -1,31 +1,54 @@
 package com.vittae.model;
 
-import com.vittae.model.enums.Status;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.vittae.model.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vittae.model.enums.Status;
+
 // Classes puras, prontas para virar JSON
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Consulta {
 
 	private Long id;
 	private Medico medico;
 	private Paciente paciente;
 	private Status status;
-	private LocalDate dataAgendado;
 	private LocalDate dataConsulta;
 	private LocalTime hora;
+	private BigDecimal valorConsulta;
+	private Especialidade especialidade;
+	
+	private String observacoes;
+	
+	private String respNome;
+	
+	private String respCpf;
+	
+	private String respParentesco;
+	
 
 	public Consulta() {
 	}
+
 	public Consulta(Medico medico, Paciente paciente, Status status, LocalDate dataAgendado, LocalDate dataConsulta,
-			LocalTime hora) {
+			BigDecimal valorConsulta, LocalTime hora, Especialidade especialidade, String respNome, String respCpf, String respParentesco,
+			String observacoes) {
 		this.medico = medico;
 		this.paciente = paciente;
 		this.status = status;
-		this.dataAgendado = dataAgendado;
 		this.dataConsulta = dataConsulta;
 		this.hora = hora;
+		this.valorConsulta = valorConsulta;
+		this.especialidade = especialidade;
+		this.respCpf = respCpf;
+		this.respNome = respNome;
+		this.respParentesco = respParentesco;
+		this.observacoes = observacoes;
 	}
+
 
 	public Long getId() {
 		return id;
@@ -37,6 +60,14 @@ public class Consulta {
 
 	public Medico getMedico() {
 		return medico;
+	}
+
+	public BigDecimal getValorConsulta() {
+		return valorConsulta;
+	}
+
+	public void setValorConsulta(BigDecimal valorConsulta) {
+		this.valorConsulta = valorConsulta;
 	}
 
 	public void setMedico(Medico medico) {
@@ -59,14 +90,6 @@ public class Consulta {
 		this.status = status;
 	}
 
-	public LocalDate getDataAgendado() {
-		return dataAgendado;
-	}
-
-	public void setDataAgendado(LocalDate dataAgendado) {
-		this.dataAgendado = dataAgendado;
-	}
-
 	public LocalDate getDataConsulta() {
 		return dataConsulta;
 	}
@@ -82,4 +105,45 @@ public class Consulta {
 	public void setHora(LocalTime hora) {
 		this.hora = hora;
 	}
+
+	public Especialidade getEspecialidade() {
+		return especialidade;
+	}
+
+	public void setEspecialidade(Especialidade especialidade) {
+		this.especialidade = especialidade;
+	}
+
+	public String getRespNome() {
+		return respNome;
+	}
+
+	public void setRespNome(String respNome) {
+		this.respNome = respNome;
+	}
+
+	public String getRespCpf() {
+		return respCpf;
+	}
+
+	public void setRespCpf(String respCpf) {
+		this.respCpf = respCpf;
+	}
+
+	public String getRespParentesco() {
+		return respParentesco;
+	}
+
+	public void setRespParentesco(String respParentesco) {
+		this.respParentesco = respParentesco;
+	}
+	
+	public String getObservacoes() {
+	    return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+	    this.observacoes = observacoes;
+	}
+
 }

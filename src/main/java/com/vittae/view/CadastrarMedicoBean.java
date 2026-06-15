@@ -2,27 +2,26 @@ package com.vittae.view;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.temporal.ChronoUnit;
-import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import com.vittae.model.Disponibilidade;
+import com.vittae.dto.MedicoEnvioDTO;
+import com.vittae.dto.MedicoEnvioDTO.DisponibilidadeEnvioDTO;
 import com.vittae.model.Medico;
-import com.vittae.model.enums.DiaSemana;
 import com.vittae.model.enums.Perfil;
 import com.vittae.service.CadastrarMedicoService;
 
@@ -39,6 +38,12 @@ public class CadastrarMedicoBean implements Serializable {
 	private Part foto;
 	private String especialidadesSelecionadas;
 	private String dataNascimentoStr;
+	
+	private boolean modalVisivel;
+	private boolean modalSucesso;
+	private String modalTitulo;
+	private String modalMensagem;
+	private String modalResumo;	
 
 	@PostConstruct
 	public void init() {
@@ -58,109 +63,147 @@ public class CadastrarMedicoBean implements Serializable {
 	}
 
 	public void salvar() {
-	    FacesContext ctx = FacesContext.getCurrentInstance();
-	    boolean valido = true;
-	    
-	    if(valido) {
-	    	dto.setPerfil(Perfil.MEDICO);
-	    	
-	    	ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-	    			"Sucesso", "Médico cadastrado com Sucesso!"));
-	    }
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		boolean valido = true;
 
-	    // 1. Validação de idade mínima (24 anos)
-	    if (dto.getDataNascimento() == null) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "Data inválida", "A data de nascimento é obrigatória."));
-	        valido = false;
-	    } else {
-	        long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalDate.now());
-	        
-	        if (idade < 24) {
-	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	                "Médico muito jovem", "O profissional deve ter no mínimo 24 anos."));
-	            valido = false;
-	        } else if (idade > 80) { // <-- NOVA VALIDAÇÃO AQUI
-	            ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	                "Idade inválida", "O profissional não pode ter mais de 80 anos."));
-	            valido = false;
-	        }
-	    }
+		// 1. Validação de data de nascimento e idade
+		if (dto.getDataNascimento() == null) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Data inválida",
+					"A data de nascimento é obrigatória."));
+			valido = false;
+		} else {
+			long idade = ChronoUnit.YEARS.between(dto.getDataNascimento(), LocalDate.now());
+			if (idade < 24) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Médico muito jovem",
+						"O profissional deve ter no mínimo 24 anos."));
+				valido = false;
+			} else if (idade > 80) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Idade inválida",
+						"O profissional não pode ter mais de 80 anos."));
+				valido = false;
+			}
+		}
 
-	    // 2. Validação de CRM (apenas números, máx 6)
-	    if (dto.getCrm() == null || !dto.getCrm().matches("\\d{1,6}")) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "CRM inválido", "O CRM deve conter apenas números (máx. 6 dígitos)."));
-	        valido = false;
-	    }
+		// 2. Validação de CRM (apenas números, máx 6 dígitos)
+		if (dto.getCrm() == null || !dto.getCrm().matches("\\d{1,6}")) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "CRM inválido",
+					"O CRM deve conter apenas números (máx. 6 dígitos)."));
+			valido = false;
+		}
 
-	    // 3. Validação de Valor da Consulta (Dinheiro)
-	    if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(BigDecimal.ZERO) <= 0) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Valor inválido", "O valor da consulta deve ser maior que zero."));
-	        valido = false;
-	    } else if (dto.getValorConsulta().compareTo(new BigDecimal("1000.00")) > 0) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Valor excedido", "O valor da consulta não pode ultrapassar R$ 1.000,00."));
-	        valido = false;
-	    }
-	    
-	    // 4. Validação de Duração
-	    if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 20 || dto.getTempoConsultaMinutos() > 90) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-	            "Duração inválida", "A duração deve ser entre 1 e 999 minutos."));
-	        valido = false;
-	    }
+		// 3. Validação de valor da consulta
+		if (dto.getValorConsulta() == null || dto.getValorConsulta().compareTo(BigDecimal.ZERO) <= 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Valor inválido",
+					"O valor da consulta deve ser maior que zero."));
+			valido = false;
+		} else if (dto.getValorConsulta().compareTo(new BigDecimal("1000.00")) > 0) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Valor excedido",
+					"O valor da consulta não pode ultrapassar R$ 1.000,00."));
+			valido = false;
+		}
 
-	    // Se houver qualquer erro acima, para a execução aqui
-	    if (!valido) {
-	        return;
-	    }
+		// 4. Validação de duração da consulta (entre 21 e 90 minutos)
+		if (dto.getTempoConsultaMinutos() == null || dto.getTempoConsultaMinutos() <= 20
+				|| dto.getTempoConsultaMinutos() > 90) {
+			ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Duração inválida",
+					"A duração deve ser entre 21 e 90 minutos."));
+			valido = false;
+		}
 
-	    try {
-	        // Foto
-	        if (foto != null) {
-	            InputStream input = foto.getInputStream();
-	            dto.setFoto(input.readAllBytes());
-	        }
+		// 5. Validação restritiva contra extensões perigosas ou inválidas (.ico, .jfif)
+		if (foto != null && foto.getSubmittedFileName() != null) {
+			String nomeArquivo = foto.getSubmittedFileName().toLowerCase();
+			if (nomeArquivo.endsWith(".ico") || nomeArquivo.endsWith(".jfif")) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Imagem inválida",
+						"Formatos .ico e .jfif não são aceitos para a foto do perfil."));
+				valido = false;
+			}
+		}
 
-	        // Especialidades
-	        if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
-	            List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(","))
-	                .map(String::trim)
-	                .collect(Collectors.toList());
-	            dto.setEspecialidades(listaEsp);
-	        }
+		if (!valido) {
+			return;
+		}
 
-	        // Disponibilidades
-	        DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
-	        List<Disponibilidade> disponibilidades = listaDias.stream()
-	            .filter(DiaUI::isSelecionado)
-	            .map(dia -> {
-	                Disponibilidade d = new Disponibilidade();
-	                d.setDiaSemana(DiaSemana.valueOf(dia.getValorEnum()));
-	                if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty())
-	                    d.setHoraInicio(LocalTime.parse(dia.getHoraInicio(), parser));
-	                if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty())
-	                    d.setHoraFim(LocalTime.parse(dia.getHoraFim(), parser));
-	                d.setMedico(dto);
-	                return d;
-	            }).collect(Collectors.toList());
-	        dto.setDisponibilidades(disponibilidades);
+		try {
+			// pega o token da sessao
+			HttpSession session = (HttpSession) ctx.getExternalContext().getSession(false);
+			String token = (String) session.getAttribute("token");
+			
+			System.out.println("Token na sessão: " + token);
+			
+			if (token == null) {
+				ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"Sessão expirada", "Faca login novamente."));
+				return;
+			}
+			
+			// monta o DTO de envio
+			MedicoEnvioDTO medicoDTO = new MedicoEnvioDTO();
+			medicoDTO.setNome(dto.getNome());
+			medicoDTO.setCpf(dto.getCpf());
+			medicoDTO.setEmail(dto.getEmail());
+			medicoDTO.setSenha(dto.getSenha());
+			medicoDTO.setCrm(dto.getCrm());
+			medicoDTO.setUfCrm(dto.getUfCrm());
+			medicoDTO.setValorConsulta(dto.getValorConsulta());
+			medicoDTO.setTempoConsultaMinutos(dto.getTempoConsultaMinutos());
+			medicoDTO.setDataNascimento(dto.getDataNascimento());
+			medicoDTO.setFoto(dto.getFoto()); 
+			medicoDTO.setTelefone(dto.getTelefone());
+			medicoDTO.setPerfil(Perfil.MEDICO);
 
-	        // Salva UMA única vez
-	        service.salvarMedico(dto);
+			// Foto
+			if (foto != null) {
+				InputStream input = foto.getInputStream();
+				medicoDTO.setFoto(input.readAllBytes());
+			}
 
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-	            "Sucesso!", "Médico cadastrado com sucesso."));
+			// Especialidades
+			if (especialidadesSelecionadas != null && !especialidadesSelecionadas.isEmpty()) {
+				List<String> listaEsp = Arrays.stream(especialidadesSelecionadas.split(",")).map(String::trim)
+						.collect(Collectors.toList());
+				medicoDTO.setEspecialidades(listaEsp);
+			}
 
-	        init(); // limpa o formulário
+			// Disponibilidades — converte DiaUI para DisponibilidadeEnvioDTO
+			DateTimeFormatter parser = DateTimeFormatter.ofPattern("HH:mm");
+			List<DisponibilidadeEnvioDTO> disponibilidades = listaDias.stream().filter(DiaUI::isSelecionado)
+					.map(dia -> {
+						DisponibilidadeEnvioDTO d = new DisponibilidadeEnvioDTO();
+						d.setDiaSemana(dia.getValorEnum());
+						if (dia.getHoraInicio() != null && !dia.getHoraInicio().isEmpty())
+							d.setHoraInicio(dia.getHoraInicio());
+						if (dia.getHoraFim() != null && !dia.getHoraFim().isEmpty())
+							d.setHoraFim(dia.getHoraFim());
+						return d;
+					}).collect(Collectors.toList());
+			medicoDTO.setDisponibilidades(disponibilidades);
 
-	    } catch (Exception e) {
-	        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-	            "Erro", "Erro ao processar dados: " + e.getMessage()));
-	    }
+			// Envia para a API
+			service.salvarMedico(medicoDTO, token);
+
+			this.modalVisivel = true;
+			this.modalSucesso = true;
+			this.modalTitulo = "Médico cadastrado!";
+			this.modalMensagem = "O profissional foi adicionado ao sistema com sucesso.";
+			this.modalResumo =
+			        "<strong>Nome:</strong> " + medicoDTO.getNome() + "<br/>" +
+			        "<strong>CPF:</strong> " + medicoDTO.getCpf() + "<br/>" +
+			        "<strong>CRM:</strong> " + medicoDTO.getCrm() + "/" + medicoDTO.getUfCrm() + "<br/>" +
+			        "<strong>E-mail:</strong> " + medicoDTO.getEmail();
+
+			init();
+			
+		} catch (Exception e) {
+		    this.modalVisivel = true;
+		    this.modalSucesso = false;
+		    this.modalTitulo = "Erro ao cadastrar médico";
+		    this.modalMensagem = "Não foi possível salvar o cadastro.";
+		    this.modalResumo = e.getMessage();
+		}
 	}
+
+	// ── Getters e Setters ────────────────────────────────────────────────────
 
 	public Medico getDto() {
 		return dto;
@@ -208,6 +251,51 @@ public class CadastrarMedicoBean implements Serializable {
 
 	public void setDataNascimentoStr(String dataNascimentoStr) {
 		this.dataNascimentoStr = dataNascimentoStr;
+	}
+	
+	public boolean isModalVisivel() {
+	    return modalVisivel;
+	}
+
+	public void setModalVisivel(boolean modalVisivel) {
+	    this.modalVisivel = modalVisivel;
+	}
+
+	public boolean isModalSucesso() {
+	    return modalSucesso;
+	}
+
+	public void setModalSucesso(boolean modalSucesso) {
+	    this.modalSucesso = modalSucesso;
+	}
+
+	public String getModalTitulo() {
+	    return modalTitulo;
+	}
+
+	public void setModalTitulo(String modalTitulo) {
+	    this.modalTitulo = modalTitulo;
+	}
+
+	public String getModalMensagem() {
+	    return modalMensagem;
+	}
+
+	public void setModalMensagem(String modalMensagem) {
+	    this.modalMensagem = modalMensagem;
+	}
+
+	public String getModalResumo() {
+	    return modalResumo;
+	}
+
+	public void setModalResumo(String modalResumo) {
+	    this.modalResumo = modalResumo;
+	}
+
+	public String fecharModal() {
+	    this.modalVisivel = false;
+	    return null;
 	}
 
 	public static class DiaUI {

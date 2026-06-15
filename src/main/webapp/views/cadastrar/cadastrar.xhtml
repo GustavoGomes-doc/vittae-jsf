@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough" lang="pt-BR">
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vittae | Cadastro</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <h:outputStylesheet library="css" name="login.css" />
+    <link rel="shortcut icon"
+        href="#{request.contextPath}/resources/imagens/VittaeLogo.ico"
+        type="image/x-icon" />
+</h:head>
+
+<h:body style="display:flex; justify-content:center; align-items:center;
+               min-height:100vh; background-color:#f4f4f9;">
+
+    <div id="toastSucesso" role="status" aria-live="polite">
+        <div class="toast-icon"><i class="fas fa-check"></i></div>
+        <div class="toast-texto">
+            <strong>Cadastro realizado!</strong>
+            <span>Bem-vindo(a)</span>
+        </div>
+    </div>
+
+    <section class="container-pai"
+        style="max-width:500px; width:100%; padding:20px;">
+        <div class="form-content"
+            style="background:white; padding:30px; border-radius:15px;
+                   box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+
+            <h:form id="cadastroForm">
+                <h2 style="text-align:center; color:#7c3aed;">Crie sua Conta</h2>
+                <p style="text-align:center; color:#666; margin-bottom:25px;">
+                    Preencha os dados abaixo para se cadastrar.
+                </p>
+
+                <div class="input-field">
+                    <i class="fas fa-user"></i>
+                    <h:inputText id="nome" value="#{loginBean.nome}"
+                        pt:placeholder="Nome Completo"
+                        required="true"
+                        requiredMessage="Nome é obrigatório" />
+                </div>
+
+                <div class="input-field">
+                    <i class="fas fa-envelope"></i>
+                    <h:inputText id="email" value="#{loginBean.email}"
+                        pt:placeholder="E-mail"
+                        required="true"
+                        requiredMessage="E-mail é obrigatório" />
+                </div>
+                <span id="emailHint" class="campo-hint"></span>
+
+                <div style="display:flex; gap:10px;">
+                    <div class="input-field" style="flex:1;">
+                        <i class="fas fa-id-card"></i>
+                        <h:inputText id="cpf" value="#{loginBean.cpfCadastro}"
+                            pt:placeholder="CPF (000.000.000-00)"
+                            pt:onkeyup="mascaraCpf(this)"
+                            maxlength="14"
+                            required="true"
+                            requiredMessage="CPF é obrigatório" />
+                    </div>
+                    <div class="input-field" style="flex:1;">
+                        <i class="fas fa-phone"></i>
+                        <h:inputText id="telefone" value="#{loginBean.telefone}"
+                            pt:placeholder="(00) 00000-0000"
+                            pt:onkeyup="mascaraTelefone(this)"
+                            maxlength="15"
+                            required="true"
+                            requiredMessage="Telefone é obrigatório" />
+                    </div>
+                </div>
+
+                <div class="input-field">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h:inputText id="cep" value="#{loginBean.cep}"
+                        pt:placeholder="CEP (00000-000)"
+                        pt:onkeyup="mascaraCep(this)"
+                        maxlength="9"
+                        required="true"
+                        requiredMessage="CEP é obrigatório" />
+                </div>
+
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <h:inputSecret id="senhaCadastro"
+                        value="#{loginBean.senhaCadastro}"
+                        pt:placeholder="Senha"
+                        required="true"
+                        requiredMessage="Senha é obrigatória" />
+                </div>
+
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <h:inputSecret id="confirmarSenha"
+                        pt:placeholder="Confirme a senha" />
+                </div>
+                <span id="pwHint" class="campo-hint"></span>
+
+                <h:commandButton value="Finalizar Cadastro"
+                    action="#{loginBean.cadastrar()}"
+                    styleClass="btn-main"
+                    style="width:100%; margin-top:15px;"
+                    onclick="return validarFormulario();">
+                    <f:ajax execute="@form" render="messages"
+                        onevent="tratarEventoAjax" />
+                </h:commandButton>
+
+                <div style="text-align:center; margin-top:20px;">
+                    <h:link outcome="/views/login/login.xhtml"
+                        value="Já tenho conta? Voltar para o Login"
+                        style="color:#7c3aed; text-decoration:none;
+                               font-size:14px; font-weight:bold;" />
+                </div>
+
+                <h:messages id="messages" globalOnly="false"
+                    style="list-style:none; padding:0; font-size:13px;
+                           margin-top:15px; text-align:center;" />
+            </h:form>
+        </div>
+    </section>
+
+    <h:outputScript library="js" name="login.js" target="body" />
+
+</h:body>
+</html>

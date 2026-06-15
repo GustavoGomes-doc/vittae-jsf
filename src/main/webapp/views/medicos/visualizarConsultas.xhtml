@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+
+    <ui:define name="css_extra">
+        <h:outputStylesheet library="css" name="visualizar.css" />
+        <h:outputStylesheet library="css" name="medico.css" />
+        <h:outputStylesheet library="css" name="paciente.css" />
+    </ui:define>
+
+    <ui:define name="titulo">Médicos | Minhas consultas</ui:define>
+
+    <ui:define name="corpo">
+
+        <h:messages id="mensagens" globalOnly="true"
+            styleClass="info-messages" errorClass="error-messages"
+            infoClass="success-messages" />
+
+        <h:form id="formConsultasMedico">
+
+            <div class="page-header">
+                <h:panelGroup layout="block">
+                    <h2 class="page-title">Consultas dos Pacientes</h2>
+                    <p class="page-subtitle">Visualize seus agendamentos no sistema Vittae</p>
+                </h:panelGroup>
+            </div>
+
+            <div class="toolbar">
+                <h:panelGroup layout="block" styleClass="search-wrap">
+                    <i class="fas fa-search"></i>
+                    <h:inputText id="filtroTexto"
+                        value="#{visualizarConsultasMedicoBean.filtroTexto}"
+                        styleClass="search-input"
+                        p:placeholder="Buscar paciente ou especialidade...">
+                        <f:ajax event="keyup" execute="@this"
+                            render="listaConsultasGroup mensagens"
+                            listener="#{visualizarConsultasMedicoBean.filtrar}" />
+                    </h:inputText>
+                </h:panelGroup>
+
+                <div class="filter-tabs">
+                    <h:commandButton value="Todas"
+                        styleClass="filter-tab #{visualizarConsultasMedicoBean.filtroStatus == 'todas' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{visualizarConsultasMedicoBean.filtroStatus}" value="todas" />
+                        <f:ajax execute="@this" render="listaConsultasGroup mensagens"
+                            listener="#{visualizarConsultasMedicoBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Pendentes"
+                        styleClass="filter-tab #{visualizarConsultasMedicoBean.filtroStatus == 'pendente' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{visualizarConsultasMedicoBean.filtroStatus}" value="pendente" />
+                        <f:ajax execute="@this" render="listaConsultasGroup mensagens"
+                            listener="#{visualizarConsultasMedicoBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Realizadas"
+                        styleClass="filter-tab #{visualizarConsultasMedicoBean.filtroStatus == 'realizada' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{visualizarConsultasMedicoBean.filtroStatus}" value="realizada" />
+                        <f:ajax execute="@this" render="listaConsultasGroup mensagens"
+                            listener="#{visualizarConsultasMedicoBean.filtrar}" />
+                    </h:commandButton>
+
+                    <h:commandButton value="Canceladas"
+                        styleClass="filter-tab #{visualizarConsultasMedicoBean.filtroStatus == 'cancelada' ? 'active' : ''}">
+                        <f:setPropertyActionListener
+                            target="#{visualizarConsultasMedicoBean.filtroStatus}" value="cancelada" />
+                        <f:ajax execute="@this" render="listaConsultasGroup mensagens"
+                            listener="#{visualizarConsultasMedicoBean.filtrar}" />
+                    </h:commandButton>
+                </div>
+            </div>
+
+            <h:panelGroup id="listaConsultasGroup" layout="block">
+
+                <h:panelGroup
+                    rendered="#{empty visualizarConsultasMedicoBean.consultasFiltradas}"
+                    layout="block" styleClass="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-calendar-times"
+                            style="font-size: 32px; color: var(--vittae-purple);"></i>
+                    </div>
+                    <h3 class="empty-title">Nenhuma consulta encontrada</h3>
+                    <h:outputText
+                        value="Não há agendamentos para os critérios selecionados."
+                        styleClass="empty-text" />
+                </h:panelGroup>
+
+                <h:panelGroup
+                    rendered="#{not empty visualizarConsultasMedicoBean.consultasFiltradas}"
+                    layout="block">
+                    <ui:repeat value="#{visualizarConsultasMedicoBean.consultasFiltradas}"
+                        var="consulta">
+
+                        <h:panelGroup layout="block"
+                            styleClass="consulta-card #{consulta.status.toString() == 'CANCELADA' ? 'consulta-cancelada' : ''}"
+                            p:data-status="#{consulta.status.toString()}"
+                            p:data-paciente="#{consulta.nomePaciente}"
+                            p:data-especialidade="#{consulta.especialidade}">
+
+                            <div class="card-header">
+                                <h:panelGroup layout="block" styleClass="doctor-info">
+                                    <div class="avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <h:panelGroup layout="block">
+                                        <div class="doctor-name">
+                                            <h:outputText value="#{consulta.nomePaciente}" />
+                                        </div>
+                                        <div class="doctor-specialty">
+                                            <i class="fas fa-stethoscope"></i>
+                                            <h:outputText value="#{consulta.especialidade}" />
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
+                                <h:panelGroup layout="block"
+                                    styleClass="badge badge-#{consulta.status.toString().toLowerCase()}">
+                                    <div class="badge-dot"></div>
+                                    <h:outputText value="#{consulta.status}" />
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="card-divider"></div>
+
+                            <div class="card-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-calendar-day"></i> Data
+                                    </span>
+                                    <h:outputText value="#{consulta.dataConsulta}"
+                                        styleClass="detail-value">
+                                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">
+                                        <i class="fas fa-clock"></i> Horário
+                                    </span>
+                                    <h:outputText value="#{consulta.hora}"
+                                        styleClass="detail-value">
+                                        <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                    </h:outputText>
+                                </div>
+                                <h:panelGroup rendered="#{not empty consulta.observacoes}" layout="block">
+                                    <div class="detail-item">
+                                        <span class="detail-label">
+                                            <i class="fas fa-notes-medical"></i> Motivo
+                                        </span>
+                                        <span class="detail-value">#{consulta.observacoes}</span>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+
+                            <div class="card-actions">
+
+                                <button type="button" class="btn-relatorio"
+								    onclick="abrirModalRelatorio(
+								    	'#{consulta.id}',
+								        '#{consulta.nomePaciente}',
+								        '#{consulta.especialidade}',
+								        '#{consulta.dataConsulta}',
+								        '#{consulta.hora}',
+								        '#{consulta.status}',
+								        '#{consulta.telefonePaciente}')">
+                                    <i class="fas fa-file-medical"></i> Relatório
+                                </button>
+
+                                <h:commandButton value="Cancelar" styleClass="btn btn-cancel"
+                                    rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}">
+                                    <f:ajax execute="@this" render="@form"
+                                        listener="#{visualizarConsultasMedicoBean.prepararCancelamentoAction(consulta.id)}" />
+                                </h:commandButton>
+                                
+                                <h:commandButton style="display:none"
+								    styleClass="btn-realizar-oculto btn-realizar-#{consulta.id}">
+								    <f:ajax execute="@this" render="@form"
+								        listener="#{visualizarConsultasMedicoBean.marcarRealizada(consulta.id)}" />
+								</h:commandButton>
+
+                            </div>
+
+                        </h:panelGroup>
+                    </ui:repeat>
+                </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup id="modalCancelamento" layout="block" style="display:contents">
+                <div class="modal-overlay"
+                    style="#{visualizarConsultasMedicoBean.exibirModalCancelamento ? 'display:flex' : 'display:none'}">
+                    <div class="modal-box">
+                        <div class="modal-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3 class="modal-title">Cancelar Consulta</h3>
+                        <p class="modal-text">Tem certeza que deseja cancelar esta consulta?</p>
+                        <div class="modal-actions">
+                            <h:commandButton value="Voltar" styleClass="btn btn-secondary">
+                                <f:ajax execute="@this" render="@form"
+                                    listener="#{visualizarConsultasMedicoBean.fecharModal}" />
+                            </h:commandButton>
+                            <h:commandButton value="Sim, cancelar" styleClass="btn btn-confirmar-cancel">
+                                <f:ajax execute="@this" render="@form"
+                                    listener="#{visualizarConsultasMedicoBean.confirmarCancelamento}" />
+                            </h:commandButton>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+				<h:inputHidden id="idConsultaRealizar" 
+				    value="#{visualizarConsultasMedicoBean.idParaRealizar}" />
+				    
+				<h:commandButton id="btnRealizarOculto" value="r" style="display:none"
+				    styleClass="btn-realizar-oculto">
+				    <f:ajax execute="idConsultaRealizar @this" render="@form"
+				        listener="#{visualizarConsultasMedicoBean.marcarRealizadaAction}" />
+				</h:commandButton>
+        </h:form>
+
+        <div id="modalRelatorio" class="modal-overlay" style="display:none;">
+            <div class="modal-box modal-relatorio-box">
+                <div class="modal-icon" style="color: #7c3aed;">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3 class="modal-title">Gerar Relatório da Consulta</h3>
+
+                <div class="relatorio-form">
+                    <div class="relatorio-field">
+                        <label class="relatorio-label">
+                            <i class="fas fa-clipboard"></i> Relatório / Observações
+                        </label>
+                        <textarea id="relatorioTexto" class="relatorio-textarea"
+                            placeholder="Descreva o quadro clínico, diagnóstico, orientações..."></textarea>
+                    </div>
+                    <div class="relatorio-field">
+                        <label class="relatorio-label">
+                            <i class="fas fa-pills"></i> Medicamentos Prescritos
+                        </label>
+                        <textarea id="relatorioMedicamentos" class="relatorio-textarea"
+                            placeholder="Ex: Dipirona 500mg — 1 comprimido a cada 6h por 5 dias..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="fecharModalRelatorio()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-gerar-pdf" onclick="gerarPDF()">
+                        <i class="fas fa-file-download"></i> Baixar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+		    window.API_BASE_URL = 'http://localhost:9090/vittae';
+		    window.JWT_TOKEN = '#{sessionScope.token}';
+		</script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <h:outputScript library="js" name="visualizarMed.js" />
+
+    </ui:define>
+</ui:composition>

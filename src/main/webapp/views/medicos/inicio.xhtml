@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+<ui:define name="titulo">Médicos | Inicio</ui:define>
+
+    <ui:define name="css_extra">
+        <h:outputStylesheet library="css" name="medico.css" />
+    </ui:define>
+
+    <ui:define name="corpo">
+
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1>Olá, Dr(a). #{usuarioLogadoBean.nome}</h1>
+                <p>Acompanhe sua agenda, consultas e pacientes no sistema Vittae.</p>
+            </div>
+            <i class="fas fa-stethoscope welcome-icon"></i>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>#{inicioMedicoBean.consultasHoje}</h4>
+                    <p>Consultas hoje</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>#{inicioMedicoBean.consultasPendentes}</h4>
+                    <p>Pendentes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>#{inicioMedicoBean.consultasRealizadas}</h4>
+                    <p>Realizadas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>#{inicioMedicoBean.pacientesAtendidos}</h4>
+                    <p>Pacientes atendidos</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-access">
+            <h:link outcome="/views/medicos/visualizarConsultas" styleClass="quick-btn">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Minhas Consultas</span>
+            </h:link>
+            <h:link outcome="/views/medicos/visualizarPacientes" styleClass="quick-btn">
+                <i class="fas fa-users"></i>
+                <span>Meus Pacientes</span>
+            </h:link>
+            <h:link outcome="/views/medicos/disponibilidades" styleClass="quick-btn">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Disponibilidade</span>
+            </h:link>
+        </div>
+
+        <div class="bottom-grid">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>
+                        <i class="fas fa-calendar-day" style="color:#7c3aed;margin-right:8px"></i>
+                        Consultas de Hoje
+                    </h3>
+                    <h:link outcome="/views/medicos/visualizarConsultas" value="Ver todas" />
+                </div>
+
+                <ui:fragment rendered="#{empty inicioMedicoBean.proximasConsultasHoje}">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <p>Nenhuma consulta pendente para hoje.</p>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{not empty inicioMedicoBean.proximasConsultasHoje}">
+                    <ul class="activity-list">
+                        <ui:repeat value="#{inicioMedicoBean.proximasConsultasHoje}" var="c">
+                            <li class="activity-item">
+                                <div class="activity-dot purple"></div>
+                                <div>
+                                    <div class="activity-text">#{c.nomePaciente}</div>
+                                    <div class="activity-time">
+                                        <h:outputText value="#{c.hora}">
+                                            <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                        </h:outputText>
+                                        <h:outputText value=" · #{c.especialidade}" rendered="#{not empty c.especialidade}" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </ui:fragment>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>
+                        <i class="fas fa-history" style="color:#7c3aed;margin-right:8px"></i>
+                        Consultas Recentes
+                    </h3>
+                    <h:link outcome="/views/medicos/visualizarConsultas" value="Ver todas" />
+                </div>
+
+                <ui:fragment rendered="#{empty inicioMedicoBean.consultasRecentes}">
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>Nenhuma consulta registrada ainda.</p>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{not empty inicioMedicoBean.consultasRecentes}">
+                    <ul class="activity-list">
+                        <ui:repeat value="#{inicioMedicoBean.consultasRecentes}" var="c">
+                            <li class="activity-item">
+                                <div class="activity-dot purple"></div>
+                                <div>
+                                    <div class="activity-text">#{c.nomePaciente}</div>
+                                    <div class="activity-time">
+                                        <h:outputText value="#{c.dataConsulta}">
+                                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                        </h:outputText>
+                                        <h:outputText value=" às ">
+                                            <f:verbatim> às </f:verbatim>
+                                        </h:outputText>
+                                        <h:outputText value="#{c.hora}">
+                                            <f:convertDateTime type="localTime" pattern="HH:mm" />
+                                        </h:outputText>
+                                        · #{c.status}
+                                    </div>
+                                </div>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </ui:fragment>
+            </div>
+
+        </div>
+	
+<script>
+    window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+</script>
+    </ui:define>
+
+</ui:composition>
+</html>

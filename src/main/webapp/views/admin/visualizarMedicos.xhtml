@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+   
+
+        <ui:define name="titulo">Admin | Médicos</ui:define>
+
+        <ui:define name="corpo">
+
+            <h:form id="formMedicos">
+
+                <div class="page-header">
+                    <h1><i class="fas fa-user-md"></i> Médicos</h1>
+                    <p class="page-subtitle">Visualize e gerencie os médicos cadastrados</p>
+                    <h:link value="+ Cadastrar Médico"
+                            outcome="/views/admin/cadastrarMedico"
+                            styleClass="btn btn-primary"/>
+                </div>
+
+                <div class="filtros-container card">
+                    <div class="filtros-row">
+                        <div class="filtro-grupo">
+                            <label for="filtroNome">Buscar</label>
+                            <h:inputText id="filtroNome"
+                                         value="#{medicosAdminBean.filtroTexto}"
+                                         styleClass="input-field"
+                                         placeholder="Nome, CRM ou especialidade...">
+                                <f:ajax event="keyup" render="tabelaMedicos contadorMedicos" delay="300"/>
+                            </h:inputText>
+                        </div>
+
+                        <div class="filtro-grupo">
+                            <label for="filtroEsp">Especialidade</label>
+                            <h:selectOneMenu id="filtroEsp"
+                                             value="#{medicosAdminBean.filtroEspecialidade}"
+                                             styleClass="input-field select-field">
+                                <f:selectItem itemValue="" itemLabel="Todas"/>
+                                <f:selectItems value="#{medicosAdminBean.especialidades}"
+                                               var="esp"
+                                               itemValue="#{esp.nome}"
+                                               itemLabel="#{esp.nome}"/>
+                                <f:ajax event="change" render="tabelaMedicos contadorMedicos"/>
+                            </h:selectOneMenu>
+                        </div>
+
+                        <div class="filtro-grupo filtro-btn">
+                            <h:commandLink styleClass="btn btn-secondary" style="height:36px; padding: 0 1rem;">
+                                <i class="fas fa-eraser"></i> Limpar filtros
+                                <f:ajax listener="#{medicosAdminBean.limparFiltros}"
+                                        execute="@form"
+                                        render="tabelaMedicos contadorMedicos filtroNome filtroEsp"/>
+                            </h:commandLink>
+                        </div>
+                    </div>
+                </div>
+
+                <h:panelGroup id="contadorMedicos" layout="block" styleClass="contador-resultados">
+                    <i class="fas fa-list"></i>
+                    <h:outputText value=" #{medicosAdminBean.medicosFiltrados.size()} médico(s) encontrado(s)"/>
+                </h:panelGroup>
+
+                <h:messages id="mensagemMedico" styleClass="mensagem-feedback"
+                            errorClass="mensagem-erro" infoClass="mensagem-sucesso"/>
+
+                <div class="card">
+                    <h:dataTable id="tabelaMedicos"
+                                 value="#{medicosAdminBean.medicosFiltrados}"
+                                 var="medico"
+                                 styleClass="tabela-dados"
+                                 headerClass="tabela-header"
+                                 rowClasses="tabela-linha-par,tabela-linha-impar">
+
+                        <h:column>
+                            <f:facet name="header">Nome</f:facet>
+                            <h:outputText value="#{medico.nome}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">CRM</f:facet>
+                            <h:outputText value="#{medico.crm} / #{medico.ufCrm}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">E-mail</f:facet>
+                            <h:outputText value="#{medico.email}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Telefone</f:facet>
+                            <h:outputText value="#{medico.telefone}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Especialidades</f:facet>
+                            <h:outputText value="#{medicosAdminBean.formatarEspecialidades(medico)}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Duração</f:facet>
+                            <h:outputText value="#{medico.tempoConsultaMinutos} min"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Valor</f:facet>
+                            <h:outputText value="#{medico.valorConsulta}">
+                                <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                            </h:outputText>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Ações</f:facet>
+                            <div class="acoes-cell">
+                                <h:commandLink styleClass="btn btn-sm btn-info"
+								               oncomplete="document.getElementById('modalDetalhesMedico').style.display='flex'">
+								    <f:ajax listener="#{medicosAdminBean.verDetalhes(medico)}"
+								            execute="@this"
+								            render="painelDetalhesMedico"/>
+								    <i class="fas fa-eye"></i>
+								</h:commandLink>
+
+                                <h:commandLink styleClass="btn btn-sm btn-danger"
+								               onclick="return confirm('Excluir o médico? Esta ação não pode ser desfeita.')"
+								               action="#{medicosAdminBean.excluirMedico(medico)}"
+								               update="tabelaMedicos contadorMedicos mensagemMedico">
+								    <i class="fas fa-trash"></i>
+								</h:commandLink>
+                            </div>
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty medicosAdminBean.medicosFiltrados}" styleClass="empty-state">
+                        <div class="emptyicon"><i class="fas fa-user-md"></i></div>
+                        <p>Nenhum médico encontrado.</p>
+                        <h:link value="Cadastrar primeiro médico"
+                                outcome="/views/admin/cadastrarMedico"
+                                styleClass="btn btn-primary"/>
+                    </h:panelGroup>
+                </div>
+
+                <div id="modalDetalhesMedico" class="modal-overlay" style="display:none;"
+                     onclick="if(event.target===this) this.style.display='none'">
+                    <div class="modal-box">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-user-md"></i> Dados do Médico</h2>
+                            <button class="modal-fechar"
+                                    onclick="document.getElementById('modalDetalhesMedico').style.display='none'">
+                                <i class="fas fa-times"/>
+                            </button>
+                        </div>
+                        <div id="painelDetalhesMedico" class="modal-body">
+                            <h:panelGroup rendered="#{not empty medicosAdminBean.medicoSelecionado}">
+                                <div class="detalhe-grid">
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Nome</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.nome}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">CPF</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.cpf}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">CRM</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.crm} / #{medicosAdminBean.medicoSelecionado.ufCrm}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">E-mail</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.email}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Telefone</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.telefone}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Data de Nascimento</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.dataNascimento}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Duração da Consulta</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.medicoSelecionado.tempoConsultaMinutos} minutos</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Valor da Consulta</span>
+                                        <span class="detalhe-valor">
+                                            <h:outputText value="#{medicosAdminBean.medicoSelecionado.valorConsulta}">
+                                                <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                                            </h:outputText>
+                                        </span>
+                                    </div>
+                                    <div class="detalhe-item detalhe-full">
+                                        <span class="detalhe-label">Especialidades</span>
+                                        <span class="detalhe-valor">#{medicosAdminBean.formatarEspecialidades(medicosAdminBean.medicoSelecionado)}</span>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>         
+
+            </h:form>
+            
+
+        </ui:define>
+
+    </ui:composition>
+</html>

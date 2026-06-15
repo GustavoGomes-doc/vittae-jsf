@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
+	
+	<ui:define name="titulo">Paciente | Visualizar Consultas</ui:define>
+
+	<ui:define name="css_extra">
+		<h:outputStylesheet library="css" name="visualizar.css" />
+		<h:outputStylesheet library="css" name="paciente.css" />
+	</ui:define>
+
+	<ui:define name="corpo">
+
+		<h:messages id="mensagens" globalOnly="true"
+			styleClass="info-messages" errorClass="error-messages"
+			infoClass="success-messages" />
+
+		<h:form id="formVisualizarConsultas">
+
+			<div class="page-header">
+				<h:panelGroup layout="block">
+					<h2 class="page-title">Minhas Consultas</h2>
+					<p class="page-subtitle">Gerencie seus agendamentos no sistema Vittae</p>
+				</h:panelGroup>
+			</div>
+
+			<div class="toolbar">
+				<h:panelGroup layout="block" styleClass="search-wrap">
+					<i class="fas fa-search"></i>
+					<h:inputText id="filtroTexto"
+						value="#{visualizarConsultasBean.filtroTexto}"
+						styleClass="search-input"
+						p:placeholder="Buscar médico ou especialidade...">
+						<f:ajax event="keyup" execute="@this"
+							render="listaConsultasGroup mensagens"
+							listener="#{visualizarConsultasBean.filtrar}" />
+					</h:inputText>
+				</h:panelGroup>
+
+				<div class="filter-tabs">
+					<h:commandButton value="Todas"
+						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'todas' ? 'active' : ''}">
+						<f:setPropertyActionListener
+							target="#{visualizarConsultasBean.filtroStatus}" value="todas" />
+						<f:ajax execute="@this"
+							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+							listener="#{visualizarConsultasBean.filtrar}" />
+					</h:commandButton>
+
+					<h:commandButton value="Pendentes"
+						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'pendente' ? 'active' : ''}">
+						<f:setPropertyActionListener
+							target="#{visualizarConsultasBean.filtroStatus}" value="pendente" />
+						<f:ajax execute="@this"
+							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+							listener="#{visualizarConsultasBean.filtrar}" />
+					</h:commandButton>
+
+					<h:commandButton value="Realizadas"
+						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'realizada' ? 'active' : ''}">
+						<f:setPropertyActionListener
+							target="#{visualizarConsultasBean.filtroStatus}"
+							value="realizada" />
+						<f:ajax execute="@this"
+							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+							listener="#{visualizarConsultasBean.filtrar}" />
+					</h:commandButton>
+
+					<h:commandButton value="Canceladas"
+						styleClass="filter-tab #{visualizarConsultasBean.filtroStatus == 'cancelada' ? 'active' : ''}">
+						<f:setPropertyActionListener
+							target="#{visualizarConsultasBean.filtroStatus}"
+							value="cancelada" />
+						<f:ajax execute="@this"
+							render="listaConsultasGroup formVisualizarConsultas:filtroTexto mensagens"
+							listener="#{visualizarConsultasBean.filtrar}" />
+					</h:commandButton>
+					<h:link outcome="/views/pacientes/agendarConsulta"
+						styleClass="btn-nova">
+						<i class="fas fa-plus"></i> Nova Consulta
+					</h:link>
+				</div>
+			</div>
+
+			<h:panelGroup id="listaConsultasGroup" layout="block">
+
+				<h:panelGroup
+					rendered="#{empty visualizarConsultasBean.consultasFiltradas}"
+					layout="block" styleClass="empty-state">
+					<div class="empty-icon">
+						<i class="fas fa-calendar-times"
+							style="font-size: 32px; color: var(--vittae-purple);"></i>
+					</div>
+					<h3 class="empty-title">Nenhuma consulta encontrada</h3>
+					<h:outputText
+						value="Você não possui agendamentos para os critérios selecionados."
+						styleClass="empty-text" />
+				</h:panelGroup>
+
+				<h:panelGroup
+					rendered="#{not empty visualizarConsultasBean.consultasFiltradas}"
+					layout="block">
+					<ui:repeat value="#{visualizarConsultasBean.consultasFiltradas}"
+						var="consulta">
+
+						<h:panelGroup layout="block"
+							styleClass="consulta-card #{consulta.status.toString() == 'CANCELADA' ? 'consulta-cancelada' : ''}">
+
+							<div class="card-header">
+								<h:panelGroup layout="block" styleClass="doctor-info">
+									<div class="avatar">
+										<i class="fas fa-user-md"></i>
+									</div>
+									<h:panelGroup layout="block">
+										<div class="doctor-name">
+											<h:outputText value="#{consulta.nomeMedico}" />
+										</div>
+										<div class="doctor-specialty">
+											<i class="fas fa-stethoscope"></i>
+											<h:outputText value="#{consulta.especialidade}" />
+										</div>
+										<div class="paciente-nome">
+											<i class="fas fa-user"></i>
+											<h:outputText value="#{consulta.nomePaciente}" />
+										</div>
+									</h:panelGroup>
+								</h:panelGroup>
+
+								<h:panelGroup layout="block"
+									styleClass="badge badge-#{consulta.status.toString().toLowerCase()}">
+									<div class="badge-dot"></div>
+									<h:outputText value="#{consulta.status}" />
+								</h:panelGroup>
+							</div>
+
+							<div class="card-divider"></div>
+
+							<div class="card-details">
+								<div class="detail-item">
+									<span class="detail-label"><i
+										class="fas fa-calendar-day"></i> Data</span>
+									<h:outputText value="#{consulta.dataConsulta}"
+										styleClass="detail-value">
+										<f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</div>
+								<div class="detail-item">
+									<span class="detail-label"><i class="fas fa-clock"></i> Horário</span>
+									<h:outputText value="#{consulta.hora}"
+										styleClass="detail-value">
+										<f:convertDateTime type="localTime" pattern="HH:mm" />
+									</h:outputText>
+								</div>
+								<div class="detail-item">
+									<span class="detail-label"><i
+										class="fas fa-money-bill-wave"></i> Valor</span>
+									<h:outputText value="#{consulta.valorConsulta}"
+										styleClass="detail-value price">
+										<f:convertNumber type="currency" currencySymbol="R$ "
+											locale="pt_BR" />
+									</h:outputText>
+								</div>
+							</div>
+
+							<div class="card-actions">
+								<h:commandButton value="Remarcar" styleClass="btn btn-remarcar"
+								    rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}"
+								    onclick="abrirModalRemarcar(#{consulta.id}, #{consulta.medicoId}); return false;" />
+
+								<h:commandButton value="Cancelar" styleClass="btn btn-cancel"
+									rendered="#{consulta.status.toString() ne 'CANCELADA' and consulta.status.toString() ne 'REALIZADA'}">
+									<f:ajax execute="@this" render="@form"
+										listener="#{visualizarConsultasBean.prepararCancelamentoAction(consulta.id)}" />
+								</h:commandButton>
+							</div>
+
+						</h:panelGroup>
+					</ui:repeat>
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<h:panelGroup id="modalCancelamento" layout="block"
+				style="display:contents">
+				<div class="modal-overlay"
+					style="#{visualizarConsultasBean.exibirModalCancelamento ? 'display:flex' : 'display:none'}">
+					<div class="modal-box">
+						<div class="modal-icon">
+							<i class="fas fa-exclamation-triangle"></i>
+						</div>
+						<h3 class="modal-title">Cancelar Consulta</h3>
+						<p class="modal-text">Tem certeza que deseja cancelar esta consulta?</p>
+						<div class="modal-actions">
+							<h:commandButton value="Voltar" styleClass="btn btn-secondary">
+								<f:ajax execute="@this" render="@form"
+									listener="#{visualizarConsultasBean.fecharModal}" />
+							</h:commandButton>
+							<h:commandButton value="Sim, cancelar"
+								styleClass="btn btn-confirmar-cancel">
+								<f:ajax execute="@this" render="@form"
+									listener="#{visualizarConsultasBean.confirmarCancelamento}" />
+							</h:commandButton>
+						</div>
+					</div>
+				</div>
+			</h:panelGroup>
+		</h:form>
+		
+		<div id="remarcarOverlay" style="display:none; position:fixed; inset:0;
+		     background:rgba(0,0,0,0.55); z-index:9999;
+		     align-items:center; justify-content:center;">
+		
+		    <div style="background:#fff; border-radius:16px; padding:28px;
+		                width:90%; max-width:600px; max-height:90vh; overflow-y:auto;
+		                box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+		
+		        <div style="text-align:center; margin-bottom:20px">
+		            <div style="font-size:36px; color:#7c3aed">&#128197;</div>
+		            <h3 style="margin:8px 0 4px; color:#1e1b4b">Remarcar Consulta</h3>
+		            <p style="color:#6b7280; margin:0">Escolha a nova data e horário</p>
+		        </div>
+		
+		        <div style="display:flex; gap:20px; flex-wrap:wrap">
+		            <div style="flex:1; min-width:220px">
+		                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+		                    <button type="button" onclick="navegarMesRemarcar(-1)"
+		                        style="background:none; border:1px solid #e5e7eb; border-radius:6px;
+		                               padding:4px 10px; cursor:pointer; font-size:16px; color:#4b5563">&#8249;</button>
+		                    <span id="remarcarCalTitulo" style="font-weight:600; color:#1e1b4b"></span>
+		                    <button type="button" onclick="navegarMesRemarcar(1)"
+		                        style="background:none; border:1px solid #e5e7eb; border-radius:6px;
+		                               padding:4px 10px; cursor:pointer; font-size:16px; color:#4b5563">&#8250;</button>
+		                </div>
+		                <div id="remarcarCalGrid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px"></div>
+		                <div style="margin-top:8px; display:flex; gap:12px; font-size:12px; color:#6b7280">
+		                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#059669;margin-right:4px"></span>Disponível</span>
+		                    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7c3aed;margin-right:4px"></span>Selecionado</span>
+		                </div>
+		            </div>
+		
+		            <div style="flex:1; min-width:180px">
+		                <p id="remarcarHorariosSub"
+		                   style="font-size:13px; color:#6b7280; margin:0 0 10px">
+		                    Selecione uma data no calendário
+		                </p>
+		                <div id="remarcarHorariosGrid"
+		                     style="display:flex; flex-wrap:wrap; gap:8px">
+		                    <div class="rc-horarios-empty">&#128197; Selecione uma data</div>
+		                </div>
+		            </div>
+		        </div>
+		
+		        <p id="remarcarErro"
+		           style="display:none; color:#dc2626; font-size:13px; margin:12px 0 0; text-align:center">
+		            &#9888; Selecione data e horário antes de confirmar
+		        </p>
+		
+		        <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px">
+		            <button type="button" onclick="fecharModalRemarcar()"
+		                style="padding:10px 20px; border:1px solid #e5e7eb; border-radius:8px;
+		                       background:#fff; color:#374151; cursor:pointer; font-size:14px">
+		                Voltar
+		            </button>
+		            <button type="button" id="btnConfirmarRemarcar" onclick="confirmarRemarcarJS()"
+		                style="padding:10px 24px; border:none; border-radius:8px;
+		                       background:#7c3aed; color:#fff; cursor:pointer; font-size:14px; font-weight:600">
+		                Confirmar Remarcação
+		            </button>
+		        </div>
+		
+		    </div>
+		</div>			
+		
+		<script>
+			window.API_BASE_URL = 'http://localhost:9090';
+			window.TOKEN_SESSAO_VITTAE = "#{usuarioLogadoBean.token}";
+		</script>
+		<h:outputScript library="js" name="visualizar.js" />
+		<h:outputScript library="js" name="remarcar.js" />
+	</ui:define>
+</ui:composition>

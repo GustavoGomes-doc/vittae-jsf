@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml">
+
+        <ui:define name="titulo">Admin | Pacientes</ui:define>
+
+        <ui:define name="corpo">
+
+            <h:form id="formPacientes">
+
+                <div class="page-header">
+                    <h1><i class="fas fa-users"></i> Pacientes</h1>
+                    <p class="page-subtitle">Visualize todos os pacientes cadastrados no sistema</p>
+                </div>
+
+                <div class="filtros-container card">
+                    <div class="filtros-row">
+                        <div class="filtro-grupo">
+                            <label for="filtroNomePaciente">Buscar</label>
+                            <h:inputText id="filtroNomePaciente"
+                                         value="#{pacientesAdminBean.filtroTexto}"
+                                         styleClass="input-field"
+                                         placeholder="Nome, CPF ou e-mail...">
+                                <f:ajax event="keyup" render="tabelaPacientes contadorPacientes" delay="300"/>
+                            </h:inputText>
+                        </div>
+
+                        <div class="filtro-grupo filtro-btn">
+                            <h:commandLink styleClass="btn btn-secondary" style="height:36px; padding: 0 1rem;">
+                                <i class="fas fa-eraser"></i> Limpar filtros
+                                <f:ajax listener="#{pacientesAdminBean.limparFiltros}"
+                                        execute="@form"
+                                        render="tabelaPacientes contadorPacientes filtroNomePaciente"/>
+                            </h:commandLink>
+                        </div>
+                    </div>
+                </div>
+
+                <h:panelGroup id="contadorPacientes" layout="block" styleClass="contador-resultados">
+                    <i class="fas fa-list"></i>
+                    <h:outputText value=" #{pacientesAdminBean.pacientesFiltrados.size()} paciente(s) encontrado(s)"/>
+                </h:panelGroup>
+
+                <h:messages id="mensagemPaciente" styleClass="mensagem-feedback"
+                            errorClass="mensagem-erro" infoClass="mensagem-sucesso"/>
+
+                <div class="card">
+                    <h:dataTable id="tabelaPacientes"
+                                 value="#{pacientesAdminBean.pacientesFiltrados}"
+                                 var="paciente"
+                                 styleClass="tabela-dados"
+                                 headerClass="tabela-header"
+                                 rowClasses="tabela-linha-par,tabela-linha-impar">
+
+                        <h:column>
+                            <f:facet name="header">Nome</f:facet>
+                            <h:outputText value="#{paciente.nome}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">CPF</f:facet>
+                            <h:outputText value="#{paciente.cpf}"/>
+                        </h:column>                  
+
+                        <h:column>
+                            <f:facet name="header">Telefone</f:facet>
+                            <h:outputText value="#{paciente.telefone}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Data de Nascimento</f:facet>
+                            <h:outputText value="#{paciente.dataNascimento}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Consultas</f:facet>
+                            <h:outputText value="#{paciente.qtdConsultas}"/>
+                        </h:column>
+
+                        <h:column>
+                            <f:facet name="header">Ações</f:facet>
+                            <div class="acoes-cell">
+                                <h:commandLink styleClass="btn btn-sm btn-info"
+                                               action="#{pacientesAdminBean.verDetalhes(paciente)}"
+                                               update="painelDetalhesPaciente"
+                                               oncomplete="document.getElementById('modalDetalhesPaciente').style.display='flex'">
+                                    <i class="fas fa-eye"></i>
+                                </h:commandLink>
+
+                                <h:commandLink styleClass="btn btn-sm btn-secondary"
+                                               action="#{pacientesAdminBean.verHistorico(paciente)}"
+                                               update="painelHistorico contadorHistorico"
+                                               oncomplete="document.getElementById('modalHistorico').style.display='flex'">
+                                    <i class="fas fa-history"></i>
+                                </h:commandLink>
+
+                                <h:commandLink styleClass="btn btn-sm btn-danger"
+								               onclick="return confirm('Excluir este paciente? Esta ação não pode ser desfeita.')"
+								               action="#{pacientesAdminBean.excluirPaciente(paciente)}"
+								               update="tabelaPacientes contadorPacientes mensagemPaciente">
+								    <i class="fas fa-trash"></i>
+								</h:commandLink>
+                            </div>
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty pacientesAdminBean.pacientesFiltrados}" styleClass="empty-state">
+                        <div class="emptyicon"><i class="fas fa-users"></i></div>
+                        <p>Nenhum paciente encontrado.</p>
+                    </h:panelGroup>
+                </div>
+
+                <div id="modalDetalhesPaciente" class="modal-overlay" style="display:none;"
+                     onclick="if(event.target===this) this.style.display='none'">
+                    <div class="modal-box">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-user"></i> Dados do Paciente</h2>
+                            <button class="modal-fechar"
+                                    onclick="document.getElementById('modalDetalhesPaciente').style.display='none'">
+                                <i class="fas fa-times"/>
+                            </button>
+                        </div>
+                        <div id="painelDetalhesPaciente" class="modal-body">
+                            <h:panelGroup rendered="#{not empty pacientesAdminBean.pacienteSelecionado}">
+                                <div class="detalhe-grid">
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Nome</span>
+                                        <span class="detalhe-valor">#{pacientesAdminBean.pacienteSelecionado.nome}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">CPF</span>
+                                        <span class="detalhe-valor">#{pacientesAdminBean.pacienteSelecionado.cpf}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Telefone</span>
+                                        <span class="detalhe-valor">#{pacientesAdminBean.pacienteSelecionado.telefone}</span>
+                                    </div>
+                                    <div class="detalhe-item">
+                                        <span class="detalhe-label">Data de Nascimento</span>
+                                        <span class="detalhe-valor">#{pacientesAdminBean.pacienteSelecionado.dataNascimento}</span>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modalHistorico" class="modal-overlay" style="display:none;"
+                     onclick="if(event.target===this) this.style.display='none'">
+                    <div class="modal-box modal-box-largo">
+                        <div class="modal-header">
+                            <h2>
+                                <i class="fas fa-history"></i> Histórico —
+                                <h:outputText value="#{pacientesAdminBean.pacienteSelecionado.nome}"/>
+                            </h2>
+                            <button class="modal-fechar"
+                                    onclick="document.getElementById('modalHistorico').style.display='none'">
+                                <i class="fas fa-times"/>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:panelGroup id="contadorHistorico" layout="block" styleClass="contador-resultados">
+                                <h:outputText value="#{pacientesAdminBean.consultasDoPaciente.size()} consulta(s)"/>
+                            </h:panelGroup>
+
+                            <h:panelGroup id="painelHistorico" layout="block">
+                                <h:dataTable value="#{pacientesAdminBean.consultasDoPaciente}"
+                                             var="c"
+                                             styleClass="tabela-dados"
+                                             headerClass="tabela-header"
+                                             rowClasses="tabela-linha-par,tabela-linha-impar">
+
+                                    <h:column>
+                                        <f:facet name="header">Data</f:facet>
+                                        <h:outputText value="#{c.dataConsulta}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Hora</f:facet>
+                                        <h:outputText value="#{c.hora}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Médico</f:facet>
+                                        <h:outputText value="#{c.nomeMedico}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Especialidade</f:facet>
+                                        <h:outputText value="#{c.especialidade}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Status</f:facet>
+                                        <h:outputText value="#{c.status}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">Valor</f:facet>
+                                        <h:outputText value="#{c.valorConsulta}">
+                                            <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                                        </h:outputText>
+                                    </h:column>
+                                </h:dataTable>
+
+                                <h:panelGroup rendered="#{empty pacientesAdminBean.consultasDoPaciente}"
+                                              styleClass="empty-state">
+                                    <div class="emptyicon"><i class="fas fa-calendar-times"></i></div>
+                                    <p>Este paciente ainda não possui consultas.</p>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>           
+
+            </h:form>
+            
+
+        </ui:define>
+
+    </ui:composition>
+</html>
