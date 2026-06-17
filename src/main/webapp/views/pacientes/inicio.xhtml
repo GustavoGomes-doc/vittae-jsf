@@ -3,7 +3,7 @@
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-	
+
 	<ui:define name="css_extra">
 		<h:outputStylesheet library="css" name="paciente.css" />
 	</ui:define>
@@ -14,15 +14,15 @@
 		<h:form id="formDashboard">
 
 			<div class="welcome-banner">
-   			 	<div class="welcome-text">
-			        <h1>Olá, <h:outputText value="#{inicioPacienteBean.primeiroNome}" />!</h1>
-			       <p>Hoje é <h:outputText value="#{inicioPacienteBean.dataAtual}">
-    			<f:convertDateTime pattern="EEEE, dd 'de' MMMM" locale="pt_BR" timeZone="America/Sao_Paulo"/>
-				</h:outputText> — Como você está se sentindo?</p>
-    			</div>
-			    <div class="welcome-icon">
-			        <i class="fas fa-stethoscope"></i>
-			    </div>
+				<div class="welcome-text">
+					<h1>Olá, <h:outputText value="#{inicioPacienteBean.primeiroNome}" />!</h1>
+					<p>Hoje é <h:outputText value="#{inicioPacienteBean.dataAtual}">
+						<f:convertDateTime pattern="EEEE, dd 'de' MMMM" locale="pt_BR" timeZone="America/Sao_Paulo"/>
+					</h:outputText> — Como você está se sentindo?</p>
+				</div>
+				<div class="welcome-icon">
+					<i class="fas fa-stethoscope"></i>
+				</div>
 			</div>
 
 			<div class="dashboard-grid">
@@ -30,32 +30,25 @@
 				<div class="dash-card">
 					<h2 class="dash-card-title">Sua Próxima Consulta</h2>
 
-					<h:panelGroup
-						rendered="#{not empty inicioPacienteBean.proximaConsulta}">
+					<h:panelGroup rendered="#{not empty inicioPacienteBean.proximaConsulta}">
 						<div class="appointment-box-dash">
 							<div class="apt-date">
-								<span class="day"> <h:outputText
-										value="#{inicioPacienteBean.proximaConsulta.dataHora}">
-										<f:convertDateTime pattern="dd/MM"
-											timeZone="America/Sao_Paulo" />
+								<span class="day">
+									<h:outputText value="#{inicioPacienteBean.proximaConsulta.dataConsulta}">
+										<f:convertDateTime pattern="dd/MM" type="localDate" />
 									</h:outputText>
-								</span> <span class="time"> <h:outputText
-										value="#{inicioPacienteBean.proximaConsulta.dataHora}">
-										<f:convertDateTime pattern="HH:mm"
-											timeZone="America/Sao_Paulo" />
+								</span>
+								<span class="time">
+									<h:outputText value="#{inicioPacienteBean.proximaConsulta.hora}">
+										<f:convertDateTime pattern="HH:mm" type="localTime" />
 									</h:outputText>
 								</span>
 							</div>
 
 							<div class="apt-details">
-								<h3>
-									Dr(a).
-									<h:outputText
-										value="#{inicioPacienteBean.proximaConsulta.medico.nome}" />
-								</h3>
+								<h3>Dr(a). <h:outputText value="#{inicioPacienteBean.proximaConsulta.nomeMedico}" /></h3>
 								<p>
-									<h:outputText
-										value="#{inicioPacienteBean.proximaConsulta.medico.especialidade}" />
+									<h:outputText value="#{inicioPacienteBean.proximaConsulta.especialidade}" />
 									- Presencial
 								</p>
 							</div>
@@ -72,8 +65,7 @@
 						</div>
 					</h:panelGroup>
 
-					<h:panelGroup
-						rendered="#{empty inicioPacienteBean.proximaConsulta}">
+					<h:panelGroup rendered="#{empty inicioPacienteBean.proximaConsulta}">
 						<div class="empty-state">
 							<i class="far fa-calendar-times"
 								style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px; display: block;"></i>
@@ -88,38 +80,30 @@
 				<div class="dash-card">
 					<h2 class="dash-card-title">Ações Rápidas</h2>
 					<div class="quick-actions">
-
-						<h:commandLink action="agendarConsulta?faces-redirect=true"
-							styleClass="action-btn">
+						<h:commandLink action="agendarConsulta?faces-redirect=true" styleClass="action-btn">
 							<span class="icon"><i class="far fa-calendar-plus"></i></span>
 							<span>Agendar Consulta</span>
 						</h:commandLink>
-
-						<h:commandLink action="visualizarConsultas?faces-redirect=true"
-							styleClass="action-btn">
+						<h:commandLink action="visualizarConsultas?faces-redirect=true" styleClass="action-btn">
 							<span class="icon"><i class="fas fa-history"></i></span>
 							<span>Meu Histórico</span>
 						</h:commandLink>
-
 					</div>
 				</div>
 
 				<div class="dash-card">
 					<h2 class="dash-card-title">Última Consulta</h2>
 
-					<h:panelGroup
-						rendered="#{not empty inicioPacienteBean.ultimaConsulta}">
+					<h:panelGroup rendered="#{not empty inicioPacienteBean.ultimaConsulta}">
 						<div style="padding: 10px 0;">
 							<p style="color: #2d3748; font-size: 15px; margin-bottom: 5px;">
-								Sua última visita foi com <strong>Dr(a). <h:outputText
-										value="#{inicioPacienteBean.ultimaConsulta.medico.nome}" /></strong>.
+								Sua última visita foi com <strong>Dr(a).
+								<h:outputText value="#{inicioPacienteBean.ultimaConsulta.nomeMedico}" /></strong>.
 							</p>
 							<p style="color: #718096; font-size: 14px; margin-bottom: 20px;">
 								<i class="fas fa-stethoscope" style="margin-right: 5px;"></i>
-								<h:outputText
-									value="#{inicioPacienteBean.ultimaConsulta.medico.especialidade}" />
+								<h:outputText value="#{inicioPacienteBean.ultimaConsulta.especialidade}" />
 							</p>
-
 							<h:commandLink value="Agendar Retorno"
 								action="#{inicioPacienteBean.agendarRetorno(inicioPacienteBean.ultimaConsulta)}"
 								styleClass="btn-primary-dash"
@@ -140,10 +124,8 @@
 					style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); color: white; border: none;">
 					<h2 class="dash-card-title"
 						style="color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
-						<i class="fas fa-lightbulb"
-							style="margin-right: 8px; color: #fde047;"></i> Dica Vittae
+						<i class="fas fa-lightbulb" style="margin-right: 8px; color: #fde047;"></i> Dica Vittae
 					</h2>
-
 					<div style="text-align: center; padding: 15px 0;">
 						<i class="fas fa-heartbeat"
 							style="font-size: 45px; margin-bottom: 20px; color: #f3f4f6;"></i>
@@ -155,9 +137,9 @@
 
 			</div>
 		</h:form>
-		
+
 		<script>
-			window.API_BASE_URL = 'http://44.197.126.129:8080/vittae';
+		window.API_BASE_URL = 'http://44.197.126.129:8080/vittae'
 		</script>
 	</ui:define>
 </ui:composition>

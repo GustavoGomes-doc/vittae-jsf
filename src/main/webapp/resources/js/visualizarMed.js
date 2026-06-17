@@ -179,7 +179,7 @@ function gerarPDF() {
 
     // ── Marca como REALIZADA via botão JSF oculto ─────────────────────────
     if (_dadosConsulta.status !== 'REALIZADA' && _dadosConsulta.status !== 'CANCELADA') {
-        var hidden = document.getElementById('formConsultasMeico:idConsultaRealizar');
+        var hidden = document.getElementById('formConsultasMedico:idConsultaRealizar');
         var btn = document.querySelector('.btn-realizar-oculto');
         console.log('hidden:', hidden, 'btn:', btn);
         if (hidden && btn) {
