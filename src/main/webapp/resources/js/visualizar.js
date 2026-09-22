@@ -18,8 +18,11 @@ function aplicarFiltros() {
     var visiveis = 0;
 
     cards.forEach(function(card) {
-        var status = card.getAttribute('data-status');
-        var medico = (card.getAttribute('data-medico') + ' ' + card.getAttribute('data-especialidade')).toLowerCase();
+        var status = (card.getAttribute('data-status') || '').toUpperCase();
+        var medico = (
+            (card.getAttribute('data-medico') || '') + ' ' +
+            (card.getAttribute('data-especialidade') || '')
+        ).toLowerCase();
 
         var okStatus = (filtroAtivo === 'todas') ||
             (filtroAtivo === 'pendente'  && status === 'PENDENTE') ||
@@ -27,7 +30,7 @@ function aplicarFiltros() {
             (filtroAtivo === 'cancelada' && status === 'CANCELADA');
 
         var okTexto = textoBusca === '' || medico.indexOf(textoBusca) !== -1;
-        
+
         if (okStatus && okTexto) {
             card.style.display = '';
             visiveis++;
@@ -36,9 +39,9 @@ function aplicarFiltros() {
         }
     });
 
-    document.getElementById('count-num').textContent = visiveis;
+    var countEl = document.getElementById('count-num');
+    if (countEl) countEl.textContent = visiveis;
 
-    // Gerenciamento do Empty State
     var empty = document.getElementById('empty-state');
     if (visiveis === 0) {
         if (!empty) {
@@ -51,7 +54,8 @@ function aplicarFiltros() {
                 '</div>' +
                 '<p class="empty-title">Nenhuma consulta encontrada</p>' +
                 '<p class="empty-text">Tente ajustar os filtros ou a busca</p>';
-            document.getElementById('lista-consultas').appendChild(div);
+            var lista = document.getElementById('lista-consultas');
+            if (lista) lista.appendChild(div);
         }
     } else if (empty) {
         empty.remove();
@@ -60,21 +64,30 @@ function aplicarFiltros() {
 
 function cancelarConsulta(id) {
     if (confirm('Deseja realmente cancelar esta consulta?')) {
+
+        var token = window.TOKEN_SESSAO_VITTAE || '';
+        if (!token || token.indexOf('#{') === 0) {
+            token = sessionStorage.getItem('token_vittae') || localStorage.getItem('token_vittae') ||
+                    sessionStorage.getItem('token')        || localStorage.getItem('token') || '';
+        }
+
         fetch(window.API_BASE_URL + '/api/agendamentos/' + id + '/cancelar', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
         })
         .then(function(response) {
             if (response.ok) {
-                // Esconde o card visualmente
                 var cards = document.querySelectorAll('.consulta-card');
                 cards.forEach(function(card) {
                     if (card.getAttribute('data-id') == id) {
-                        card.style.display = 'none';
+                        card.setAttribute('data-status', 'CANCELADA');
+                        card.style.display = '';
                     }
                 });
                 alert('Consulta cancelada com sucesso!');
-                // Atualiza o contador de consultas visíveis após o cancelamento
                 aplicarFiltros();
             } else {
                 alert('Erro ao cancelar consulta.');
